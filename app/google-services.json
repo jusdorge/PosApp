@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "584734497865",
+    "firebase_url": "https://shop-64a8b-default-rtdb.firebaseio.com",
+    "project_id": "shop-64a8b",
+    "storage_bucket": "shop-64a8b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584734497865:android:14aa8e8fd334578ba8b398",
+        "android_client_info": {
+          "package_name": "com.example.posapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVcYwuG2EZ80M61e2W3jke80QB_TWmrns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

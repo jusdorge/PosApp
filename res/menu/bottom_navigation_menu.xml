@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_reports"
+        android:title="التقارير"
+        android:icon="@drawable/ic_reports" />
+    <item
+        android:id="@+id/nav_today"
+        android:title="اليوم"
+        android:icon="@drawable/ic_today" />
+    <item
+        android:id="@+id/nav_counter"
+        android:title="عداد"
+        android:icon="@drawable/ic_counter"
+        android:checked="true" />
+    <item
+        android:id="@+id/nav_items"
+        android:title="العناصر"
+        android:icon="@drawable/ic_items" />
+    <item
+        android:id="@+id/nav_more"
+        android:title="المزيد"
+        android:icon="@drawable/ic_more" />
+</menu> 

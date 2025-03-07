@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.posapp.MainActivity">
+    
+    <item
+        android:id="@+id/action_manage_customers"
+        android:icon="@drawable/ic_customers"
+        android:title="إدارة الزبائن"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_manage_products"
+        android:icon="@drawable/ic_products"
+        android:title="إدارة المنتجات"
+        app:showAsAction="ifRoom" />
+        
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+</menu>

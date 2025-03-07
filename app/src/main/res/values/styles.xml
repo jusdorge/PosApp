@@ -1,0 +1,12 @@
+<resources>
+    <!-- نمط أساسي بألوان Facebook -->
+    <style name="AppTheme.Facebook" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:textColorPrimary">@color/colorText</item>
+        <item name="android:textColorSecondary">@color/colorSecondaryText</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+    </style>
+</resources> 

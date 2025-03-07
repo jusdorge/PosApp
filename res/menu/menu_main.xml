@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_add_product"
+        android:icon="@drawable/ic_add_product"
+        android:title="إدارة المنتج"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom" />
+        
+    <item
+        android:id="@+id/action_settings"
+        android:title="الإعدادات"
+        android:orderInCategory="200"
+        app:showAsAction="never" />
+</menu> 

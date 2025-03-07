@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">PosApp</string>
+    <string name="inventoryManagement">إدارة المنتج</string>
+    <string name="settings">الإعدادات</string>
+    <string name="reports">التقارير</string>
+    <string name="today">اليوم</string>
+    <string name="counter">عداد</string>
+    <string name="items">العناصر</string>
+    <string name="more">المزيد</string>
+    <string name="counterMenu">عداد</string>
+    <string name="reportsMenu">التقارير</string>
+    <string name="todayMenu">اليوم</string>
+    <string name="itemsMenu">العناصر</string>
+    <string name="moreMenu">المزيد</string>
+    <string name="action_settings">الإعدادات</string>
+    <string name="currency_symbol">دج</string>
+</resources>
