@@ -14,19 +14,22 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.posapp.model.Customer;
 import com.example.posapp.model.InvoiceItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoiceItemDeleteListener, EditInvoiceItemDialog.OnItemUpdatedListener {
-    
+    private static TextView invoiceCustomerTextView;
     private RecyclerView invoiceItemsRecyclerView;
     private TextView totalPriceTextView;
     private Button checkoutButton;
     private InvoiceAdapter invoiceAdapter;
     private static List<InvoiceItem> invoiceItems = new ArrayList<>();
     private double totalPrice = 0.0;
+
+    private static Customer currentCustomer;
 
     @Nullable
     @Override
@@ -37,6 +40,10 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         invoiceItemsRecyclerView = view.findViewById(R.id.invoiceItemsRecyclerView);
         totalPriceTextView = view.findViewById(R.id.totalPriceTextView);
         checkoutButton = view.findViewById(R.id.checkoutButton);
+        invoiceCustomerTextView = view.findViewById(R.id.invoiceCustomerTextView);
+        if (currentCustomer != null) {
+            invoiceCustomerTextView.setText("الزبون: " + currentCustomer.getName());
+        }
 
         // إعداد محول الفاتورة
         invoiceAdapter = new InvoiceAdapter(invoiceItems, this);
@@ -125,6 +132,11 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         // إذا لم يكن المنتج موجودًا، أضفه
         if (!found) {
             invoiceItems.add(item);
+        }
+    }
+    public static void setCustomer(Customer customer) {
+        if (customer != null) {
+            currentCustomer = customer;
         }
     }
 

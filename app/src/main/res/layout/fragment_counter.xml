@@ -20,17 +20,36 @@
             android:textSize="24sp"
             android:textStyle="bold" />
     </LinearLayout>
-
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:padding="8dp"
-        android:text="الفاتورة الحالية"
-        android:textColor="@color/colorWhite"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:orientation="horizontal"
+        android:padding="16dp">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="8dp"
+                android:text="الفاتورة الحالية"
+                android:layout_weight="1"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/invoiceCustomerTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:padding="8dp"
+                android:text="الزبون:مجهول"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+    </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/invoiceItemsRecyclerView"
         android:layout_width="match_parent"

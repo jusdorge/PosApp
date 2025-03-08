@@ -51,9 +51,9 @@ public class CheckoutDialog extends DialogFragment {
     private static TextInputEditText customerNameEditText;
     private static TextInputEditText phoneNumberEditText;
 
-    public static void setCustomer(Customer currentCustomer) {
-        customerNameEditText.setText(currentCustomer.getName());
-        phoneNumberEditText.setText(currentCustomer.getPhone());
+    private static Customer currentCustomer;
+    public static void setCustomer(Customer newCurrentCustomer) {
+        currentCustomer = newCurrentCustomer;
     }
 
     public interface OnInvoiceCompletedListener {
@@ -88,7 +88,11 @@ public class CheckoutDialog extends DialogFragment {
         Button cancelButton = view.findViewById(R.id.cancelButton);
         Button confirmButton = view.findViewById(R.id.confirmButton);
         ImageButton contactPickerButton = view.findViewById(R.id.contactPickerButton);
-        
+
+        if (currentCustomer != null) {
+            customerNameEditText.setText(currentCustomer.getName());
+            phoneNumberEditText.setText(currentCustomer.getPhone());
+        }
         // عرض المجموع
         totalAmountTextView.setText(String.format("%.2f ريال", totalAmount));
         

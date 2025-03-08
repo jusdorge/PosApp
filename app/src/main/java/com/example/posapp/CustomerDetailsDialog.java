@@ -208,13 +208,14 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     }
     
     private void selectCustomerForInvoice() {
-        currentCustomer=new Customer();
-        currentCustomer.setId(customerId);
-        currentCustomer.setName(customerNameTextView.getText().toString());
-        currentCustomer.setPhone(customerPhoneTextView.getText().toString());
+        Customer newCurrentCustomer=new Customer();
+        newCurrentCustomer.setId(customerId);
+        newCurrentCustomer.setName(customerNameTextView.getText().toString());
+        newCurrentCustomer.setPhone(customerPhoneTextView.getText().toString());
+        CounterFragment.setCustomer(newCurrentCustomer);
+        CheckoutDialog.setCustomer(newCurrentCustomer);
 
-        CheckoutDialog.setCustomer(currentCustomer);
-        Toast.makeText(getContext(), "تم اختيار الزبون للفاتورة", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "تم اختيار الزبون للفاتورة"+customerNameTextView.getText(), Toast.LENGTH_SHORT).show();
         dismiss();
     }
 } 
