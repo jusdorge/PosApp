@@ -1,9 +1,11 @@
 package com.example.posapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,80 +29,76 @@ public class ReportsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reports, container, false);
 
-        // ربط TextView لعرض الأرباح
-        TextView profitDisplayTextView = view.findViewById(R.id.profitDisplayTextView);
+        // ربط TextViews لعرض البيانات
+        TextView lowStockTextView = view.findViewById(R.id.lowStockTextView);
+        TextView remainingStockTextView = view.findViewById(R.id.remainingStockTextView);
+        TextView totalSalesTextView = view.findViewById(R.id.totalSalesTextView);
+        TextView dailyProfitTextView = view.findViewById(R.id.dailyProfitTextView);
+        TextView topStocksTextView = view.findViewById(R.id.topStocksTextView);
+        TextView topCategoryTextView = view.findViewById(R.id.topCategoryTextView);
+        TextView totalReceiptCountTextView = view.findViewById(R.id.totalReceiptCountTextView);
+        TextView topCustomerTextView = view.findViewById(R.id.topCustomerTextView);
+        ImageView profitDetailsIcon = view.findViewById(R.id.profitDetailsIcon);
 
         // تهيئة Firestore
         db = FirebaseFirestore.getInstance();
 
-        // عرض الأرباح اليومية عند تحميل الصفحة
-        showDailyProfits(profitDisplayTextView);
+        // إعداد مستمع للأيقونة للتنقل إلى صفحة تفاصيل الأرباح
+        profitDetailsIcon.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), ProfitDetailsActivity.class);
+            startActivity(intent);
+        });
+
+        // جلب البيانات وعرضها
+        fetchLowStockInventory(lowStockTextView);
+        fetchRemainingStock(remainingStockTextView);
+        fetchTotalSales(totalSalesTextView);
+        fetchDailyProfit(dailyProfitTextView);
+        fetchTopStocks(topStocksTextView);
+        fetchTopCategory(topCategoryTextView);
+        fetchTotalReceiptCount(totalReceiptCountTextView);
+        fetchTopCustomer(topCustomerTextView);
 
         return view;
     }
 
-    private void showDailyProfits(TextView profitDisplayTextView) {
-        // الحصول على تاريخ اليوم
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date todayStart = calendar.getTime();
-
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        Date todayEnd = calendar.getTime();
-
-        // جلب الفواتير من Firestore
-        db.collection("invoices")
-            .whereGreaterThanOrEqualTo("date", todayStart)
-            .whereLessThan("date", todayEnd)
-            .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                double totalProfit = 0.0;
-                for (Invoice invoice : queryDocumentSnapshots.toObjects(Invoice.class)) {
-                    double profit = invoice.getTotalAmount() - calculateCost(invoice);
-                    totalProfit += profit;
-                }
-                profitDisplayTextView.setText(String.format("الأرباح اليومية: %.2f دج", totalProfit));
-            })
-            .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "فشل في جلب البيانات: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+    private void fetchLowStockInventory(TextView textView) {
+        // منطق جلب وعرض المخزون المنخفض
+        textView.setText("Low Stock Inventory: ...");
     }
 
-    private double calculateCost(Invoice invoice) {
-        // حساب التكلفة الإجمالية للفاتورة
-        double totalCost = 0.0;
-        if (invoice.getItems() != null) {
-            for (InvoiceItem item : invoice.getItems()) {
-                // نفترض أن لديك طريقة للحصول على تكلفة المنتج
-                double costPrice = getProductCostPrice(item.getProductId());
-                totalCost += costPrice * item.getQuantity();
-            }
-        }
-        return totalCost;
+    private void fetchRemainingStock(TextView textView) {
+        // منطق جلب وعرض المخزون المتبقي
+        textView.setText("Remaining Stock: ...");
     }
 
-    private double getProductCostPrice(String productId) {
-        // جلب تكلفة المنتج من قاعدة البيانات
-        final double[] costPrice = {0.0}; // استخدام مصفوفة لتخزين القيمة بسبب القيود على المتغيرات النهائية في Java
+    private void fetchTotalSales(TextView textView) {
+        // منطق جلب وعرض مجموع المبيعات
+        textView.setText("Total Sales: ...");
+    }
 
-        db.collection("products")
-            .document(productId)
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    Double cost = documentSnapshot.getDouble("costPrice");
-                    if (cost != null) {
-                        costPrice[0] = cost;
-                    }
-                }
-            })
-            .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "فشل في جلب تكلفة المنتج: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+    private void fetchDailyProfit(TextView textView) {
+        // منطق جلب وعرض الأرباح اليومية
+        textView.setText("Daily Profit: ...");
+    }
 
-        return costPrice[0];
+    private void fetchTopStocks(TextView textView) {
+        // منطق جلب وعرض أفضل المنتجات
+        textView.setText("Top Stocks: ...");
+    }
+
+    private void fetchTopCategory(TextView textView) {
+        // منطق جلب وعرض أفضل فئة
+        textView.setText("Top Category: ...");
+    }
+
+    private void fetchTotalReceiptCount(TextView textView) {
+        // منطق جلب وعرض عدد الفواتير الكلي
+        textView.setText("Total Receipt Count: ...");
+    }
+
+    private void fetchTopCustomer(TextView textView) {
+        // منطق جلب وعرض أفضل زبون
+        textView.setText("Top Customer: ...");
     }
 }

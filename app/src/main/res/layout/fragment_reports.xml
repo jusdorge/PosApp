@@ -1,18 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- TextView لعرض الأرباح اليومية -->
-    <TextView
-        android:id="@+id/profitDisplayTextView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="عرض الأرباح هنا"
-        android:textSize="18sp"
-        android:gravity="center"
-        android:layout_marginTop="16dp" />
+        android:orientation="vertical">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/dailyProfitTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Daily Profit: ..."
+                android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/profitDetailsIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:contentDescription="عرض تفاصيل الأرباح"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lowStockTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Low Stock Inventory: ..."
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/remainingStockTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remaining Stock: ..."
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/totalSalesTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total Sales: ..."
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/topStocksTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Top Stocks: ..."
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/topCategoryTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Top Category: ..."
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/totalReceiptCountTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total Receipt Count: ..."
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/topCustomerTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Top Customer: ..."
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+    </LinearLayout>
+</ScrollView>
