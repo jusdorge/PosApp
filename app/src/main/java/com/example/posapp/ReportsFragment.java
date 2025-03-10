@@ -34,30 +34,30 @@ public class ReportsFragment extends Fragment {
         TextView remainingStockTextView = view.findViewById(R.id.remainingStockTextView);
         TextView totalSalesTextView = view.findViewById(R.id.totalSalesTextView);
         TextView dailyProfitTextView = view.findViewById(R.id.dailyProfitTextView);
-        TextView topStocksTextView = view.findViewById(R.id.topStocksTextView);
-        TextView topCategoryTextView = view.findViewById(R.id.topCategoryTextView);
-        TextView totalReceiptCountTextView = view.findViewById(R.id.totalReceiptCountTextView);
-        TextView topCustomerTextView = view.findViewById(R.id.topCustomerTextView);
-        ImageView profitDetailsIcon = view.findViewById(R.id.profitDetailsIcon);
+//        TextView topStocksTextView = view.findViewById(R.id.topStocksTextView);
+//        TextView topCategoryTextView = view.findViewById(R.id.topCategoryTextView);
+//        TextView totalReceiptCountTextView = view.findViewById(R.id.totalReceiptCountTextView);
+//        TextView topCustomerTextView = view.findViewById(R.id.topCustomerTextView);
+//        ImageView profitDetailsIcon = view.findViewById(R.id.profitDetailsIcon);
 
         // تهيئة Firestore
         db = FirebaseFirestore.getInstance();
 
-        // إعداد مستمع للأيقونة للتنقل إلى صفحة تفاصيل الأرباح
-        profitDetailsIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), ProfitDetailsActivity.class);
-            startActivity(intent);
-        });
+//        // إعداد مستمع للأيقونة للتنقل إلى صفحة تفاصيل الأرباح
+//        profitDetailsIcon.setOnClickListener(v -> {
+//            Intent intent = new Intent(getContext(), ProfitDetailsActivity.class);
+//            startActivity(intent);
+//        });
 
         // جلب البيانات وعرضها
         fetchLowStockInventory(lowStockTextView);
         fetchRemainingStock(remainingStockTextView);
         fetchTotalSales(totalSalesTextView);
         fetchDailyProfit(dailyProfitTextView);
-        fetchTopStocks(topStocksTextView);
-        fetchTopCategory(topCategoryTextView);
-        fetchTotalReceiptCount(totalReceiptCountTextView);
-        fetchTopCustomer(topCustomerTextView);
+//        fetchTopStocks(topStocksTextView);
+//        fetchTopCategory(topCategoryTextView);
+//        fetchTotalReceiptCount(totalReceiptCountTextView);
+//        fetchTopCustomer(topCustomerTextView);
 
         return view;
     }

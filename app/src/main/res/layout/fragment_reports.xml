@@ -2,92 +2,186 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#F5F5F5">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Low Stock Inventory Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/lowStockTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LOW STOCK INVENTORY"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Couscous Blé Dur Snobar = -15.0"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="18sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="19 More Inventory are low"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Remaining Stocks Section -->
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/remainingStockTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REMAINING STOCKS"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Maruja 150g"
+                android:textColor="@android:color/holo_green_dark"
+                android:textSize="18sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+37 other items with available stock"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Date and Navigation Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
+            android:background="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="2dp">
+
+            <Button
+                android:id="@+id/previousDayButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="←"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/dateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Today: 10 Mar"
+                android:textSize="18sp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
+
+            <Button
+                android:id="@+id/nextDayButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="→"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <!-- Total Sales Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/totalSalesTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TOTAL SALES"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DA2,53,270.00"
+                android:textColor="@android:color/holo_blue_dark"
+                android:textSize="18sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DA66,020.00 is Highest"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Profits Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:padding="16dp"
+            android:elevation="2dp">
 
             <TextView
                 android:id="@+id/dailyProfitTextView"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Daily Profit: ..."
-                android:textSize="18sp" />
+                android:text="PROFITS"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
 
-            <ImageView
-                android:id="@+id/profitDetailsIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_info_details"
-                android:contentDescription="عرض تفاصيل الأرباح"
-                android:layout_marginStart="8dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DA19,454.00"
+                android:textColor="@android:color/holo_blue_dark"
+                android:textSize="18sp"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DA6,314.00 is Highest"
+                android:textColor="@android:color/darker_gray"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/lowStockTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Low Stock Inventory: ..."
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/remainingStockTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Remaining Stock: ..."
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/totalSalesTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Total Sales: ..."
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/topStocksTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Top Stocks: ..."
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/topCategoryTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Top Category: ..."
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/totalReceiptCountTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Total Receipt Count: ..."
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/topCustomerTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Top Customer: ..."
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
 
     </LinearLayout>
 </ScrollView>

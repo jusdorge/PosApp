@@ -37,6 +37,11 @@
             android:name=".EditProductActivity"
             android:label="تعديل المنتج"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ProfitDetailsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_profit_details">
+        </activity>
     </application>
 
 </manifest>

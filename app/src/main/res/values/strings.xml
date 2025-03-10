@@ -14,4 +14,5 @@
     <string name="moreMenu">المزيد</string>
     <string name="action_settings">الإعدادات</string>
     <string name="currency_symbol">دج</string>
+    <string name="title_activity_profit_details">عرض الأرباح</string>
 </resources>
