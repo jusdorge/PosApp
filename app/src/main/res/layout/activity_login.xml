@@ -28,4 +28,10 @@
         android:layout_height="wrap_content"
         android:text="تسجيل الدخول"
         android:background="@drawable/button_background"/>
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/googleSignInButton"
+        android:text="تسجيل الدخول باستخدام جوجل"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"/>
 </LinearLayout>

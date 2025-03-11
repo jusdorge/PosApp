@@ -31,14 +31,15 @@ android {
 
 dependencies {
     // Firebase
-    implementation platform('com.google.firebase:firebase-bom:33.10.0')
-    implementation 'com.google.firebase:firebase-firestore'
-    implementation 'com.google.firebase:firebase-analytics'
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.firestore
+    implementation libs.firebase.analytics
+    implementation libs.google.firebase.auth
     
     // google play services auth
-    implementation 'com.google.android.gms:play-services-auth:21.3.0'
+    implementation libs.play.services.auth
 
-    implementation 'com.google.android.gms:play-services-maps:19.1.0'
+    implementation libs.play.services.maps
 
     implementation libs.appcompat
     implementation libs.material

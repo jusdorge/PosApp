@@ -13,7 +13,12 @@
           "package_name": "com.example.posapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBVcYwuG2EZ80M61e2W3jke80QB_TWmrns"
@@ -21,7 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
