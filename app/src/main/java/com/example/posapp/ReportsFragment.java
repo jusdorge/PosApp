@@ -23,8 +23,8 @@ public class ReportsFragment extends Fragment {
         // ربط TextViews لعرض البيانات
         TextView lowStockTextView = view.findViewById(R.id.lowStockTextView);
         TextView remainingStockTextView = view.findViewById(R.id.remainingStockTextView);
-        TextView totalSalesTextView = view.findViewById(R.id.totalSalesTextView);
-        TextView dailyProfitTextView = view.findViewById(R.id.dailyProfitTextView);
+//        TextView totalSalesTextView = view.findViewById(R.id.totalSalesTextView);
+//        TextView dailyProfitTextView = view.findViewById(R.id.dailyProfitTextView);
 //        TextView topStocksTextView = view.findViewById(R.id.topStocksTextView);
 //        TextView topCategoryTextView = view.findViewById(R.id.topCategoryTextView);
 //        TextView totalReceiptCountTextView = view.findViewById(R.id.totalReceiptCountTextView);
@@ -43,12 +43,6 @@ public class ReportsFragment extends Fragment {
         // جلب البيانات وعرضها
         fetchLowStockInventory(lowStockTextView);
         fetchRemainingStock(remainingStockTextView);
-        fetchTotalSales(totalSalesTextView);
-        fetchDailyProfit(dailyProfitTextView);
-//        fetchTopStocks(topStocksTextView);
-//        fetchTopCategory(topCategoryTextView);
-//        fetchTotalReceiptCount(totalReceiptCountTextView);
-//        fetchTopCustomer(topCustomerTextView);
 
         return view;
     }
