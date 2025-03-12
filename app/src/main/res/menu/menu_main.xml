@@ -8,13 +8,13 @@
         android:id="@+id/action_manage_customers"
         android:icon="@drawable/ic_customers"
         android:title="إدارة الزبائن"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     
     <item
         android:id="@+id/action_manage_products"
         android:icon="@drawable/ic_products"
         android:title="إدارة المنتجات"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
         
     <item
         android:id="@+id/action_settings"
