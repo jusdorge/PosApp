@@ -25,5 +25,5 @@
         android:id="@+id/action_logout"
         android:icon="@drawable/ic_logout"
         android:title="تسجيل الخروج"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 </menu>

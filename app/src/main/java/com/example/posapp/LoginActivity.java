@@ -1,7 +1,10 @@
 package com.example.posapp;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -57,8 +60,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signInWithGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        try {
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        } catch (Exception e) {
+            Log.e(TAG, "Google Sign In failed", e);
+            Toast.makeText(this, "فشل في تسجيل الدخول: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -69,9 +77,10 @@ public class LoginActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
+                Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
-                e.printStackTrace();
+                Log.w(TAG, "Google sign in failed", e);
                 Toast.makeText(this,"فشل تسجيل الدخول باستخدام Google: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
             }
