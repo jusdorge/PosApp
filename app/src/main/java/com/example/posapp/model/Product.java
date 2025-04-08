@@ -4,7 +4,7 @@ public class Product {
     private String id;
     private String name;
     private String category;      // فئة المنتج
-    private double sellingPrice;  // سعر البيع
+    private double defaultPrice;  // سعر البيع
     private double costPrice;     // سعر الشراء
     private int quantity;         // الكمية الحالية
     private int minQuantity;      // الحد الأدنى للمخزون
@@ -15,12 +15,12 @@ public class Product {
         // Empty constructor needed for Firestore
     }
     
-    public Product(String id, String name, String category, double sellingPrice, 
+    public Product(String id, String name, String category, double defaultPrice,
                   double costPrice, int quantity, int minQuantity, String barcode, String imageUrl) {
         this.id = id;
         this.name = name;
         this.category = category;
-        this.sellingPrice = sellingPrice;
+        this.defaultPrice = defaultPrice;
         this.costPrice = costPrice;
         this.quantity = quantity;
         this.minQuantity = minQuantity;
@@ -38,8 +38,8 @@ public class Product {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
     
-    public double getSellingPrice() { return sellingPrice; }
-    public void setSellingPrice(double sellingPrice) { this.sellingPrice = sellingPrice; }
+    public double getDefaultPrice() { return defaultPrice; }
+    public void setDefaultPrice(double sellingPrice) { this.defaultPrice = sellingPrice; }
     
     public double getCostPrice() { return costPrice; }
     public void setCostPrice(double costPrice) { this.costPrice = costPrice; }
@@ -58,7 +58,7 @@ public class Product {
     
     // حساب الربح للوحدة
     public double getUnitProfit() {
-        return sellingPrice - costPrice;
+        return defaultPrice - costPrice;
     }
     
     // التحقق من حالة المخزون
