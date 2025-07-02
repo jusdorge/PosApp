@@ -97,7 +97,7 @@ public class EditProductActivity extends AppCompatActivity {
         productNameEditText.setText(currentProduct.getName());
         barcodeEditText.setText(currentProduct.getBarcode());
         costPriceEditText.setText(String.valueOf(currentProduct.getCostPrice()));
-        sellingPriceEditText.setText(String.valueOf(currentProduct.getSellingPrice()));
+        sellingPriceEditText.setText(String.valueOf(currentProduct.getDefaultPrice()));
         quantityEditText.setText(String.valueOf(currentProduct.getQuantity()));
         
         if (currentProduct.getCategory() != null) {
@@ -170,7 +170,7 @@ public class EditProductActivity extends AppCompatActivity {
         currentProduct.setName(name);
         currentProduct.setBarcode(barcode);
         currentProduct.setCostPrice(costPrice);
-        currentProduct.setSellingPrice(sellingPrice);
+        currentProduct.setDefaultPrice(sellingPrice);
         currentProduct.setQuantity(quantity);
         currentProduct.setCategory(category);
 

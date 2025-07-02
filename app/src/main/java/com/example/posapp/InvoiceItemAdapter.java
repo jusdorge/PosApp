@@ -72,7 +72,7 @@ public class InvoiceItemAdapter extends RecyclerView.Adapter<InvoiceItemAdapter.
 
         void bindProduct(Product product) {
             productNameText.setText(product.getName());
-            productPriceText.setText("السعر: " + product.getSellingPrice() + " ريال");
+            productPriceText.setText("السعر: " + product.getDefaultPrice() + " ريال");
             productCategoryText.setText(product.getCategory());
             
             decreaseQuantityButton.setOnClickListener(v -> {

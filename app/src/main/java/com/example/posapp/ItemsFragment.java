@@ -121,7 +121,7 @@ public class ItemsFragment extends Fragment implements InvoiceItemAdapter.OnProd
         InvoiceItem invoiceItem = new InvoiceItem(
                 product.getId(),
                 product.getName(),
-                product.getSellingPrice(),
+                product.getDefaultPrice(),
                 quantity
         );
         
