@@ -18,4 +18,5 @@
     <string name="navigation_drawer_open">فتح القائمة</string>
     <string name="navigation_drawer_close">إغلاق القائمة</string>
     <string name="title_Selected_Customer_Location">تحديد موقع العميل</string>
+    <string name="saveLocation">حفظ الموقع</string>
 </resources>
