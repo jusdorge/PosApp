@@ -11,6 +11,8 @@ public class Customer implements Serializable {
     private String phone;
     private double totalDebt;
     private List<CustomerDebt> debts;
+    private double latitude;
+    private double longitude;
     
     // Empty constructor needed for Firestore
     public Customer() {
@@ -45,4 +47,10 @@ public class Customer implements Serializable {
     
     public List<CustomerDebt> getDebts() { return debts; }
     public void setDebts(List<CustomerDebt> debts) { this.debts = debts; }
+    
+    public double getLatitude() { return latitude; }
+    public void setLatitude(double latitude) { this.latitude = latitude; }
+    
+    public double getLongitude() { return longitude; }
+    public void setLongitude(double longitude) { this.longitude = longitude; }
 } 

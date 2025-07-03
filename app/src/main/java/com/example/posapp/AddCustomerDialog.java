@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,13 +30,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class AddCustomerDialog extends DialogFragment {
     private static final int CONTACT_PERMISSION_CODE = 1001;
     private static final int CONTACT_PICK_CODE = 1002;
+    private static final int LOCATION_PICK_CODE = 2001;
     
     private TextInputEditText customerNameEditText;
     private TextInputEditText phoneNumberEditText;
     private ImageButton contactPickerButton;
+    private Button btnSelectLocation;
+    private TextView tvSelectedLocation;
     private OnCustomerAddedListener listener;
 
     private FirebaseFirestore db;
+    private Double latitude = null;
+    private Double longitude = null;
 
     public interface OnCustomerAddedListener {
         void onCustomerAdded(Customer customer);
@@ -59,6 +65,8 @@ public class AddCustomerDialog extends DialogFragment {
         contactPickerButton = view.findViewById(R.id.contactPickerButton);
         Button cancelButton = view.findViewById(R.id.cancelButton);
         Button saveButton = view.findViewById(R.id.saveButton);
+        btnSelectLocation = view.findViewById(R.id.btn_select_location);
+        tvSelectedLocation = view.findViewById(R.id.tv_selected_location);
 
         builder.setView(view);
         AlertDialog dialog = builder.create();
@@ -72,6 +80,11 @@ public class AddCustomerDialog extends DialogFragment {
                 // طلب صلاحية الوصول إلى جهات الاتصال
                 requestContactPermission();
             }
+        });
+
+        btnSelectLocation.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SelectCustomerLocationActivity.class);
+            startActivityForResult(intent, LOCATION_PICK_CODE);
         });
 
         cancelButton.setOnClickListener(v -> dismiss());
@@ -100,6 +113,10 @@ public class AddCustomerDialog extends DialogFragment {
                     } else {
                         // إضافة زبون جديد
                         Customer customer = new Customer(name, phone);
+                        if (latitude != null && longitude != null) {
+                            customer.setLatitude(latitude);
+                            customer.setLongitude(longitude);
+                        }
                         
                         db.collection("customers")
                             .add(customer)
@@ -186,6 +203,12 @@ public class AddCustomerDialog extends DialogFragment {
                 
                 cursor.close();
             }
+        }
+
+        if (requestCode == LOCATION_PICK_CODE && resultCode == requireActivity().RESULT_OK && data != null) {
+            latitude = data.getDoubleExtra("latitude", 0);
+            longitude = data.getDoubleExtra("longitude", 0);
+            tvSelectedLocation.setText("الموقع: " + latitude + ", " + longitude);
         }
     }
 } 

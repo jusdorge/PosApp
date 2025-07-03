@@ -6,28 +6,65 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private ActionBarDrawerToggle drawerToggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // تهيئة Firebase Auth
-         mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         // إعداد Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false); // إخفاء العنوان الافتراضي
+
+        // إعداد DrawerLayout و NavigationView
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+        drawerToggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+
+        // مستمع لعناصر القائمة الجانبية
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.action_home) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CounterFragment()).commit();
+                } else if (id == R.id.action_manage_customers) {
+                    navigateToCustomersManagement();
+                } else if (id == R.id.action_manage_products) {
+                    navigateToProductsManagement();
+                } else if (id == R.id.action_logout) {
+                    logoutUser();
+                } else if (id == R.id.action_select_customer_location) {
+                    showSelectCustomerLocationPage();
+                }
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
@@ -72,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle != null && drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
@@ -121,5 +161,19 @@ public class MainActivity extends AppCompatActivity {
     public void switchToCounterFragment() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.nav_counter);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        if (drawerToggle != null) {
+            drawerToggle.syncState();
+        }
+    }
+
+    // صفحة اختيار الموقع الجغرافي للعميل
+    private void showSelectCustomerLocationPage() {
+        Intent intent = new Intent(this, SelectCustomerLocationActivity.class);
+        startActivity(intent);
     }
 }

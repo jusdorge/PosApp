@@ -61,6 +61,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="الموقع: "
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_customer_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="غير محدد"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_show_location_on_map"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="عرض على الخريطة"
+            android:textColor="@color/colorWhite"
+            android:backgroundTint="@color/colorPrimary" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginBottom="16dp">
 
         <TextView

@@ -5,6 +5,12 @@
     tools:context="com.example.posapp.MainActivity">
     
     <item
+        android:id="@+id/action_home"
+        android:icon="@drawable/ic_counter"
+        android:title="الرئيسية"
+        app:showAsAction="never" />
+    
+    <item
         android:id="@+id/action_manage_customers"
         android:icon="@drawable/ic_customers"
         android:title="إدارة الزبائن"
@@ -26,5 +32,10 @@
         android:id="@+id/action_logout"
         android:icon="@drawable/ic_logout"
         android:title="تسجيل الخروج"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_select_customer_location"
+        android:icon="@drawable/ic_menu_add"
+        android:title="تحديد موقع العميل"
         app:showAsAction="never" />
 </menu>

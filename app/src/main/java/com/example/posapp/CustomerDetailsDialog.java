@@ -1,6 +1,7 @@
 package com.example.posapp;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,10 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     private Button closeButton;
     private Button addPaymentButton;
     private Button selectCustomerButton;
+    private TextView tvCustomerLocation;
+    private Button btnShowLocationOnMap;
+    private Double latitude = null;
+    private Double longitude = null;
     
     private FirebaseFirestore db;
     private String customerId;
@@ -80,6 +85,8 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         selectCustomerButton = view.findViewById(R.id.selectCustomerButton);
         closeButton = view.findViewById(R.id.closeButton);
         addPaymentButton = view.findViewById(R.id.addPaymentButton);
+        tvCustomerLocation = view.findViewById(R.id.tv_customer_location);
+        btnShowLocationOnMap = view.findViewById(R.id.btn_show_location_on_map);
         
         debtsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         invoicesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -87,6 +94,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         selectCustomerButton.setOnClickListener(v -> selectCustomerForInvoice());
         closeButton.setOnClickListener(v -> dismiss());
         addPaymentButton.setOnClickListener(v -> showAddPaymentDialog());
+        btnShowLocationOnMap.setOnClickListener(v -> showLocationOnMap());
         
         builder.setView(view);
         
@@ -127,6 +135,16 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         customerNameTextView.setText(customer.getName());
         customerPhoneTextView.setText(customer.getPhone());
         totalDebtTextView.setText(String.format("%.2f دج", customer.getTotalDebt()));
+        
+        latitude = customer.getLatitude();
+        longitude = customer.getLongitude();
+        if (latitude != 0 && longitude != 0) {
+            tvCustomerLocation.setText(latitude + ", " + longitude);
+            btnShowLocationOnMap.setEnabled(true);
+        } else {
+            tvCustomerLocation.setText("غير محدد");
+            btnShowLocationOnMap.setEnabled(false);
+        }
         
         // تفعيل/تعطيل زر الدفع بناءً على وجود ديون
         addPaymentButton.setEnabled(customer.getTotalDebt() > 0);
@@ -217,5 +235,15 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
 
         Toast.makeText(getContext(), "تم اختيار الزبون للفاتورة"+customerNameTextView.getText(), Toast.LENGTH_SHORT).show();
         dismiss();
+    }
+    
+    private void showLocationOnMap() {
+        if (latitude != null && longitude != null && latitude != 0 && longitude != 0) {
+            Intent intent = new Intent(getActivity(), SelectCustomerLocationActivity.class);
+            intent.putExtra("latitude", latitude);
+            intent.putExtra("longitude", longitude);
+            intent.putExtra("view_only", true);
+            startActivity(intent);
+        }
     }
 } 

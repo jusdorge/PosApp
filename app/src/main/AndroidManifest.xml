@@ -52,6 +52,11 @@
             android:exported="false"
             android:label="@string/title_activity_profit_details">
         </activity>
+        <activity
+            android:name=".SelectCustomerLocationActivity"
+            android:exported="false"
+            android:label="@string/title_Selected_Customer_Location">
+        </activity>
     </application>
 
 </manifest>
