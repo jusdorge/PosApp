@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
+    private BottomNavigationView bottomNavigationView;
 
     // للحفاظ على الFragments وتجنب إعادة إنشائها
     private final FragmentManager fragmentManager = getSupportFragmentManager();
@@ -32,7 +34,12 @@ public class MainActivity extends AppCompatActivity {
     private Fragment todayFragment = new TodayFragment();
     private Fragment reportsFragment = new ReportsFragment();
     private Fragment moreFragment = new MoreFragment();
+    private Fragment customersFragment = null; // سيتم إنشاؤها عند الحاجة
+    private Fragment productsManagementFragment = null; // سيتم إنشاؤها عند الحاجة
     private Fragment activeFragment = counterFragment;
+
+    // متغير لتتبع ما إذا كنا في شاشة من القائمة الجانبية
+    private boolean isInDrawerFragment = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +63,19 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+        // الحصول على مرجع لـ BottomNavigationView
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+
         // مستمع لعناصر القائمة الجانبية
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.action_home) {
+                    // العودة إلى الشاشة الرئيسية
+                    isInDrawerFragment = false;
                     switchToFragment(counterFragment);
-                    BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-                    bottomNav.setSelectedItemId(R.id.nav_counter);
+                    bottomNavigationView.setSelectedItemId(R.id.nav_counter);
                 } else if (id == R.id.action_manage_customers) {
                     navigateToCustomersManagement();
                 } else if (id == R.id.action_manage_products) {
@@ -78,8 +89,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // إعداد BottomNavigationView
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            // إذا كنا في شاشة من القائمة الجانبية، نعود أولاً إلى الـ Fragments الأساسية
+            if (isInDrawerFragment) {
+                isInDrawerFragment = false;
+            }
+
             Fragment selectedFragment = null;
 
             switch (item.getItemId()) {
@@ -107,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        // إضافة جميع الFragments مع إخفائها (ما عدا CounterFragment)
+        // إضافة جميع الFragments الأساسية مع إخفائها (ما عدا CounterFragment)
         fragmentManager.beginTransaction()
                 .add(R.id.fragment_container, moreFragment, "5").hide(moreFragment)
                 .add(R.id.fragment_container, itemsFragment, "4").hide(itemsFragment)
@@ -119,10 +134,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchToFragment(Fragment fragment) {
         if (activeFragment != fragment) {
-            fragmentManager.beginTransaction()
-                    .hide(activeFragment)
-                    .show(fragment)
-                    .commit();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+            // إخفاء الـ Fragment النشط الحالي
+            transaction.hide(activeFragment);
+
+            // إذا كان الـ Fragment المطلوب غير مضاف بعد، أضفه
+            if (!fragment.isAdded()) {
+                transaction.add(R.id.fragment_container, fragment);
+            }
+
+            // إظهار الـ Fragment المطلوب
+            transaction.show(fragment);
+
+            transaction.commit();
             activeFragment = fragment;
         }
     }
@@ -168,21 +193,75 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateToCustomersManagement() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new CustomersFragment())
-                .addToBackStack(null)
-                .commit();
+        // إنشاء Fragment إدارة الزبائن إذا لم يكن موجوداً
+        if (customersFragment == null) {
+            customersFragment = new CustomersFragment();
+        }
+
+        isInDrawerFragment = true;
+
+        // استخدام نفس آلية show/hide
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // إخفاء جميع الـ Fragments
+        transaction.hide(activeFragment);
+
+        // إضافة أو إظهار Fragment إدارة الزبائن
+        if (!customersFragment.isAdded()) {
+            transaction.add(R.id.fragment_container, customersFragment, "customers");
+        } else {
+            transaction.show(customersFragment);
+        }
+
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        activeFragment = customersFragment;
+
+        // إلغاء تحديد عناصر Bottom Navigation
+        bottomNavigationView.getMenu().setGroupCheckable(0, true, false);
+        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setChecked(false);
+        }
+        bottomNavigationView.getMenu().setGroupCheckable(0, true, true);
     }
 
     private void navigateToProductsManagement() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new ProductsManagementFragment())
-                .addToBackStack(null)
-                .commit();
+        // إنشاء Fragment إدارة المنتجات إذا لم يكن موجوداً
+        if (productsManagementFragment == null) {
+            productsManagementFragment = new ProductsManagementFragment();
+        }
+
+        isInDrawerFragment = true;
+
+        // استخدام نفس آلية show/hide
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // إخفاء جميع الـ Fragments
+        transaction.hide(activeFragment);
+
+        // إضافة أو إظهار Fragment إدارة المنتجات
+        if (!productsManagementFragment.isAdded()) {
+            transaction.add(R.id.fragment_container, productsManagementFragment, "products");
+        } else {
+            transaction.show(productsManagementFragment);
+        }
+
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        activeFragment = productsManagementFragment;
+
+        // إلغاء تحديد عناصر Bottom Navigation
+        bottomNavigationView.getMenu().setGroupCheckable(0, true, false);
+        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setChecked(false);
+        }
+        bottomNavigationView.getMenu().setGroupCheckable(0, true, true);
     }
 
     public void switchToCounterFragment() {
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        isInDrawerFragment = false;
         bottomNavigationView.setSelectedItemId(R.id.nav_counter);
     }
 
@@ -200,6 +279,23 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawers();
         } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             getSupportFragmentManager().popBackStack();
+
+            // إذا كنا نعود من شاشة القائمة الجانبية
+            if (isInDrawerFragment) {
+                isInDrawerFragment = false;
+                // إعادة تحديد العنصر المناسب في Bottom Navigation
+                if (activeFragment == counterFragment) {
+                    bottomNavigationView.setSelectedItemId(R.id.nav_counter);
+                } else if (activeFragment == itemsFragment) {
+                    bottomNavigationView.setSelectedItemId(R.id.nav_items);
+                } else if (activeFragment == todayFragment) {
+                    bottomNavigationView.setSelectedItemId(R.id.nav_today);
+                } else if (activeFragment == reportsFragment) {
+                    bottomNavigationView.setSelectedItemId(R.id.nav_reports);
+                } else if (activeFragment == moreFragment) {
+                    bottomNavigationView.setSelectedItemId(R.id.nav_more);
+                }
+            }
         } else if (activeFragment != counterFragment) {
             switchToCounterFragment();
         } else {
