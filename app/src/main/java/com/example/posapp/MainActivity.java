@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -23,6 +24,15 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
+    private BottomNavigationView bottomNavigationView;
+
+    // للحفاظ على الفragments وتجنب إعادة إنشائها
+    private Fragment counterFragment;
+    private Fragment itemsFragment;
+    private Fragment todayFragment;
+    private Fragment reportsFragment;
+    private Fragment moreFragment;
+    private Fragment activeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,74 +41,108 @@ public class MainActivity extends AppCompatActivity {
 
         // تهيئة Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
         // إعداد Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false); // إخفاء العنوان الافتراضي
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // إعداد DrawerLayout و NavigationView
+        setupDrawer(toolbar);
+
+        // إعداد Bottom Navigation
+        setupBottomNavigation();
+
+        // تهيئة الFragments
+        initializeFragments();
+    }
+
+    private void setupDrawer(Toolbar toolbar) {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
+
         drawerToggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
-        // مستمع لعناصر القائمة الجانبية
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.action_home) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CounterFragment()).commit();
-                } else if (id == R.id.action_manage_customers) {
-                    navigateToCustomersManagement();
-                } else if (id == R.id.action_manage_products) {
-                    navigateToProductsManagement();
-                } else if (id == R.id.action_logout) {
-                    logoutUser();
-                } else if (id == R.id.action_select_customer_location) {
-                    showSelectCustomerLocationPage();
-                }
-                drawerLayout.closeDrawers();
-                return true;
-            }
-        });
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            boolean handled = false;
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+            if (id == R.id.action_home) {
+                switchFragment(counterFragment);
+                bottomNavigationView.setSelectedItemId(R.id.nav_counter);
+                handled = true;
+            } else if (id == R.id.action_manage_customers) {
+                navigateToCustomersManagement();
+                handled = true;
+            } else if (id == R.id.action_manage_products) {
+                navigateToProductsManagement();
+                handled = true;
+            } else if (id == R.id.action_logout) {
+                logoutUser();
+                handled = true;
+            }
+
+            drawerLayout.closeDrawers();
+            return handled;
+        });
+    }
+
+    private void setupBottomNavigation() {
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
-            
             switch (item.getItemId()) {
                 case R.id.nav_reports:
-                    selectedFragment = new ReportsFragment();
-                    break;
+                    switchFragment(reportsFragment);
+                    return true;
                 case R.id.nav_today:
-                    selectedFragment = new TodayFragment();
-                    break;
+                    switchFragment(todayFragment);
+                    return true;
                 case R.id.nav_counter:
-                    selectedFragment = new CounterFragment();
-                    break;
+                    switchFragment(counterFragment);
+                    return true;
                 case R.id.nav_items:
-                    selectedFragment = new ItemsFragment();
-                    break;
+                    switchFragment(itemsFragment);
+                    return true;
                 case R.id.nav_more:
-                    selectedFragment = new MoreFragment();
-                    break;
+                    switchFragment(moreFragment);
+                    return true;
             }
-            
-            if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, selectedFragment)
-                    .commit();
-            }
-            
-            return true;
+            return false;
         });
+    }
 
-        // Load the default fragment (CounterFragment)
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new CounterFragment()).commit();
+    private void initializeFragments() {
+        // إنشاء الFragments مرة واحدة فقط
+        counterFragment = new CounterFragment();
+        itemsFragment = new ItemsFragment();
+        todayFragment = new TodayFragment();
+        reportsFragment = new ReportsFragment();
+        moreFragment = new MoreFragment();
+
+        // إضافة جميع الFragments مع إخفائها
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, moreFragment, "more").hide(moreFragment)
+                .add(R.id.fragment_container, reportsFragment, "reports").hide(reportsFragment)
+                .add(R.id.fragment_container, todayFragment, "today").hide(todayFragment)
+                .add(R.id.fragment_container, itemsFragment, "items").hide(itemsFragment)
+                .add(R.id.fragment_container, counterFragment, "counter")
+                .commit();
+
+        activeFragment = counterFragment;
+    }
+
+    private void switchFragment(Fragment fragment) {
+        if (fragment != activeFragment) {
+            getSupportFragmentManager().beginTransaction()
+                    .hide(activeFragment)
+                    .show(fragment)
+                    .commit();
+            activeFragment = fragment;
+        }
     }
 
     @Override
@@ -112,9 +156,10 @@ public class MainActivity extends AppCompatActivity {
         if (drawerToggle != null && drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        int id = item.getItemId();
 
+        int id = item.getItemId();
         if (id == R.id.action_settings) {
+            // فتح شاشة الإعدادات
             return true;
         } else if (id == R.id.action_manage_customers) {
             navigateToCustomersManagement();
@@ -122,22 +167,19 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.action_manage_products) {
             navigateToProductsManagement();
             return true;
-        }else if (id == R.id.action_logout) {
-            // هنا يمكنك إضافة منطق تسجيل الخروج
+        } else if (id == R.id.action_logout) {
             logoutUser();
             return true;
         }
-
-         // إذا لم يتم التعامل مع الخيار، استدعاء الدالة الأصلية
 
         return super.onOptionsItemSelected(item);
     }
 
     private void logoutUser() {
-        mAuth.signOut(); // تسجيل الخروج من Firebase
+        mAuth.signOut();
         GoogleSignIn.getClient(this, new GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()).signOut(); // تسجيل الخروج من Google Sign-In
-        // منطق تسجيل الخروج، مثل مسح بيانات المستخدم أو الانتقال إلى شاشة تسجيل الدخول
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()).signOut();
+
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -145,21 +187,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateToCustomersManagement() {
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.fragment_container, new CustomersFragment())
-            .addToBackStack(null)
-            .commit();
+        // استخدام replace بدلاً من add لتجنب تكديس الFragments
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out,
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+        );
+        transaction.replace(R.id.fragment_container, new CustomersFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     private void navigateToProductsManagement() {
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.fragment_container, new ProductsManagementFragment())
-            .addToBackStack(null)
-            .commit();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out,
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+        );
+        transaction.replace(R.id.fragment_container, new ProductsManagementFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     public void switchToCounterFragment() {
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.nav_counter);
     }
 
@@ -171,9 +225,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // صفحة اختيار الموقع الجغرافي للعميل
-    private void showSelectCustomerLocationPage() {
-        Intent intent = new Intent(this, SelectCustomerLocationActivity.class);
-        startActivity(intent);
+    @Override
+    public void onBackPressed() {
+        // التعامل مع زر الرجوع بشكل أفضل
+        if (drawerLayout.isDrawerOpen(navigationView)) {
+            drawerLayout.closeDrawers();
+        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+        } else if (activeFragment != counterFragment) {
+            switchToCounterFragment();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
