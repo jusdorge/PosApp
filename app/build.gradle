@@ -38,8 +38,10 @@ dependencies {
 
     // Google Play Services
     implementation libs.play.services.auth
-    implementation libs.play.services.maps
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+
+    // OpenStreetMap
+    implementation 'org.osmdroid:osmdroid-android:6.1.17'
 
     // Android Core Dependencies
     implementation libs.appcompat

@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:hardwareAccelerated="true"
@@ -63,11 +64,6 @@
             android:name=".SelectCustomerLocationActivity"
             android:exported="false"
             android:label="@string/title_Selected_Customer_Location" />
-
-        <!-- مفتاح Google Maps API -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_MAPS_API_KEY_HERE" />
     </application>
 
 </manifest>

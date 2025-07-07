@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- خريطة OpenStreetMap -->
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- زر الموقع الحالي -->
+    <Button
+        android:id="@+id/btn_current_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="موقعي الحالي"
+        android:drawableStart="@android:drawable/ic_menu_mylocation"
+        android:drawablePadding="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorWhite"
+        android:textColor="@color/colorPrimary"
+        android:elevation="4dp" />
+
+    <!-- مؤشر التحميل -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <!-- زر حفظ الموقع -->
+    <Button
+        android:id="@+id/btn_save_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="حفظ الموقع"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/colorWhite"
+        android:enabled="false"
+        android:elevation="4dp" />
+
+    <!-- رسالة توضيحية -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="انقر على الخريطة لتحديد موقع العميل"
+        android:textAlignment="center"
+        android:background="#99000000"
+        android:textColor="@color/colorWhite"
+        android:padding="8dp"
+        android:layout_above="@id/btn_save_location"
+        android:layout_marginBottom="16dp" />
+
+</RelativeLayout>
