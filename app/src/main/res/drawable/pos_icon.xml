@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- خلفية دائرية -->
+    <path
+        android:fillColor="#1877F2"
+        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0"/>
+
+    <!-- أيقونة نقطة البيع -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,35h48v30h-48z"/>
+
+    <path
+        android:fillColor="#1877F2"
+        android:pathData="M34,39h40v22h-40z"/>
+
+    <!-- شاشة -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,41h36v8h-36z"/>
+
+    <!-- أزرار -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,52h7v3h-7z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M47,52h7v3h-7z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M56,52h7v3h-7z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M65,52h7v3h-7z"/>
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,57h7v3h-7z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M47,57h7v3h-7z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M56,57h7v3h-7z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M65,57h7v3h-7z"/>
+
+    <!-- قاعدة -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M46,65h16v8h-16z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,73h24v2h-24z"/>
+</vector>

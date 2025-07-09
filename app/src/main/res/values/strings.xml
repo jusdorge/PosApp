@@ -19,4 +19,5 @@
     <string name="navigation_drawer_close">إغلاق القائمة</string>
     <string name="title_Selected_Customer_Location">تحديد موقع العميل</string>
     <string name="saveLocation">حفظ الموقع</string>
+    <string name="default_web_client_id">584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com</string>
 </resources>
