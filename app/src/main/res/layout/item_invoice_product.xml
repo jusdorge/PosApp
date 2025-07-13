@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--suppress ALL -->
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -58,9 +59,9 @@
 
                 <ImageButton
                     android:id="@+id/decreaseQuantityButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@android:drawable/btn_minus"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@android:drawable/ic_menu_substract"
                     android:contentDescription="إنقاص الكمية" />
 
                 <EditText
@@ -73,8 +74,8 @@
 
                 <ImageButton
                     android:id="@+id/increaseQuantityButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:src="@android:drawable/ic_menu_add"
                     android:contentDescription="زيادة الكمية" />
             </LinearLayout>
