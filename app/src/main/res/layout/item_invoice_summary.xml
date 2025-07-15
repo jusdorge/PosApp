@@ -59,14 +59,14 @@
 
             <TextView
                 android:id="@+id/customerNameTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="اسم العميل"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="العميل: "
                 android:textSize="16sp" />
@@ -81,13 +81,13 @@
             android:layout_marginTop="4dp">
             <TextView
                 android:id="@+id/customerPhoneTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="رقم الهاتف"
                 android:textSize="16sp" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="الهاتف: "
                 android:textSize="16sp" />
@@ -114,12 +114,15 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text ="                                               "
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/invoiceItemsCountTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="end"
                 android:text="5 منتجات"
                 android:textSize="14sp" />
         </LinearLayout>
