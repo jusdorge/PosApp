@@ -31,11 +31,14 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
 
     private static Customer currentCustomer;
 
+    public static CounterFragment activeInstance;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_counter, container, false);
 
+        activeInstance = this;
         // ربط العناصر من واجهة المستخدم
         invoiceItemsRecyclerView = view.findViewById(R.id.invoiceItemsRecyclerView);
         totalPriceTextView = view.findViewById(R.id.totalPriceTextView);
@@ -80,6 +83,14 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         updateTotalPrice();
 
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (activeInstance == this) {
+            activeInstance = null;
+        }
     }
 
     @Override
@@ -133,6 +144,11 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         if (!found) {
             invoiceItems.add(item);
         }
+        // تحديث واجهة المستخدم إذا كان الـ Fragment نشطًا
+        if (activeInstance != null) {
+            activeInstance.invoiceAdapter.notifyDataSetChanged();
+            activeInstance.updateTotalPrice();
+        }
     }
     public static void setCustomer(Customer customer) {
         if (customer != null) {
@@ -143,7 +159,7 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
     private void updateTotalPrice() {
         totalPrice = 0.0;
         for (InvoiceItem item : invoiceItems) {
-            totalPrice += item.getTotal();
+            totalPrice += item.getQuantity()*item.getPrice();
         }
         totalPriceTextView.setText(String.format("%.2f ريال", totalPrice));
     }

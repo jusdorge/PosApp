@@ -303,6 +303,10 @@ public class CheckoutDialog extends DialogFragment {
         batch.commit()
             .addOnSuccessListener(aVoid -> {
                 Toast.makeText(getContext(), "تم حفظ الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
+                // إعادة تعيين الزبون
+                currentCustomer = null;
+                customerNameEditText.setText("");
+                phoneNumberEditText.setText("");
                 if (listener != null) {
                     listener.onInvoiceCompleted();
                 }
