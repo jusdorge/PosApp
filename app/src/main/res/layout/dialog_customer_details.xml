@@ -149,24 +149,24 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/selectCustomerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
             android:text="اختيار للفاتورة"
-            android:textColor="@color/colorWhite"
-            android:backgroundTint="@color/colorAccent" />
+            android:textColor="@color/colorWhite" />
 
         <Button
             android:id="@+id/closeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
             android:text="إغلاق"
-            android:textColor="@color/colorWhite"
-            android:backgroundTint="@color/colorPrimary" />
+            android:textColor="@color/colorWhite" />
     </LinearLayout>
 </LinearLayout> 
