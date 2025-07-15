@@ -18,11 +18,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -34,9 +36,22 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        try {
+            // تحقق من أن Firebase تم تهيئته
+            if (FirebaseApp.getApps(this).isEmpty()) {
+                Log.d(TAG, "Firebase not initialized, initializing now");
+                FirebaseApp.initializeApp(this);
+            }
 
-        // تهيئة Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
+            // الآن يمكننا الحصول على instance من FirebaseAuth
+            // تهيئة Firebase Auth
+            mAuth = FirebaseAuth.getInstance();
+            Log.d(TAG, "FirebaseAuth initialized successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "FirebaseAuth initialization failed", e);
+            Toast.makeText(this, "فشل في تهيئة Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return; // الخروج من onCreate إذا فشلت التهيئة
+        }
         // تهيئة Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
