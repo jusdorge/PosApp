@@ -58,18 +58,20 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="العميل: "
-                android:textSize="16sp" />
-
-            <TextView
                 android:id="@+id/customerNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="اسم العميل"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="العميل: "
+                android:textSize="16sp" />
+
+
         </LinearLayout>
 
         <LinearLayout
@@ -77,6 +79,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="4dp">
+            <TextView
+                android:id="@+id/customerPhoneTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="رقم الهاتف"
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -84,12 +92,6 @@
                 android:text="الهاتف: "
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/customerPhoneTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="رقم الهاتف"
-                android:textSize="16sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -97,14 +99,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="8dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="المجموع: "
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
             <TextView
                 android:id="@+id/invoiceTotalTextView"
                 android:layout_width="wrap_content"
@@ -113,6 +107,13 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="المجموع: "
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
 
             <TextView
                 android:id="@+id/invoiceItemsCountTextView"
