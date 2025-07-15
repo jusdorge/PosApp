@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="5dp">
 
             <TextView
                 android:id="@+id/invoiceCustomerTextView"
@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:background="@color/colorPrimary"
-                android:padding="8dp"
+
                 android:text="الزبون:مجهول"
                 android:layout_weight="1"
                 android:textColor="@color/colorWhite"
@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorWhite"
         android:orientation="vertical"
-        android:padding="8dp">
+       >
 
         <LinearLayout
             android:layout_width="match_parent"
