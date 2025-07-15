@@ -60,7 +60,7 @@
                     android:id="@+id/decreaseQuantityButton"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@android:drawable/btn_minus"
+                    android:src="@drawable/minus-circle-svgrepo-com"
                     android:contentDescription="إنقاص الكمية" />
 
                 <EditText
