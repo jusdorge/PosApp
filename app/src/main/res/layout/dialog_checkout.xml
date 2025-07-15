@@ -93,7 +93,16 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginBottom="8dp">
-
+        <TextView
+            android:id="@+id/totalAmountTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:text="0.00 ريال"
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,15 +111,7 @@
             android:textStyle="bold"
             android:layout_marginEnd="8dp" />
 
-        <TextView
-            android:id="@+id/totalAmountTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="0.00 ريال"
-            android:textSize="18sp"
-            android:textColor="@color/colorPrimary"
-            android:textStyle="bold" />
+
     </LinearLayout>
 
     <LinearLayout

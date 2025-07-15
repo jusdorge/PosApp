@@ -30,6 +30,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:background="@color/colorPrimary"
                 android:padding="8dp"
                 android:text="الفاتورة الحالية"
@@ -37,15 +38,23 @@
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
             <TextView
                 android:id="@+id/invoiceCustomerTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:background="@color/colorPrimary"
                 android:padding="8dp"
                 android:text="الزبون:مجهول"
                 android:layout_weight="1"
-                android:gravity="end"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
@@ -69,15 +78,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="4dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="المجموع:"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
             <TextView
                 android:id="@+id/totalPriceTextView"
                 android:layout_width="wrap_content"
@@ -86,6 +86,14 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="المجموع:"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
         <Button
