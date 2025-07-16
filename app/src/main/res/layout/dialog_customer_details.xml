@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="1dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -22,18 +22,18 @@
         android:layout_marginBottom="8dp">
 
         <TextView
+            android:id="@+id/customerNameTextView"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="اسم الزبون"
+            android:textSize="16sp" />
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="الاسم: "
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/customerNameTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="اسم الزبون"
-            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -41,20 +41,18 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="8dp">
-
         <TextView
+            android:id="@+id/customerPhoneTextView"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="رقم الهاتف"
+            android:textSize="16sp" />
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="الهاتف: "
             android:textSize="16sp"
             android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/customerPhoneTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="رقم الهاتف"
-            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -62,13 +60,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="8dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="الموقع: "
-            android:textSize="16sp"
-            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_customer_location"
@@ -85,6 +76,12 @@
             android:text="عرض على الخريطة"
             android:textColor="@color/colorWhite"
             android:backgroundTint="@color/colorPrimary" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="الموقع: "
+            android:textSize="16sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
@@ -93,12 +90,13 @@
         android:orientation="horizontal"
         android:layout_marginBottom="16dp">
 
-        <TextView
+        <Button
+            android:id="@+id/addPaymentButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="إجمالي الدين: "
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:text="دفع"
+            android:textColor="@color/colorWhite"
+            android:backgroundTint="@color/colorAccent" />
 
         <TextView
             android:id="@+id/totalDebtTextView"
@@ -110,13 +108,12 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/addPaymentButton"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="دفع"
-            android:textColor="@color/colorWhite"
-            android:backgroundTint="@color/colorAccent" />
+            android:text="إجمالي الدين: "
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <TextView
