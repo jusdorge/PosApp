@@ -20,6 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -192,10 +193,18 @@ public class MainActivity extends AppCompatActivity {
     private void showAddCustomerDialog() {
         SelectCustomerDialog dialog = new SelectCustomerDialog();
         dialog.setOnCustomerSelectedListener(customer -> {
-            // يمكنك إضافة منطق هنا عند اختيار العميل
-            // مثلاً: حفظ العميل المختار للفاتورة الحالية
+            // تعيين العميل في CounterFragment
+            CounterFragment.setCustomer(customer);
+            
+            // تحديث اسم العميل في واجهة CounterFragment إذا كانت نشطة
+            if (CounterFragment.activeInstance != null) {
+                TextView customerTextView = findViewById(R.id.invoiceCustomerTextView);
+                if (customerTextView != null) {
+                    customerTextView.setText("الزبون: " + customer.getName());
+                }
+            }
+            
             Toast.makeText(this, "تم اختيار العميل: " + customer.getName(), Toast.LENGTH_SHORT).show();
-            // TODO: إضافة منطق ربط العميل بالفاتورة الحالية
         });
         dialog.show(getSupportFragmentManager(), "SelectCustomerDialog");
     }

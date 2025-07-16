@@ -153,6 +153,10 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
     public static void setCustomer(Customer customer) {
         if (customer != null) {
             currentCustomer = customer;
+            // تحديث TextView إذا كان Fragment نشطًا
+            if (activeInstance != null && invoiceCustomerTextView != null) {
+                invoiceCustomerTextView.setText("الزبون: " + customer.getName());
+            }
         }
     }
 
