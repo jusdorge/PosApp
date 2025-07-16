@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -165,7 +166,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_add_customer) {
+            showAddCustomerDialog();
+            return true;
+        } else if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_manage_customers) {
             navigateToCustomersManagement();
@@ -176,9 +180,30 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.action_logout) {
             logoutUser();
             return true;
+        } else if (id == R.id.action_select_customer_location) {
+            showSelectCustomerLocationPage();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    // عرض dialog لاختيار عميل للفاتورة
+    private void showAddCustomerDialog() {
+        SelectCustomerDialog dialog = new SelectCustomerDialog();
+        dialog.setOnCustomerSelectedListener(customer -> {
+            // يمكنك إضافة منطق هنا عند اختيار العميل
+            // مثلاً: حفظ العميل المختار للفاتورة الحالية
+            Toast.makeText(this, "تم اختيار العميل: " + customer.getName(), Toast.LENGTH_SHORT).show();
+            // TODO: إضافة منطق ربط العميل بالفاتورة الحالية
+        });
+        dialog.show(getSupportFragmentManager(), "SelectCustomerDialog");
+    }
+
+    // صفحة اختيار الموقع الجغرافي للعميل
+    private void showSelectCustomerLocationPage() {
+        Intent intent = new Intent(this, SelectCustomerLocationActivity.class);
+        startActivity(intent);
     }
 
     private void logoutUser() {

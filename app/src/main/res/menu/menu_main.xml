@@ -4,6 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.posapp.MainActivity">
     
+    <!-- عنصر إضافة/اختيار عميل - يظهر كأيقونة في الـ toolbar -->
+    <item
+        android:id="@+id/action_add_customer"
+        android:icon="@drawable/ic_customers"
+        android:title="اختيار عميل"
+        app:showAsAction="always" />
+    
     <item
         android:id="@+id/action_home"
         android:icon="@drawable/ic_counter"
