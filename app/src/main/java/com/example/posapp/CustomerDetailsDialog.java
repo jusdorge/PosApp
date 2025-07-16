@@ -41,6 +41,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     private Button selectCustomerButton;
     private TextView tvCustomerLocation;
     private Button btnShowLocationOnMap;
+    private Button btnSetLocation;
     private Double latitude = null;
     private Double longitude = null;
 
@@ -85,6 +86,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         addPaymentButton = view.findViewById(R.id.addPaymentButton);
         tvCustomerLocation = view.findViewById(R.id.tv_customer_location);
         btnShowLocationOnMap = view.findViewById(R.id.btn_show_location_on_map);
+        btnSetLocation = view.findViewById(R.id.btn_set_location);
 
         debtsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         invoicesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -93,6 +95,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         closeButton.setOnClickListener(v -> dismiss());
         addPaymentButton.setOnClickListener(v -> showAddPaymentDialog());
         btnShowLocationOnMap.setOnClickListener(v -> showLocationOnMap());
+        btnSetLocation.setOnClickListener(v -> setCustomerLocation());
 
         builder.setView(view);
 
@@ -138,9 +141,11 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         if (latitude != null && longitude != null && latitude != 0 && longitude != 0) {
             tvCustomerLocation.setText(String.format("%.4f, %.4f", latitude, longitude));
             btnShowLocationOnMap.setEnabled(true);
+            btnSetLocation.setText("تحديث");
         } else {
             tvCustomerLocation.setText("غير محدد");
             btnShowLocationOnMap.setEnabled(false);
+            btnSetLocation.setText("تحديد");
         }
 
         // تفعيل/تعطيل زر الدفع بناءً على وجود ديون
@@ -236,6 +241,41 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
             intent.putExtra("longitude", longitude);
             intent.putExtra("view_only", true);
             startActivity(intent);
+        }
+    }
+
+    private void setCustomerLocation() {
+        Intent intent = new Intent(getActivity(), SelectCustomerLocationActivity.class);
+        if (latitude != null && longitude != null && latitude != 0 && longitude != 0) {
+            intent.putExtra("latitude", latitude);
+            intent.putExtra("longitude", longitude);
+        }
+        startActivityForResult(intent, 1001);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001 && resultCode == getActivity().RESULT_OK && data != null) {
+            double newLatitude = data.getDoubleExtra("latitude", 0);
+            double newLongitude = data.getDoubleExtra("longitude", 0);
+            
+            if (newLatitude != 0 && newLongitude != 0) {
+                // تحديث الموقع في قاعدة البيانات
+                db.collection("customers").document(customerId)
+                    .update("latitude", newLatitude, "longitude", newLongitude)
+                    .addOnSuccessListener(aVoid -> {
+                        latitude = newLatitude;
+                        longitude = newLongitude;
+                        tvCustomerLocation.setText(String.format("%.4f, %.4f", latitude, longitude));
+                        btnShowLocationOnMap.setEnabled(true);
+                        btnSetLocation.setText("تحديث");
+                        Toast.makeText(getContext(), "تم تحديث موقع العميل", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "فشل تحديث الموقع: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+            }
         }
     }
 }
