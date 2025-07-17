@@ -162,16 +162,31 @@
 
         <Button
             android:id="@+id/selectCustomerButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
             android:backgroundTint="@color/colorAccent"
             android:text="اختيار للفاتورة"
             android:textColor="@color/colorWhite" />
 
         <Button
-            android:id="@+id/closeButton"
-            android:layout_width="wrap_content"
+            android:id="@+id/deleteCustomerButton"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:text="حذف العميل"
+            android:textColor="@color/colorWhite" />
+
+        <Button
+            android:id="@+id/closeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
             android:backgroundTint="@color/colorPrimary"
             android:text="إغلاق"
             android:textColor="@color/colorWhite" />

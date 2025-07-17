@@ -30,6 +30,17 @@ import java.util.List;
 
 public class CustomerDetailsDialog extends DialogFragment implements AddPaymentDialog.OnPaymentAddedListener {
     private static final String ARG_CUSTOMER_ID = "customer_id";
+    
+    // Interface لإشعار الـ Fragment عند حذف العميل
+    public interface OnCustomerDeletedListener {
+        void onCustomerDeleted();
+    }
+    
+    private static OnCustomerDeletedListener customerDeletedListener;
+    
+    public static void setOnCustomerDeletedListener(OnCustomerDeletedListener listener) {
+        customerDeletedListener = listener;
+    }
 
     private TextView customerNameTextView;
     private TextView customerPhoneTextView;
@@ -42,6 +53,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     private TextView tvCustomerLocation;
     private Button btnShowLocationOnMap;
     private Button btnSetLocation;
+    private Button deleteCustomerButton;
     private Double latitude = null;
     private Double longitude = null;
 
@@ -87,6 +99,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         tvCustomerLocation = view.findViewById(R.id.tv_customer_location);
         btnShowLocationOnMap = view.findViewById(R.id.btn_show_location_on_map);
         btnSetLocation = view.findViewById(R.id.btn_set_location);
+        deleteCustomerButton = view.findViewById(R.id.deleteCustomerButton);
 
         debtsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         invoicesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -96,6 +109,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         addPaymentButton.setOnClickListener(v -> showAddPaymentDialog());
         btnShowLocationOnMap.setOnClickListener(v -> showLocationOnMap());
         btnSetLocation.setOnClickListener(v -> setCustomerLocation());
+        deleteCustomerButton.setOnClickListener(v -> showDeleteConfirmationDialog());
 
         builder.setView(view);
 
@@ -276,6 +290,74 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
                         Toast.makeText(getContext(), "فشل تحديث الموقع: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
             }
+        }
+    }
+
+    private void showDeleteConfirmationDialog() {
+        if (currentCustomer == null) return;
+        
+        new AlertDialog.Builder(requireContext())
+                .setTitle("تأكيد الحذف")
+                .setMessage("هل أنت متأكد من حذف العميل \"" + currentCustomer.getName() + "\"؟\n\n" +
+                           "سيتم حذف:\n" +
+                           "• جميع بيانات العميل\n" +
+                           "• جميع فواتير العميل\n" +
+                           "• سجل المعاملات\n\n" +
+                           "هذا الإجراء لا يمكن التراجع عنه!")
+                .setPositiveButton("حذف", (dialog, which) -> deleteCustomer())
+                .setNegativeButton("إلغاء", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    private void deleteCustomer() {
+        if (currentCustomer == null) return;
+        
+        // عرض مؤشر التحميل
+        deleteCustomerButton.setEnabled(false);
+        deleteCustomerButton.setText("جاري الحذف...");
+        
+        // حذف جميع فواتير العميل أولاً
+        db.collection("invoices")
+                .whereEqualTo("customerPhone", currentCustomer.getPhone())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // حذف جميع الفواتير
+                    for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                        db.collection("invoices").document(document.getId()).delete();
+                    }
+                    
+                    // بعد حذف الفواتير، احذف العميل
+                    db.collection("customers").document(customerId)
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(getContext(), "تم حذف العميل \"" + currentCustomer.getName() + "\" بنجاح", Toast.LENGTH_SHORT).show();
+                                dismiss();
+                                
+                                // إشعار الأنشطة الأخرى بحذف العميل
+                                notifyCustomerDeleted();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(getContext(), "فشل في حذف العميل: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                deleteCustomerButton.setEnabled(true);
+                                deleteCustomerButton.setText("حذف العميل");
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "فشل في حذف فواتير العميل: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    deleteCustomerButton.setEnabled(true);
+                    deleteCustomerButton.setText("حذف العميل");
+                });
+    }
+
+    private void notifyCustomerDeleted() {
+        // إذا كان هذا العميل مختاراً في CounterFragment، قم بإلغاء اختياره
+        if (CounterFragment.activeInstance != null) {
+            CounterFragment.setCustomer(null);
+        }
+        // إشعار الـ Fragment الذي قام بإظهار هذا الحوار عند حذف العميل
+        if (customerDeletedListener != null) {
+            customerDeletedListener.onCustomerDeleted();
         }
     }
 }

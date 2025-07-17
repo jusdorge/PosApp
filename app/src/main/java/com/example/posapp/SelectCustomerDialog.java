@@ -101,6 +101,12 @@ public class SelectCustomerDialog extends DialogFragment {
 
         cancelButton.setOnClickListener(v -> dismiss());
 
+        // تسجيل مستمع حذف العملاء
+        CustomerDetailsDialog.setOnCustomerDeletedListener(() -> {
+            // إعادة تحميل قائمة العملاء عند حذف عميل
+            loadCustomers();
+        });
+
         // تحميل العملاء من قاعدة البيانات
         loadCustomers();
 

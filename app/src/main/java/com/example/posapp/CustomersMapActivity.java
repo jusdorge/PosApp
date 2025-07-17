@@ -59,6 +59,12 @@ public class CustomersMapActivity extends AppCompatActivity {
         FloatingActionButton fabCenterMap = findViewById(R.id.fab_center_map);
         fabCenterMap.setOnClickListener(v -> centerMapOnMarkers());
 
+        // تسجيل مستمع حذف العملاء
+        CustomerDetailsDialog.setOnCustomerDeletedListener(() -> {
+            // إعادة تحميل مواقع العملاء عند حذف عميل
+            loadCustomersWithLocation();
+        });
+
         // تحميل العملاء
         loadCustomersWithLocation();
     }

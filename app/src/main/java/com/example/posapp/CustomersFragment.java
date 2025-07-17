@@ -84,6 +84,24 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+        // تسجيل مستمع حذف العملاء
+        CustomerDetailsDialog.setOnCustomerDeletedListener(() -> {
+            // إعادة تحميل قائمة العملاء عند حذف عميل
+            loadCustomers();
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // إلغاء تسجيل المستمع
+        CustomerDetailsDialog.setOnCustomerDeletedListener(null);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         loadCustomers();
