@@ -68,6 +68,17 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         void onInvoiceCompleted();
     }
 
+    // Interface لإشعار الأجزاء الأخرى عند إضافة فاتورة جديدة
+    public interface OnInvoiceAddedListener {
+        void onInvoiceAdded();
+    }
+    
+    private static OnInvoiceAddedListener invoiceAddedListener;
+    
+    public static void setOnInvoiceAddedListener(OnInvoiceAddedListener listener) {
+        invoiceAddedListener = listener;
+    }
+
     public static CheckoutDialog newInstance(List<InvoiceItem> items, double totalAmount) {
         CheckoutDialog dialog = new CheckoutDialog();
         dialog.invoiceItems = new ArrayList<>(items);
@@ -454,6 +465,9 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
                     Toast.makeText(getContext(), "تم حفظ الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
                     if (listener != null) {
                         listener.onInvoiceCompleted();
+                    }
+                    if (invoiceAddedListener != null) {
+                        invoiceAddedListener.onInvoiceAdded();
                     }
                     dismiss();
                 })

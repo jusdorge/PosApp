@@ -72,6 +72,24 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     }
     
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+        // تسجيل مستمع إضافة الفواتير
+        CheckoutDialog.setOnInvoiceAddedListener(() -> {
+            // إعادة تحميل فواتير اليوم عند إضافة فاتورة جديدة
+            loadTodayInvoices();
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // إلغاء تسجيل المستمع
+        CheckoutDialog.setOnInvoiceAddedListener(null);
+    }
+    
+    @Override
     public void onResume() {
         super.onResume();
         // إعادة تحميل البيانات عند العودة للواجهة
