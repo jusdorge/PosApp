@@ -10,16 +10,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    
-    <!-- أذونات البلوتوث للـ Android 12 وما فوق -->
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
-    
-    <!-- إعلان أن التطبيق يستخدم البلوتوث -->
-    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
 
     <application
         android:name=".MyPOSApplication"
@@ -76,35 +66,21 @@
             android:name=".SelectCustomerLocationActivity"
             android:exported="false"
             android:label="@string/title_Selected_Customer_Location" />
-
-        <!-- شاشة عرض مواقع العملاء على الخريطة -->
-        <activity
-            android:name=".CustomersMapActivity"
-            android:exported="false"
-            android:label="مواقع العملاء" />
-
-        <!-- شاشة طباعة الفاتورة -->
-        <activity
-            android:name=".InvoicePrintActivity"
-            android:exported="false"
-            android:label="طباعة الفاتورة" />
-
-        <!-- شاشة طباعة QR Code -->
-        <activity
-            android:name=".QRCodePrintActivity"
-            android:exported="false"
-            android:label="طباعة QR Code" />
-
-        <!-- شاشة جميع الفواتير -->
-        <activity
-            android:name=".AllInvoicesActivity"
-            android:exported="false"
-            android:label="جميع الفواتير" />
-
-        <!-- FileProvider للمشاركة -->
+        <!-- شاشة عرض جميع الفواتير -->
+        <activity android:name=".AllInvoicesActivity">
+            <!-- You can add intent filters here if this activity can be launched by other apps
+                 or as a main entry point.
+                 For example:
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <!-- File Provider for sharing files -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.posapp.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

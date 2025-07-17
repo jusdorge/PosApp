@@ -9,4 +9,48 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorBottomNav">#FFFFFF</color>
     <color name="colorDivider">#CCD0D5</color>
+    <!-- Report specific colors -->
+    <color name="reportPrimary">#1877F2</color>
+    <color name="reportSecondary">#42A5F5</color>
+    <color name="reportSuccess">#4CAF50</color>
+    <color name="reportWarning">#FF9800</color>
+    <color name="reportDanger">#F44336</color>
+    <color name="reportInfo">#2196F3</color>
+
+    <!-- Card backgrounds -->
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="cardShadow">#E0E0E0</color>
+
+    <!-- Chart colors -->
+    <color name="chartBlue">#2196F3</color>
+    <color name="chartGreen">#4CAF50</color>
+    <color name="chartOrange">#FF9800</color>
+    <color name="chartRed">#F44336</color>
+    <color name="chartPurple">#9C27B0</color>
+    <color name="chartTeal">#009688</color>
+
+    <!-- Gradient colors -->
+    <color name="gradientStart">#1877F2</color>
+    <color name="gradientEnd">#166FE5</color>
+
+    <!-- Text colors for reports -->
+    <color name="reportTextPrimary">#212121</color>
+    <color name="reportTextSecondary">#757575</color>
+    <color name="reportTextLight">#BDBDBD</color>
+
+    <!-- Status colors -->
+    <color name="statusPaid">#4CAF50</color>
+    <color name="statusPending">#FF9800</color>
+    <color name="statusOverdue">#F44336</color>
+
+    <!-- Performance colors -->
+    <color name="performanceExcellent">#4CAF50</color>
+    <color name="performanceGood">#8BC34A</color>
+    <color name="performanceAverage">#FFC107</color>
+    <color name="performancePoor">#FF5722</color>
+
+    <!-- Background variations -->
+    <color name="reportBackground">#F5F5F5</color>
+    <color name="reportBackgroundLight">#FAFAFA</color>
+    <color name="reportBackgroundDark">#EEEEEE</color>
 </resources>
