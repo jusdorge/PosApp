@@ -2,12 +2,25 @@ package com.example.posapp;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,6 +67,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     private Button btnShowLocationOnMap;
     private Button btnSetLocation;
     private Button deleteCustomerButton;
+    private Button generateQRButton;
     private Double latitude = null;
     private Double longitude = null;
 
@@ -100,6 +114,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         btnShowLocationOnMap = view.findViewById(R.id.btn_show_location_on_map);
         btnSetLocation = view.findViewById(R.id.btn_set_location);
         deleteCustomerButton = view.findViewById(R.id.deleteCustomerButton);
+        generateQRButton = view.findViewById(R.id.generateQRButton);
 
         debtsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         invoicesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -110,6 +125,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         btnShowLocationOnMap.setOnClickListener(v -> showLocationOnMap());
         btnSetLocation.setOnClickListener(v -> setCustomerLocation());
         deleteCustomerButton.setOnClickListener(v -> showDeleteConfirmationDialog());
+        generateQRButton.setOnClickListener(v -> showCustomerQRCode());
 
         builder.setView(view);
 
@@ -359,5 +375,84 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         if (customerDeletedListener != null) {
             customerDeletedListener.onCustomerDeleted();
         }
+    }
+
+    private void showCustomerQRCode() {
+        if (currentCustomer == null) {
+            Toast.makeText(getContext(), "لا توجد معلومات عميل", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String qrData = generateCustomerQRData();
+        Bitmap qrBitmap = generateQRCode(qrData);
+
+        if (qrBitmap != null) {
+            showQRCodeDialog(qrBitmap);
+        } else {
+            Toast.makeText(getContext(), "فشل في إنشاء QR Code", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String generateCustomerQRData() {
+        StringBuilder qrData = new StringBuilder();
+        
+        qrData.append("CUSTOMER_INFO\n");
+        qrData.append("Name: ").append(currentCustomer.getName() != null ? currentCustomer.getName() : "N/A").append("\n");
+        qrData.append("Phone: ").append(currentCustomer.getPhone() != null ? currentCustomer.getPhone() : "N/A").append("\n");
+        qrData.append("Total_Debt: ").append(String.format("%.2f DZD", currentCustomer.getTotalDebt())).append("\n");
+        
+        if (latitude != null && longitude != null && latitude != 0 && longitude != 0) {
+            qrData.append("Location: ").append(String.format("%.6f,%.6f", latitude, longitude)).append("\n");
+        }
+        
+        qrData.append("Customer_ID: ").append(currentCustomer.getId() != null ? currentCustomer.getId() : "N/A");
+        
+        return qrData.toString();
+    }
+
+    private Bitmap generateQRCode(String data) {
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            Map<EncodeHintType, Object> hints = new HashMap<>();
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+            
+            BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, 300, 300, hints);
+            
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                }
+            }
+            
+            return bitmap;
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void showQRCodeDialog(Bitmap qrBitmap) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        
+        View dialogView = LayoutInflater.from(getContext()).inflate(android.R.layout.select_dialog_item, null);
+        ImageView imageView = new ImageView(getContext());
+        imageView.setImageBitmap(qrBitmap);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        
+        builder.setTitle("QR Code للعميل: " + currentCustomer.getName())
+                .setView(imageView)
+                .setPositiveButton("إغلاق", null)
+                .setNeutralButton("مشاركة", (dialog, which) -> shareQRCode(qrBitmap))
+                .show();
+    }
+
+    private void shareQRCode(Bitmap qrBitmap) {
+        // يمكن إضافة وظيفة مشاركة QR Code هنا
+        Toast.makeText(getContext(), "وظيفة المشاركة ستتم إضافتها قريباً", Toast.LENGTH_SHORT).show();
     }
 }

@@ -10,6 +10,16 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    
+    <!-- أذونات البلوتوث للـ Android 12 وما فوق -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    
+    <!-- إعلان أن التطبيق يستخدم البلوتوث -->
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
 
     <application
         android:name=".MyPOSApplication"
@@ -72,6 +82,12 @@
             android:name=".CustomersMapActivity"
             android:exported="false"
             android:label="مواقع العملاء" />
+
+        <!-- شاشة طباعة الفاتورة -->
+        <activity
+            android:name=".InvoicePrintActivity"
+            android:exported="false"
+            android:label="طباعة الفاتورة" />
     </application>
 
 </manifest>

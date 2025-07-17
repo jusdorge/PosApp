@@ -1,5 +1,7 @@
 package com.example.posapp;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,8 +10,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +39,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomersFragment extends Fragment implements CustomerAdapter.OnCustomerClickListener {
+public class CustomersFragment extends Fragment implements CustomerAdapter.OnCustomerClickListener, CustomerAdapter.OnQRCodeClickListener {
     private RecyclerView customersRecyclerView;
     private EditText searchCustomerEditText;
     private Button addCustomerButton;
@@ -48,6 +63,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
         customerList = new ArrayList<>();
         customerAdapter = new CustomerAdapter(customerList);
         customerAdapter.setOnCustomerClickListener(this);
+        customerAdapter.setOnQRCodeClickListener(this);
 
         customersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         customersRecyclerView.setAdapter(customerAdapter);
@@ -157,5 +173,73 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
     public void onCustomerClick(Customer customer, int position) {
         CustomerDetailsDialog dialog = CustomerDetailsDialog.newInstance(customer.getId());
         dialog.show(getChildFragmentManager(), "CustomerDetailsDialog");
+    }
+
+    @Override
+    public void onQRCodeClick(Customer customer) {
+        showCustomerQRCode(customer);
+    }
+
+    private void showCustomerQRCode(Customer customer) {
+        String qrData = generateCustomerQRData(customer);
+        Bitmap qrBitmap = generateQRCode(qrData);
+
+        if (qrBitmap != null) {
+            showQRCodeDialog(customer, qrBitmap);
+        } else {
+            Toast.makeText(getContext(), "فشل في إنشاء QR Code", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String generateCustomerQRData(Customer customer) {
+        StringBuilder qrData = new StringBuilder();
+        
+        qrData.append("CUSTOMER_INFO\n");
+        qrData.append("Name: ").append(customer.getName() != null ? customer.getName() : "N/A").append("\n");
+        qrData.append("Phone: ").append(customer.getPhone() != null ? customer.getPhone() : "N/A").append("\n");
+        qrData.append("Total_Debt: ").append(String.format("%.2f DZD", customer.getTotalDebt())).append("\n");
+        qrData.append("Customer_ID: ").append(customer.getId() != null ? customer.getId() : "N/A");
+        
+        return qrData.toString();
+    }
+
+    private Bitmap generateQRCode(String data) {
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            Map<EncodeHintType, Object> hints = new HashMap<>();
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+            
+            BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, 300, 300, hints);
+            
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                }
+            }
+            
+            return bitmap;
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void showQRCodeDialog(Customer customer, Bitmap qrBitmap) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        
+        ImageView imageView = new ImageView(getContext());
+        imageView.setImageBitmap(qrBitmap);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        imageView.setPadding(20, 20, 20, 20);
+        
+        builder.setTitle("QR Code للعميل: " + customer.getName())
+                .setView(imageView)
+                .setPositiveButton("إغلاق", null)
+                .show();
     }
 } 
