@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
                     navigateToCustomersManagement();
                 } else if (id == R.id.action_manage_products) {
                     navigateToProductsManagement();
+                } else if (id == R.id.action_select_customer_location) {
+                    showSelectCustomersLocationPage();
                 } else if (id == R.id.action_logout) {
                     logoutUser();
                 }
@@ -132,6 +134,11 @@ public class MainActivity extends AppCompatActivity {
                 .add(R.id.fragment_container, reportsFragment, "2").hide(reportsFragment)
                 .add(R.id.fragment_container, counterFragment, "1")
                 .commit();
+    }
+
+    private void showSelectCustomersLocationPage() {
+        Intent intent = new Intent(this, CustomersMapActivity.class);
+        startActivity(intent);
     }
 
     private void switchToFragment(Fragment fragment) {
