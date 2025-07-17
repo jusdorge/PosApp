@@ -439,20 +439,143 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     private void showQRCodeDialog(Bitmap qrBitmap) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         
-        View dialogView = LayoutInflater.from(getContext()).inflate(android.R.layout.select_dialog_item, null);
         ImageView imageView = new ImageView(getContext());
         imageView.setImageBitmap(qrBitmap);
         imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        imageView.setPadding(20, 20, 20, 20);
         
         builder.setTitle("QR Code للعميل: " + currentCustomer.getName())
                 .setView(imageView)
-                .setPositiveButton("إغلاق", null)
+                .setPositiveButton("شاشة الطباعة", (dialog, which) -> openPrintScreen(qrBitmap))
                 .setNeutralButton("مشاركة", (dialog, which) -> shareQRCode(qrBitmap))
+                .setNegativeButton("إغلاق", null)
                 .show();
     }
 
     private void shareQRCode(Bitmap qrBitmap) {
-        // يمكن إضافة وظيفة مشاركة QR Code هنا
-        Toast.makeText(getContext(), "وظيفة المشاركة ستتم إضافتها قريباً", Toast.LENGTH_SHORT).show();
+        try {
+            if (qrBitmap == null) {
+                Toast.makeText(getContext(), "QR Code غير متوفر", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            // إنشاء مجلد الصور في الذاكرة المؤقتة
+            java.io.File cachePath = new java.io.File(getContext().getCacheDir(), "images");
+            if (!cachePath.exists()) {
+                cachePath.mkdirs();
+            }
+            
+            // حفظ QR Code في الذاكرة المؤقتة
+            String fileName = "customer_qr_" + System.currentTimeMillis() + ".png";
+            java.io.File file = new java.io.File(cachePath, fileName);
+            
+            java.io.FileOutputStream stream = new java.io.FileOutputStream(file);
+            qrBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            stream.flush();
+            stream.close();
+            
+            // التحقق من وجود الملف
+            if (!file.exists()) {
+                Toast.makeText(getContext(), "فشل في حفظ QR Code", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            try {
+                // إنشاء URI للملف
+                android.net.Uri contentUri = androidx.core.content.FileProvider.getUriForFile(
+                        getContext(), 
+                        "com.example.posapp.fileprovider", 
+                        file);
+                
+                // إنشاء Intent للمشاركة
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("image/png");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "QR Code للعميل: " + currentCustomer.getName());
+                shareIntent.putExtra(Intent.EXTRA_TEXT, 
+                    "QR Code للعميل: " + currentCustomer.getName() + "\n" +
+                    "الهاتف: " + (currentCustomer.getPhone() != null ? currentCustomer.getPhone() : "غير محدد") + "\n" +
+                    "إجمالي الدين: " + String.format("%.2f دج", currentCustomer.getTotalDebt()));
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                
+                // التحقق من وجود تطبيقات للمشاركة
+                if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                    startActivity(Intent.createChooser(shareIntent, "مشاركة QR Code"));
+                } else {
+                    Toast.makeText(getContext(), "لا توجد تطبيقات للمشاركة", Toast.LENGTH_SHORT).show();
+                }
+                
+            } catch (Exception fileProviderException) {
+                // طريقة بديلة: مشاركة النص فقط
+                shareQRCodeAsText();
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "فشل في مشاركة QR Code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void printQRCode(Bitmap qrBitmap) {
+        if (qrBitmap == null) {
+            Toast.makeText(getContext(), "QR Code غير متوفر", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // إنشاء Intent لطباعة QR Code
+        Intent printIntent = new Intent(getContext(), QRCodePrintActivity.class);
+        
+        // تحويل Bitmap إلى byte array للإرسال
+        java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
+        qrBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        
+        printIntent.putExtra("qr_bitmap", byteArray);
+        printIntent.putExtra("customer_name", currentCustomer.getName());
+        printIntent.putExtra("customer_phone", currentCustomer.getPhone());
+        printIntent.putExtra("customer_debt", currentCustomer.getTotalDebt());
+        
+        startActivity(printIntent);
+    }
+
+    private void openPrintScreen(Bitmap qrBitmap) {
+        Intent printIntent = new Intent(getContext(), QRCodePrintActivity.class);
+        
+        // تحويل Bitmap إلى byte array للإرسال
+        java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
+        qrBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        
+        printIntent.putExtra("qr_bitmap", byteArray);
+        printIntent.putExtra("customer_name", currentCustomer.getName());
+        printIntent.putExtra("customer_phone", currentCustomer.getPhone());
+        printIntent.putExtra("customer_debt", currentCustomer.getTotalDebt());
+        
+        startActivity(printIntent);
+    }
+
+    private void shareQRCodeAsText() {
+        try {
+            String qrData = generateCustomerQRData();
+            
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "معلومات العميل - QR Code");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, 
+                "معلومات العميل:\n" +
+                "الاسم: " + currentCustomer.getName() + "\n" +
+                "الهاتف: " + (currentCustomer.getPhone() != null ? currentCustomer.getPhone() : "غير محدد") + "\n" +
+                "إجمالي الدين: " + String.format("%.2f دج", currentCustomer.getTotalDebt()) + "\n\n" +
+                "QR Code Data:\n" + qrData);
+            
+            if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                startActivity(Intent.createChooser(shareIntent, "مشاركة معلومات العميل"));
+            } else {
+                Toast.makeText(getContext(), "لا توجد تطبيقات للمشاركة", Toast.LENGTH_SHORT).show();
+            }
+            
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "فشل في مشاركة معلومات العميل", Toast.LENGTH_SHORT).show();
+        }
     }
 }

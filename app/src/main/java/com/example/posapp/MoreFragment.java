@@ -1,5 +1,6 @@
 package com.example.posapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 public class MoreFragment extends Fragment {
     private CardView customersManagementCard;
     private CardView productsManagementCard;
+    private CardView allInvoicesCard;
     
     @Nullable
     @Override
@@ -21,6 +23,7 @@ public class MoreFragment extends Fragment {
         
         customersManagementCard = view.findViewById(R.id.customersManagementCard);
         productsManagementCard = view.findViewById(R.id.productsManagementCard);
+        allInvoicesCard = view.findViewById(R.id.allInvoicesCard);
         
         setupClickListeners();
         
@@ -34,6 +37,10 @@ public class MoreFragment extends Fragment {
         
         productsManagementCard.setOnClickListener(v -> {
             navigateToProductsManagement();
+        });
+        
+        allInvoicesCard.setOnClickListener(v -> {
+            openAllInvoicesActivity();
         });
     }
     
@@ -51,5 +58,10 @@ public class MoreFragment extends Fragment {
             .replace(R.id.fragment_container, new ProductsManagementFragment())
             .addToBackStack(null)
             .commit();
+    }
+    
+    private void openAllInvoicesActivity() {
+        Intent intent = new Intent(getActivity(), AllInvoicesActivity.class);
+        startActivity(intent);
     }
 }

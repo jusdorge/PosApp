@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
                     navigateToCustomersManagement();
                 } else if (id == R.id.action_manage_products) {
                     navigateToProductsManagement();
+                } else if (id == R.id.action_all_invoices) {
+                    openAllInvoicesActivity();
                 } else if (id == R.id.action_select_customer_location) {
                     showSelectCustomersLocationPage();
                 } else if (id == R.id.action_logout) {
@@ -141,6 +143,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void openAllInvoicesActivity() {
+        Intent intent = new Intent(this, AllInvoicesActivity.class);
+        startActivity(intent);
+    }
+
     private void switchToFragment(Fragment fragment) {
         if (activeFragment != fragment) {
             FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -184,6 +191,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.action_manage_products) {
             navigateToProductsManagement();
+            return true;
+        } else if (id == R.id.action_all_invoices) {
+            openAllInvoicesActivity();
             return true;
         } else if (id == R.id.action_logout) {
             logoutUser();

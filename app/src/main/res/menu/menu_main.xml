@@ -28,6 +28,13 @@
         android:icon="@drawable/ic_products"
         android:title="إدارة المنتجات"
         app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/action_all_invoices"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="جميع الفواتير"
+        app:showAsAction="never" />
+    
     <item
         android:id="@+id/action_select_customer_location"
         android:icon="@drawable/ic_menu_add"
