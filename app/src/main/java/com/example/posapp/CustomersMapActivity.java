@@ -17,14 +17,19 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.util.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.os.Handler;
+import android.os.Looper;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class CustomersMapActivity extends AppCompatActivity {
     private MapView mapView;
     private FirebaseFirestore db;
     private List<Customer> customersWithLocation = new ArrayList<>();
+    private BoundingBox currentBoundingBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +55,19 @@ public class CustomersMapActivity extends AppCompatActivity {
         mapView.setMultiTouchControls(true);
         mapView.setBuiltInZoomControls(true);
 
+        // إعداد الزر العائم
+        FloatingActionButton fabCenterMap = findViewById(R.id.fab_center_map);
+        fabCenterMap.setOnClickListener(v -> centerMapOnMarkers());
+
         // تحميل العملاء
         loadCustomersWithLocation();
+    }
+
+    private void centerMapOnMarkers() {
+        if (currentBoundingBox != null) {
+            mapView.zoomToBoundingBox(currentBoundingBox, true, 50);
+            Toast.makeText(this, "تم توسيط الخريطة على جميع العملاء", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadCustomersWithLocation() {
@@ -110,12 +126,25 @@ public class CustomersMapActivity extends AppCompatActivity {
             return;
         }
 
-        // حساب مركز جميع النقاط
-        double avgLat = 0, avgLon = 0;
-        int markerCount = 0;
+        // حساب الحدود الدنيا والعليا للمواقع
+        double minLat = Double.MAX_VALUE;
+        double maxLat = Double.MIN_VALUE;
+        double minLon = Double.MAX_VALUE;
+        double maxLon = Double.MIN_VALUE;
+        
+        List<GeoPoint> geoPoints = new ArrayList<>();
         
         for (Customer customer : customersWithLocation) {
-            GeoPoint position = new GeoPoint(customer.getLatitude(), customer.getLongitude());
+            double lat = customer.getLatitude();
+            double lon = customer.getLongitude();
+            
+            minLat = Math.min(minLat, lat);
+            maxLat = Math.max(maxLat, lat);
+            minLon = Math.min(minLon, lon);
+            maxLon = Math.max(maxLon, lon);
+            
+            GeoPoint position = new GeoPoint(lat, lon);
+            geoPoints.add(position);
             
             System.out.println("إضافة ماركر للعميل: " + customer.getName() + 
                     " في الموقع: " + position.getLatitude() + ", " + position.getLongitude());
@@ -142,23 +171,50 @@ public class CustomersMapActivity extends AppCompatActivity {
             });
             
             mapView.getOverlays().add(marker);
-            markerCount++;
-            
-            avgLat += customer.getLatitude();
-            avgLon += customer.getLongitude();
         }
         
         // تحديث الخريطة لإظهار التغييرات
         mapView.invalidate();
         
-        // توسيط الخريطة على متوسط المواقع
-        avgLat /= customersWithLocation.size();
-        avgLon /= customersWithLocation.size();
-        GeoPoint centerPoint = new GeoPoint(avgLat, avgLon);
-        mapController.setCenter(centerPoint);
-        mapController.setZoom(12.0);
+        // إنشاء BoundingBox من جميع النقاط
+        BoundingBox boundingBox = new BoundingBox(maxLat, maxLon, minLat, minLon);
+        currentBoundingBox = boundingBox;
         
-        System.out.println("تم إضافة " + markerCount + " ماركر بنجاح");
+        System.out.println("BoundingBox: " + boundingBox.toString());
+        
+        // حساب المركز خارج lambda
+        final double centerLat = (minLat + maxLat) / 2.0;
+        final double centerLon = (minLon + maxLon) / 2.0;
+        final double latDiff = maxLat - minLat;
+        final double lonDiff = maxLon - minLon;
+        final double maxDiff = Math.max(latDiff, lonDiff);
+        
+        // تأخير قصير لضمان تحميل الخريطة ثم توسيطها
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            try {
+                // استخدام zoomToBoundingBox لضمان ظهور جميع الماركرات
+                mapView.zoomToBoundingBox(boundingBox, true, 50);
+                
+                // تأخير إضافي للتأكد من التوسيط
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    GeoPoint centerPoint = new GeoPoint(centerLat, centerLon);
+                    mapController.animateTo(centerPoint);
+                }, 500);
+            } catch (Exception e) {
+                // في حالة فشل zoomToBoundingBox، استخدم الطريقة التقليدية
+                System.out.println("فشل في zoomToBoundingBox، استخدام الطريقة التقليدية");
+                GeoPoint centerPoint = new GeoPoint(centerLat, centerLon);
+                
+                double zoomLevel = customersWithLocation.size() == 1 ? 16.0 : 
+                                  maxDiff < 0.01 ? 14.0 : 
+                                  maxDiff < 0.1 ? 11.0 : 8.0;
+                
+                mapController.setCenter(centerPoint);
+                mapController.setZoom(zoomLevel);
+            }
+        }, 1000);
+        
+        System.out.println("تم إضافة " + customersWithLocation.size() + " ماركر بنجاح");
         Toast.makeText(this, "تم العثور على " + customersWithLocation.size() + " عميل بموقع محدد", Toast.LENGTH_SHORT).show();
     }
 
