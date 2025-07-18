@@ -196,6 +196,10 @@ public class InventoryManagementFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // تنظيف حقل البحث عند العودة للشاشة
+        if (searchInventoryEditText != null) {
+            searchInventoryEditText.setText("");
+        }
         loadInventoryData();
     }
 } 

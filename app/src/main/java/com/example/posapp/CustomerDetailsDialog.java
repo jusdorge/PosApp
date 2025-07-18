@@ -79,17 +79,10 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     private List<Invoice> customerInvoices = new ArrayList<>();
 
     public static CustomerDetailsDialog newInstance(String customerId) {
-        // Debug log
-        android.util.Log.d("CustomerDetailsDialog", "newInstance called with customerId: " + customerId);
-        
         CustomerDetailsDialog fragment = new CustomerDetailsDialog();
         Bundle args = new Bundle();
         args.putString(ARG_CUSTOMER_ID, customerId);
         fragment.setArguments(args);
-        
-        // Debug log
-        android.util.Log.d("CustomerDetailsDialog", "newInstance finished");
-        
         return fragment;
     }
 
@@ -97,24 +90,15 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Debug log
-        android.util.Log.d("CustomerDetailsDialog", "onCreate called");
-        
         if (getArguments() != null) {
             customerId = getArguments().getString(ARG_CUSTOMER_ID);
         }
         db = FirebaseFirestore.getInstance();
-        
-        // Debug log
-        android.util.Log.d("CustomerDetailsDialog", "onCreate finished with customerId: " + customerId);
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // Debug log
-        android.util.Log.d("CustomerDetailsDialog", "onCreateDialog called");
-        
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_customer_details, null);

@@ -65,6 +65,10 @@ public class EditInvoiceItemDialog extends DialogFragment {
         priceEditText.setText(String.valueOf(invoiceItem.getPrice()));
         quantityEditText.setText(String.valueOf(invoiceItem.getQuantity()));
         updateTotalPrice(totalPriceText, invoiceItem.getPrice(), invoiceItem.getQuantity());
+        
+        // تنظيف التركيز على الحقول
+        priceEditText.clearFocus();
+        quantityEditText.clearFocus();
 
         // إضافة مستمعين لتغيير الكمية بالأزرار
         decreaseButton.setOnClickListener(v -> {

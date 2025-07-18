@@ -98,6 +98,12 @@ public class StockAdjustmentDialog extends DialogFragment {
         productNameTextView.setText(product.getName());
         currentQuantityTextView.setText("الكمية الحالية: " + product.getQuantity());
         addRadioButton.setChecked(true); // Default to adding
+        
+        // تنظيف الحقول عند فتح الـ dialog
+        adjustmentQuantityEditText.setText("");
+        reasonEditText.setText("");
+        adjustmentQuantityEditText.clearFocus();
+        reasonEditText.clearFocus();
     }
     
     private void setupListeners() {

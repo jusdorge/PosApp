@@ -38,9 +38,6 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_counter, container, false);
 
-        // Debug log
-        android.util.Log.d("CounterFragment", "onCreateView called");
-        
         activeInstance = this;
         // ربط العناصر من واجهة المستخدم
         invoiceItemsRecyclerView = view.findViewById(R.id.invoiceItemsRecyclerView);
@@ -74,18 +71,11 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
             // إظهار نافذة الدفع
             CheckoutDialog dialog;
             
-            // Debug log
-            android.util.Log.d("CounterFragment", "Creating CheckoutDialog with customer: " + 
-                (currentCustomer != null ? currentCustomer.getName() : "null"));
-            
-            if (currentCustomer != null) {
-                dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice, currentCustomer);
-            } else {
-                dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice);
-            }
-            
-            // Debug log
-            android.util.Log.d("CounterFragment", "CheckoutDialog created");
+                    if (currentCustomer != null) {
+            dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice, currentCustomer);
+        } else {
+            dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice);
+        }
             dialog.setOnInvoiceCompletedListener(() -> {
                 // مسح الفاتورة بعد الدفع
                 invoiceItems.clear();
@@ -93,17 +83,11 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
                 updateTotalPrice();
             });
             dialog.show(getChildFragmentManager(), "CheckoutDialog");
-            
-            // Debug log
-            android.util.Log.d("CounterFragment", "CheckoutDialog shown");
         });
 
         // تحديث إجمالي السعر
         updateTotalPrice();
 
-        // Debug log
-        android.util.Log.d("CounterFragment", "onCreateView finished");
-        
         return view;
     }
 
@@ -111,23 +95,14 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
     public void onDestroy() {
         super.onDestroy();
         
-        // Debug log
-        android.util.Log.d("CounterFragment", "onDestroy called");
-        
         if (activeInstance == this) {
             activeInstance = null;
         }
-        
-        // Debug log
-        android.util.Log.d("CounterFragment", "onDestroy finished");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        
-        // Debug log
-        android.util.Log.d("CounterFragment", "onResume called");
         
         // تحديث قائمة الفاتورة وإجمالي السعر عند العودة إلى الشاشة
         if (invoiceAdapter != null) {
@@ -143,9 +118,6 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
                 invoiceCustomerTextView.setText("الزبون: مجهول");
             }
         }
-        
-        // Debug log
-        android.util.Log.d("CounterFragment", "onResume finished");
     }
 
     @Override
@@ -198,10 +170,6 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
     public static void setCustomer(Customer customer) {
         currentCustomer = customer;
         
-        // Debug log
-        android.util.Log.d("CounterFragment", "Setting customer: " + 
-            (customer != null ? customer.getName() : "null"));
-        
         // تحديث TextView إذا كان Fragment نشطًا
         if (activeInstance != null && invoiceCustomerTextView != null) {
             if (customer != null) {
@@ -210,60 +178,32 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
                 invoiceCustomerTextView.setText("الزبون: مجهول");
             }
         }
-        
-        // Debug log
-        android.util.Log.d("CounterFragment", "setCustomer finished");
     }
 
     public static Customer getCurrentCustomer() {
-        // Debug log
-        android.util.Log.d("CounterFragment", "getCurrentCustomer called, returning: " + 
-            (currentCustomer != null ? currentCustomer.getName() : "null"));
-        
-        // Debug log
-        android.util.Log.d("CounterFragment", "getCurrentCustomer finished");
-        
         return currentCustomer;
     }
 
     public static void clearInvoice() {
-        // Debug log
-        android.util.Log.d("CounterFragment", "clearInvoice called");
-        
         invoiceItems.clear();
         if (activeInstance != null && activeInstance.invoiceAdapter != null) {
             activeInstance.invoiceAdapter.notifyDataSetChanged();
             activeInstance.updateTotalPrice();
         }
-        
-        // Debug log
-        android.util.Log.d("CounterFragment", "clearInvoice finished");
     }
 
     public static void clearCustomer() {
-        // Debug log
-        android.util.Log.d("CounterFragment", "clearCustomer called");
-        
         currentCustomer = null;
         if (activeInstance != null && invoiceCustomerTextView != null) {
             invoiceCustomerTextView.setText("الزبون: مجهول");
         }
-        
-        // Debug log
-        android.util.Log.d("CounterFragment", "clearCustomer finished");
     }
 
     private void updateTotalPrice() {
-        // Debug log
-        android.util.Log.d("CounterFragment", "updateTotalPrice called");
-        
         totalPrice = 0.0;
         for (InvoiceItem item : invoiceItems) {
             totalPrice += item.getQuantity()*item.getPrice();
         }
         totalPriceTextView.setText(String.format("%.2f ريال", totalPrice));
-        
-        // Debug log
-        android.util.Log.d("CounterFragment", "updateTotalPrice finished - total: " + totalPrice);
     }
 } 

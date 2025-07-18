@@ -121,6 +121,10 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
     @Override
     public void onResume() {
         super.onResume();
+        // تنظيف حقل البحث عند العودة للشاشة
+        if (searchCustomerEditText != null) {
+            searchCustomerEditText.setText("");
+        }
         loadCustomers();
     }
 

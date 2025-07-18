@@ -86,6 +86,9 @@ public class AddProductActivity extends AppCompatActivity {
         uploadImageButton.setOnClickListener(v -> openImageChooser());
         cancelButton.setOnClickListener(v -> confirmExit());
 
+        // تنظيف الحقول عند فتح الشاشة
+        clearAllFields();
+        
         loadProducts(); // Load products from Firestore
     }
 
@@ -221,5 +224,16 @@ public class AddProductActivity extends AppCompatActivity {
                !productCostPriceInput.getText().toString().trim().isEmpty() ||
                !productQuantityInput.getText().toString().trim().isEmpty() ||
                !productMinQuantityInput.getText().toString().trim().isEmpty();
+    }
+
+    private void clearAllFields() {
+        productNameInput.setText("");
+        productCategoryInput.setText("");
+        productBarcodeInput.setText("");
+        productSellingPriceInput.setText("");
+        productCostPriceInput.setText("");
+        productQuantityInput.setText("");
+        productMinQuantityInput.setText("");
+        imageUrl = "";
     }
 } 

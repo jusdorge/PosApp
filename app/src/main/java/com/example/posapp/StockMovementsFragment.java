@@ -260,6 +260,11 @@ public class StockMovementsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // تنظيف حقل البحث والمرشحات عند العودة للشاشة
+        if (searchMovementsEditText != null) {
+            searchMovementsEditText.setText("");
+        }
+        clearFilters();
         loadStockMovements();
     }
 } 

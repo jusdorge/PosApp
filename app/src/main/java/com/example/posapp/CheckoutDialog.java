@@ -52,18 +52,14 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
 
     public CheckoutDialog() {
         super();
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "Constructor called");
+
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onCreate called");
-        android.util.Log.d("CheckoutDialog", "onCreate - selectedCustomer: " + 
-            (selectedCustomer != null ? selectedCustomer.getName() : "null"));
+
     }
 
     private List<InvoiceItem> invoiceItems;
@@ -102,9 +98,7 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         dialog.invoiceItems = new ArrayList<>(items);
         dialog.totalAmount = totalAmount;
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "Created without customer");
-        
+
         return dialog;
     }
 
@@ -114,10 +108,7 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         dialog.totalAmount = totalAmount;
         dialog.selectedCustomer = customer;
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "Created with customer: " + 
-            (customer != null ? customer.getName() : "null"));
-        
+
         return dialog;
     }
 
@@ -128,26 +119,16 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
     public void setSelectedCustomer(Customer customer) {
         selectedCustomer = customer;
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "setSelectedCustomer called with: " + 
-            (customer != null ? customer.getName() : "null"));
-        
         // تحديث الحقول إذا كانت الواجهة جاهزة
         if (customerNameEditText != null && phoneNumberEditText != null) {
             updateCustomerFields();
             hideSearchResults();
         }
-        
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "setSelectedCustomer finished");
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onCreateDialog called");
-        
         db = FirebaseFirestore.getInstance();
         searchResults = new ArrayList<>();
 
@@ -174,18 +155,12 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         searchResultsRecyclerView.setAdapter(searchAdapter);
 
         // إذا كان هناك عميل محدد مسبقاً
-        android.util.Log.d("CheckoutDialog", "onCreateDialog - selectedCustomer: " + 
-            (selectedCustomer != null ? selectedCustomer.getName() : "null"));
-            
         if (selectedCustomer != null) {
             updateCustomerFields();
             hideSearchResults();
         } else {
             // إذا لم يكن هناك عميل محدد، تحقق من CounterFragment
             Customer currentCustomer = CounterFragment.getCurrentCustomer();
-            android.util.Log.d("CheckoutDialog", "CounterFragment customer: " + 
-                (currentCustomer != null ? currentCustomer.getName() : "null"));
-                
             if (currentCustomer != null) {
                 selectedCustomer = currentCustomer;
                 updateCustomerFields();
@@ -276,10 +251,6 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
 
         builder.setView(view);
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onCreateDialog finished - selectedCustomer: " + 
-            (selectedCustomer != null ? selectedCustomer.getName() : "null"));
-        
         return builder.create();
     }
 
@@ -287,48 +258,43 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
     public void onStart() {
         super.onStart();
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onStart called");
-        
         // تحديث الحقول مرة أخرى في حالة لم تكن جاهزة من قبل
         if (selectedCustomer != null) {
             updateCustomerFields();
         }
-        
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onStart finished");
     }
 
     @Override
     public void onResume() {
         super.onResume();
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onResume called");
-        
         // تحديث الحقول مرة أخرى في حالة لم تكن جاهزة من قبل
         if (selectedCustomer != null) {
             updateCustomerFields();
         }
-        
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onResume finished");
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onViewCreated called");
-        
         // تحديث الحقول بعد أن تصبح الـ views جاهزة
         if (selectedCustomer != null) {
             updateCustomerFields();
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
         
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onViewCreated finished");
+        // تنظيف المتغيرات عند إغلاق الـ dialog
+        selectedCustomer = null;
+        if (searchResults != null) {
+            searchResults.clear();
+        }
+        
+
     }
 
     private void searchCustomers(String query) {
@@ -393,77 +359,37 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
     }
 
     private void hideSearchResults() {
-        android.util.Log.d("CheckoutDialog", "hideSearchResults called");
-        
         searchResultsRecyclerView.setVisibility(View.GONE);
         noResultsTextView.setVisibility(View.GONE);
         addNewCustomerButton.setVisibility(View.GONE);
         searchContactsButton.setVisibility(View.GONE);
-        
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "hideSearchResults finished");
     }
 
     @Override
     public void onCustomerSelected(Customer customer) {
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onCustomerSelected called with: " + 
-            (customer != null ? customer.getName() : "null"));
-        
         selectedCustomer = customer;
         updateCustomerFields();
         hideSearchResults();
-        
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "onCustomerSelected finished");
     }
 
     private void updateCustomerFields() {
-        android.util.Log.d("CheckoutDialog", "updateCustomerFields called");
-        android.util.Log.d("CheckoutDialog", "selectedCustomer: " + 
-            (selectedCustomer != null ? selectedCustomer.getName() : "null"));
-        android.util.Log.d("CheckoutDialog", "customerNameEditText: " + 
-            (customerNameEditText != null ? "not null" : "null"));
-        android.util.Log.d("CheckoutDialog", "phoneNumberEditText: " + 
-            (phoneNumberEditText != null ? "not null" : "null"));
-            
         if (selectedCustomer != null && customerNameEditText != null && phoneNumberEditText != null) {
             String customerName = selectedCustomer.getName();
             String customerPhone = selectedCustomer.getPhone();
             
             customerNameEditText.setText(customerName);
             phoneNumberEditText.setText(customerPhone);
-            
-            // Debug log
-            android.util.Log.d("CheckoutDialog", "Updated customer fields: " + customerName);
-            android.util.Log.d("CheckoutDialog", "Name field now contains: " + customerNameEditText.getText().toString());
-            android.util.Log.d("CheckoutDialog", "Phone field now contains: " + phoneNumberEditText.getText().toString());
-        } else {
-            android.util.Log.d("CheckoutDialog", "Cannot update customer fields - missing required objects");
         }
-        
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "updateCustomerFields finished");
     }
 
     private void showAddCustomerDialog() {
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "showAddCustomerDialog called");
-        
         AddCustomerDialog dialog = new AddCustomerDialog();
         dialog.setOnCustomerAddedListener(customer -> {
-            // Debug log
-            android.util.Log.d("CheckoutDialog", "Customer added from dialog: " + 
-                (customer != null ? customer.getName() : "null"));
-            
             selectedCustomer = customer;
             updateCustomerFields();
             hideSearchResults();
         });
         dialog.show(getChildFragmentManager(), "AddCustomerDialog");
-        
-        // Debug log
-        android.util.Log.d("CheckoutDialog", "showAddCustomerDialog finished");
     }
 
     // التحقق من إذن الوصول لجهات الاتصال
