@@ -37,6 +37,36 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- قسم إضافة منتوج جديد -->
+    <LinearLayout
+        android:id="@+id/addProductSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        android:background="@color/colorBackground">
+
+        <TextView
+            android:id="@+id/noResultsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="لا توجد نتائج للبحث"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/addNewProductButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="إضافة منتوج جديد"
+            android:backgroundTint="@color/colorAccent"
+            android:textColor="@color/colorWhite"
+            android:layout_marginBottom="8dp" />
+    </LinearLayout>
+
     <!-- قسم المنتجات -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/productsRecyclerView"

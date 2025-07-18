@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment moreFragment = new MoreFragment();
     private Fragment customersFragment = null; // سيتم إنشاؤها عند الحاجة
     private Fragment productsManagementFragment = null; // سيتم إنشاؤها عند الحاجة
+    private Fragment inventoryManagementFragment = null; // سيتم إنشاؤها عند الحاجة
     private Fragment activeFragment = counterFragment;
 
     // متغير لتتبع ما إذا كنا في شاشة من القائمة الجانبية
@@ -48,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Debug log
+        android.util.Log.d("MainActivity", "onCreate called");
+        
         // تهيئة Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
@@ -82,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
                     navigateToCustomersManagement();
                 } else if (id == R.id.action_manage_products) {
                     navigateToProductsManagement();
+                } else if (id == R.id.action_inventory_management) {
+                    navigateToInventoryManagement();
                 } else if (id == R.id.action_all_invoices) {
                     openAllInvoicesActivity();
                 } else if (id == R.id.action_select_customer_location) {
@@ -208,8 +214,14 @@ public class MainActivity extends AppCompatActivity {
 
     // عرض dialog لاختيار عميل للفاتورة
     private void showAddCustomerDialog() {
+        // Debug log
+        android.util.Log.d("MainActivity", "showAddCustomerDialog called");
+        
         SelectCustomerDialog dialog = new SelectCustomerDialog();
         dialog.setOnCustomerSelectedListener(customer -> {
+            // Debug log
+            android.util.Log.d("MainActivity", "Customer selected: " + customer.getName());
+            
             // تعيين العميل في CounterFragment
             CounterFragment.setCustomer(customer);
             
@@ -224,6 +236,9 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "تم اختيار العميل: " + customer.getName(), Toast.LENGTH_SHORT).show();
         });
         dialog.show(getSupportFragmentManager(), "SelectCustomerDialog");
+        
+        // Debug log
+        android.util.Log.d("MainActivity", "showAddCustomerDialog finished");
     }
 
     // صفحة اختيار الموقع الجغرافي للعميل
@@ -302,6 +317,40 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
 
         activeFragment = productsManagementFragment;
+
+        // إلغاء تحديد عناصر Bottom Navigation
+        bottomNavigationView.getMenu().setGroupCheckable(0, true, false);
+        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setChecked(false);
+        }
+        bottomNavigationView.getMenu().setGroupCheckable(0, true, true);
+    }
+
+    private void navigateToInventoryManagement() {
+        // إنشاء Fragment إدارة المخزون إذا لم يكن موجوداً
+        if (inventoryManagementFragment == null) {
+            inventoryManagementFragment = new InventoryManagementFragment();
+        }
+
+        isInDrawerFragment = true;
+
+        // استخدام نفس آلية show/hide
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // إخفاء جميع الـ Fragments
+        transaction.hide(activeFragment);
+
+        // إضافة أو إظهار Fragment إدارة المخزون
+        if (!inventoryManagementFragment.isAdded()) {
+            transaction.add(R.id.fragment_container, inventoryManagementFragment, "inventory");
+        } else {
+            transaction.show(inventoryManagementFragment);
+        }
+
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        activeFragment = inventoryManagementFragment;
 
         // إلغاء تحديد عناصر Bottom Navigation
         bottomNavigationView.getMenu().setGroupCheckable(0, true, false);

@@ -79,25 +79,42 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     private List<Invoice> customerInvoices = new ArrayList<>();
 
     public static CustomerDetailsDialog newInstance(String customerId) {
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "newInstance called with customerId: " + customerId);
+        
         CustomerDetailsDialog fragment = new CustomerDetailsDialog();
         Bundle args = new Bundle();
         args.putString(ARG_CUSTOMER_ID, customerId);
         fragment.setArguments(args);
+        
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "newInstance finished");
+        
         return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "onCreate called");
+        
         if (getArguments() != null) {
             customerId = getArguments().getString(ARG_CUSTOMER_ID);
         }
         db = FirebaseFirestore.getInstance();
+        
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "onCreate finished with customerId: " + customerId);
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "onCreateDialog called");
+        
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_customer_details, null);
@@ -131,10 +148,16 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
 
         loadCustomerDetails();
 
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "onCreateDialog finished");
+        
         return builder.create();
     }
 
     private void loadCustomerDetails() {
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "loadCustomerDetails called with customerId: " + customerId);
+        
         if (customerId == null) {
             Toast.makeText(getContext(), "خطأ: معرّف الزبون غير متوفر", Toast.LENGTH_SHORT).show();
             dismiss();
@@ -159,9 +182,15 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
                     Toast.makeText(getContext(), "فشل في تحميل بيانات الزبون: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     dismiss();
                 });
+        
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "loadCustomerDetails finished");
     }
 
     private void displayCustomerDetails(Customer customer) {
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "displayCustomerDetails called with: " + customer.getName());
+        
         customerNameTextView.setText(customer.getName());
         customerPhoneTextView.setText(customer.getPhone());
         totalDebtTextView.setText(String.format("%.2f دج", customer.getTotalDebt()));
@@ -200,6 +229,9 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
 
         // نستدعي تحميل الفواتير هنا بعد تحميل بيانات العميل
         loadCustomerInvoices();
+        
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "displayCustomerDetails finished");
     }
 
     private void showAddPaymentDialog() {
@@ -253,14 +285,24 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     }
 
     private void selectCustomerForInvoice() {
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "selectCustomerForInvoice called");
+        
         Customer newCurrentCustomer = new Customer();
         newCurrentCustomer.setId(customerId);
         newCurrentCustomer.setName(customerNameTextView.getText().toString());
         newCurrentCustomer.setPhone(customerPhoneTextView.getText().toString());
+        
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "Selecting customer: " + newCurrentCustomer.getName());
+        
         CounterFragment.setCustomer(newCurrentCustomer);
-        CheckoutDialog.setCustomer(newCurrentCustomer);
 
         Toast.makeText(getContext(), "تم اختيار الزبون للفاتورة: " + customerNameTextView.getText(), Toast.LENGTH_SHORT).show();
+        
+        // Debug log
+        android.util.Log.d("CustomerDetailsDialog", "selectCustomerForInvoice finished");
+        
         dismiss();
     }
 

@@ -172,8 +172,14 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
 
     @Override
     public void onCustomerClick(Customer customer, int position) {
+        // Debug log
+        android.util.Log.d("CustomersFragment", "onCustomerClick called with customer: " + customer.getName());
+        
         CustomerDetailsDialog dialog = CustomerDetailsDialog.newInstance(customer.getId());
         dialog.show(getChildFragmentManager(), "CustomerDetailsDialog");
+        
+        // Debug log
+        android.util.Log.d("CustomersFragment", "onCustomerClick finished");
     }
 
     @Override

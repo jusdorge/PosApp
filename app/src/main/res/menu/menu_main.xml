@@ -30,6 +30,12 @@
         app:showAsAction="never" />
     
     <item
+        android:id="@+id/action_inventory_management"
+        android:icon="@drawable/ic_items"
+        android:title="إدارة المخزون"
+        app:showAsAction="never" />
+    
+    <item
         android:id="@+id/action_all_invoices"
         android:icon="@android:drawable/ic_menu_agenda"
         android:title="جميع الفواتير"

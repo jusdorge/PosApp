@@ -1,5 +1,6 @@
 package com.example.posapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,9 @@ public class ItemsFragment extends Fragment implements InvoiceItemAdapter.OnProd
     private RecyclerView productsRecyclerView;
     private EditText searchProductEdit;
     private ImageButton scanBarcodeButton;
+    private LinearLayout addProductSection;
+    private TextView noResultsTextView;
+    private Button addNewProductButton;
     
     private InvoiceItemAdapter productAdapter;
     
@@ -51,6 +56,9 @@ public class ItemsFragment extends Fragment implements InvoiceItemAdapter.OnProd
         productsRecyclerView = view.findViewById(R.id.productsRecyclerView);
         searchProductEdit = view.findViewById(R.id.searchProductEdit);
         scanBarcodeButton = view.findViewById(R.id.scanBarcodeButton);
+        addProductSection = view.findViewById(R.id.addProductSection);
+        noResultsTextView = view.findViewById(R.id.noResultsTextView);
+        addNewProductButton = view.findViewById(R.id.addNewProductButton);
 
         // إعداد محول المنتجات
         productAdapter = new InvoiceItemAdapter(filteredProductList, this);
@@ -75,6 +83,19 @@ public class ItemsFragment extends Fragment implements InvoiceItemAdapter.OnProd
         scanBarcodeButton.setOnClickListener(v -> {
             // هنا يمكن إضافة وظيفة مسح الباركود
             Toast.makeText(getContext(), "سيتم تنفيذ وظيفة مسح الباركود لاحقاً", Toast.LENGTH_SHORT).show();
+        });
+
+        // إعداد مستمع زر إضافة منتوج جديد
+        addNewProductButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), AddProductActivity.class);
+            startActivity(intent);
+        });
+
+        // إعداد مستمع النقر على شريط البحث
+        searchProductEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && searchProductEdit.getText().toString().trim().isEmpty()) {
+                showAddProductSection("أدخل اسم المنتج للبحث أو إضافة منتوج جديد");
+            }
         });
 
         // تحميل المنتجات
@@ -104,15 +125,33 @@ public class ItemsFragment extends Fragment implements InvoiceItemAdapter.OnProd
         filteredProductList.clear();
         if (query.isEmpty()) {
             filteredProductList.addAll(productList);
+            hideAddProductSection();
         } else {
-
+            boolean foundResults = false;
             for (Product product : productList) {
-                if (product.getName().contains(query)){
+                if (product.getName().toLowerCase().contains(query.toLowerCase())){
                     filteredProductList.add(product);
+                    foundResults = true;
                 }
+            }
+            
+            // إظهار قسم إضافة المنتوج الجديد إذا لم توجد نتائج
+            if (!foundResults && !query.trim().isEmpty()) {
+                showAddProductSection("لا توجد نتائج للبحث عن \"" + query + "\"");
+            } else {
+                hideAddProductSection();
             }
         }
         productAdapter.notifyDataSetChanged();
+    }
+
+    private void showAddProductSection(String message) {
+        noResultsTextView.setText(message);
+        addProductSection.setVisibility(View.VISIBLE);
+    }
+
+    private void hideAddProductSection() {
+        addProductSection.setVisibility(View.GONE);
     }
 
     @Override
@@ -133,5 +172,20 @@ public class ItemsFragment extends Fragment implements InvoiceItemAdapter.OnProd
         
         // التبديل إلى CounterFragment لعرض الفاتورة (اختياري)
         ((MainActivity) requireActivity()).switchToCounterFragment();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // تنظيف حقل البحث عند العودة للشاشة
+        if (searchProductEdit != null) {
+            searchProductEdit.setText("");
+        }
+        // إخفاء قسم إضافة المنتج
+        if (addProductSection != null) {
+            addProductSection.setVisibility(View.GONE);
+        }
+        // إعادة تحميل المنتجات عند العودة من AddProductActivity
+        loadProducts();
     }
 }
