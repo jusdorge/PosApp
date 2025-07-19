@@ -48,6 +48,18 @@
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
+
+            <Button
+                android:id="@+id/scanQRButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="@color/colorAccent"
+                android:drawableLeft="@android:drawable/ic_menu_camera"
+                android:drawablePadding="4dp"
+                android:text="QR"
+                android:textColor="@color/colorWhite"
+                android:textSize="12sp" />
     </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/invoiceItemsRecyclerView"

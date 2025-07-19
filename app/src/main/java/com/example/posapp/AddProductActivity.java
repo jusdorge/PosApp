@@ -208,11 +208,13 @@ public class AddProductActivity extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle("تأكيد الخروج")
                     .setMessage("هل تريد الخروج بدون حفظ التغييرات؟")
-                    .setPositiveButton("خروج", (dialog, which) -> finish())
+                    .setPositiveButton("خروج", (dialog, which) -> {
+                        super.onBackPressed();
+                    })
                     .setNegativeButton("إلغاء", null)
                     .show();
         } else {
-            finish();
+            super.onBackPressed();
         }
     }
 

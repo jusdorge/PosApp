@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- صلاحيات التطبيق -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
@@ -14,6 +18,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".MyPOSApplication"
@@ -79,6 +84,21 @@
             android:name=".QRCodePrintActivity"
             android:exported="false"
             android:label="@string/title_activity_qr_code" />
+        <!-- شاشة عرض العملاء على الخريطة -->
+        <activity android:name=".CustomersMapActivity" />
+        
+        <!-- شاشة مسح QR Code -->
+        <activity 
+            android:name=".QRScannerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+            
+        <!-- CaptureActivity من مكتبة ZXing -->
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="android:screenOrientation" />
+
         <!-- File Provider for sharing files -->
         <provider
             android:name="androidx.core.content.FileProvider"
