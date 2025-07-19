@@ -37,15 +37,32 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/customerDebtTextView"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/debt_background"
-            android:padding="8dp"
-            android:text="250.00 دج"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/customerDebtTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/debt_background"
+                android:padding="8dp"
+                android:text="250.00 دج"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/qrCodeButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:background="@color/colorPrimary"
+                android:text="QR"
+                android:textColor="@color/colorWhite"
+                android:textSize="10sp" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView> 

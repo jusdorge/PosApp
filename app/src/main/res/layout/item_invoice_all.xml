@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- الصف الأول: رقم الفاتورة وحالة الدفع -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvInvoiceNumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="فاتورة #12345"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/tvPaymentStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="نقدي"
+                android:textColor="@color/colorWhite"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:padding="6dp"
+                android:background="@drawable/payment_background" />
+
+        </LinearLayout>
+
+        <!-- الصف الثاني: اسم العميل وعدد العناصر -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvCustomerName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="العميل: أحمد محمد"
+                android:textSize="14sp"
+                android:textColor="@color/colorText" />
+
+            <TextView
+                android:id="@+id/tvItemsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5 عناصر"
+                android:textSize="12sp"
+                android:textColor="@color/colorSecondaryText"
+                android:background="@color/colorBackground"
+                android:padding="4dp" />
+
+        </LinearLayout>
+
+        <!-- الصف الثالث: التاريخ والمبلغ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvInvoiceDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="التاريخ: 01/01/2024 14:30"
+                android:textSize="12sp"
+                android:textColor="@color/colorSecondaryText" />
+
+            <TextView
+                android:id="@+id/tvTotalAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="المبلغ: 1250.00 دج"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/holo_green_dark" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView> 

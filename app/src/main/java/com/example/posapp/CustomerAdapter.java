@@ -3,6 +3,7 @@ package com.example.posapp;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,9 +18,14 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
     private List<Customer> customerList;
     private List<Customer> filteredList;
     private OnCustomerClickListener clickListener;
+    private OnQRCodeClickListener qrCodeClickListener;
 
     public interface OnCustomerClickListener {
         void onCustomerClick(Customer customer, int position);
+    }
+
+    public interface OnQRCodeClickListener {
+        void onQRCodeClick(Customer customer);
     }
 
     public CustomerAdapter(List<Customer> customerList) {
@@ -29,6 +35,10 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
 
     public void setOnCustomerClickListener(OnCustomerClickListener listener) {
         this.clickListener = listener;
+    }
+
+    public void setOnQRCodeClickListener(OnQRCodeClickListener listener) {
+        this.qrCodeClickListener = listener;
     }
 
     @NonNull
@@ -75,12 +85,14 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
         TextView customerNameTextView;
         TextView customerPhoneTextView;
         TextView customerDebtTextView;
+        Button qrCodeButton;
 
         public CustomerViewHolder(@NonNull View itemView) {
             super(itemView);
             customerNameTextView = itemView.findViewById(R.id.customerNameTextView);
             customerPhoneTextView = itemView.findViewById(R.id.customerPhoneTextView);
             customerDebtTextView = itemView.findViewById(R.id.customerDebtTextView);
+            qrCodeButton = itemView.findViewById(R.id.qrCodeButton);
         }
 
         void bind(Customer customer, int position) {
@@ -98,6 +110,12 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
             itemView.setOnClickListener(v -> {
                 if (clickListener != null) {
                     clickListener.onCustomerClick(customer, position);
+                }
+            });
+
+            qrCodeButton.setOnClickListener(v -> {
+                if (qrCodeClickListener != null) {
+                    qrCodeClickListener.onQRCodeClick(customer);
                 }
             });
         }

@@ -85,9 +85,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="4dp"
             android:text="إلغاء"
-            android:textColor="@color/colorPrimary"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
+            android:textColor="@color/colorWhite"
+            android:backgroundTint="@color/colorAccent"/>
         <Button
             android:id="@+id/saveButton"
             android:layout_width="0dp"

@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,7 +36,7 @@ public class AddProductActivity extends AppCompatActivity {
     private EditText productNameInput, productCategoryInput, productBarcodeInput,
                      productSellingPriceInput, productCostPriceInput,
                      productQuantityInput, productMinQuantityInput;
-    private Button addProductButton, uploadImageButton;
+    private Button addProductButton, uploadImageButton, cancelButton;
     private RecyclerView productsRecyclerView;
     private ProductAdapter productAdapter;
     private List<Product> productList;
@@ -50,6 +51,12 @@ public class AddProductActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // إعداد شريط التنقل
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("إضافة منتج جديد");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         // Initialize Firebase
         FirebaseApp.initializeApp(this);
@@ -67,6 +74,7 @@ public class AddProductActivity extends AppCompatActivity {
         productMinQuantityInput = findViewById(R.id.productMinQuantityInput);
         addProductButton = findViewById(R.id.addProductButton);
         uploadImageButton = findViewById(R.id.uploadImageButton);
+        cancelButton = findViewById(R.id.cancelButton);
         productsRecyclerView = findViewById(R.id.productsRecyclerView);
 
         productList = new ArrayList<>();
@@ -76,7 +84,11 @@ public class AddProductActivity extends AppCompatActivity {
 
         addProductButton.setOnClickListener(v -> addProduct());
         uploadImageButton.setOnClickListener(v -> openImageChooser());
+        cancelButton.setOnClickListener(v -> confirmExit());
 
+        // تنظيف الحقول عند فتح الشاشة
+        clearAllFields();
+        
         loadProducts(); // Load products from Firestore
     }
 
@@ -178,5 +190,52 @@ public class AddProductActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        confirmExit();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        confirmExit();
+    }
+
+    private void confirmExit() {
+        if (hasUnsavedChanges()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("تأكيد الخروج")
+                    .setMessage("هل تريد الخروج بدون حفظ التغييرات؟")
+                    .setPositiveButton("خروج", (dialog, which) -> {
+                        super.onBackPressed();
+                    })
+                    .setNegativeButton("إلغاء", null)
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean hasUnsavedChanges() {
+        return !productNameInput.getText().toString().trim().isEmpty() ||
+               !productCategoryInput.getText().toString().trim().isEmpty() ||
+               !productBarcodeInput.getText().toString().trim().isEmpty() ||
+               !productSellingPriceInput.getText().toString().trim().isEmpty() ||
+               !productCostPriceInput.getText().toString().trim().isEmpty() ||
+               !productQuantityInput.getText().toString().trim().isEmpty() ||
+               !productMinQuantityInput.getText().toString().trim().isEmpty();
+    }
+
+    private void clearAllFields() {
+        productNameInput.setText("");
+        productCategoryInput.setText("");
+        productBarcodeInput.setText("");
+        productSellingPriceInput.setText("");
+        productCostPriceInput.setText("");
+        productQuantityInput.setText("");
+        productMinQuantityInput.setText("");
+        imageUrl = "";
     }
 } 

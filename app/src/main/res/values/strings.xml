@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PosApp</string>
+    <string name="app_name">نقطةالبيع </string>
     <string name="inventoryManagement">إدارة المنتج</string>
     <string name="settings">الإعدادات</string>
     <string name="reports">التقارير</string>
@@ -20,4 +20,6 @@
     <string name="title_Selected_Customer_Location">تحديد موقع العميل</string>
     <string name="saveLocation">حفظ الموقع</string>
     <string name="default_web_client_id">584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com</string>
+    <string name="title_activity_all_invoices">جميع الفواتير</string>
+    <string name="title_activity_qr_code">QR code طباعة</string>
 </resources>

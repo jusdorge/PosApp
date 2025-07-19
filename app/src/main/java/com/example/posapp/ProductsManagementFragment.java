@@ -88,6 +88,10 @@ public class ProductsManagementFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // تنظيف حقل البحث عند العودة للشاشة
+        if (searchProductEditText != null) {
+            searchProductEditText.setText("");
+        }
         loadProducts();
     }
 

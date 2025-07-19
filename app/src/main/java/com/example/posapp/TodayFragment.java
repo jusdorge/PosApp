@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import android.content.Intent;
 
 public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvoiceClickListener {
     private RecyclerView invoicesRecyclerView;
@@ -69,6 +70,24 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         loadTodayInvoices();
         
         return view;
+    }
+    
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+        // تسجيل مستمع إضافة الفواتير
+        CheckoutDialog.setOnInvoiceAddedListener(() -> {
+            // إعادة تحميل فواتير اليوم عند إضافة فاتورة جديدة
+            loadTodayInvoices();
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // إلغاء تسجيل المستمع
+        CheckoutDialog.setOnInvoiceAddedListener(null);
     }
     
     @Override
@@ -148,12 +167,9 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     
     @Override
     public void onInvoiceClick(Invoice invoice, int position) {
-        // يمكن إضافة معالجة النقر على الفاتورة هنا
-        // مثلاً، عرض تفاصيل الفاتورة في نافذة منبثقة
-        Toast.makeText(getContext(), "فاتورة #" + invoice.getId().substring(0, 6).toUpperCase(), Toast.LENGTH_SHORT).show();
-        
-        // يمكن إضافة الكود لعرض تفاصيل الفاتورة لاحقاً
-        showInvoiceDetails(invoice);
+        // فتح صفحة طباعة الفاتورة
+        Intent intent = InvoicePrintActivity.createIntent(getContext(), invoice.getId());
+        startActivity(intent);
     }
     
     private void showInvoiceDetails(Invoice invoice) {
