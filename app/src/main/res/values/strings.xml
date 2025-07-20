@@ -42,6 +42,6 @@
     <string name="import_products">استيراد المنتجات</string>
     
     <!-- CSV Arabic Support Instructions -->
-    <string name="csv_encoding_info">نصائح هامة لملفات CSV:\n• الملفات محفوظة بترميز UTF-8\n• لفتحها في Excel: Data > From Text/CSV > UTF-8\n• أو استخدم Google Sheets مباشرة</string>
-    <string name="csv_template_info">القالب جاهز للاستخدام:\n• املأ البيانات في الصفوف\n• لا تغير العناوين\n• احفظ كـ CSV عند الانتهاء</string>
+    <string name="csv_encoding_info">نصائح هامة لملفات CSV:\n• الملفات محفوظة بترميز UTF-8\n• يستخدم الفاصلة المنقوطة (;) كفاصل للحقول\n• لفتحها في Excel: افتح مباشرة أو استخدم استيراد البيانات\n• أو استخدم Google Sheets مباشرة</string>
+    <string name="csv_template_info">القالب جاهز للاستخدام:\n• املأ البيانات في الصفوف\n• لا تغير العناوين\n• لا تغير الفاصل (;)\n• احفظ كـ CSV عند الانتهاء</string>
 </resources>

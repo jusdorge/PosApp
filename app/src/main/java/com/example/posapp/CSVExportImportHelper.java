@@ -17,7 +17,11 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.ICSVWriter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,6 +35,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Helper class للتعامل مع تصدير واستيراد البيانات بصيغة CSV
+ * 
+ * ملاحظات هامة:
+ * - يستخدم ترميز UTF-8 مع BOM لضمان عرض النصوص العربية بشكل صحيح
+ * - يستخدم الفاصلة المنقوطة (;) كفاصل للحقول لأن:
+ *   1. Excel في النسخ العربية يتوقع الفاصلة المنقوطة كفاصل افتراضي
+ *   2. الفاصلة العادية (,) قد تتداخل مع الفاصلة العشرية في الأرقام العربية
+ *   3. يضمن فصل الحقول بشكل صحيح في جميع التطبيقات
+ * 
+ * التقنيات المستخدمة:
+ * - CSVWriterBuilder مع withSeparator(';') للتصدير (يرجع ICSVWriter)
+ * - CSVReaderBuilder مع CSVParserBuilder للاستيراد
+ * - FileWriter مع StandardCharsets.UTF_8 للترميز الصحيح
+ */
 public class CSVExportImportHelper {
     private static final String TAG = "CSVHelper";
     private Context context;
@@ -147,7 +166,10 @@ public class CSVExportImportHelper {
                     // إضافة BOM للتعرف على UTF-8 في Excel
                     fileWriter.write('\ufeff');
                     
-                    CSVWriter writer = new CSVWriter(fileWriter);
+                    // استخدام الفاصلة المنقوطة للنسخ العربية من Excel
+                    ICSVWriter writer = new CSVWriterBuilder(fileWriter)
+                        .withSeparator(';')
+                        .build();
                     
                     // كتابة العناوين
                     String[] headers = {"معرف العميل", "الاسم", "رقم الهاتف", "إجمالي الدين", "خط الطول", "خط العرض"};
@@ -192,7 +214,10 @@ public class CSVExportImportHelper {
                     // إضافة BOM للتعرف على UTF-8 في Excel
                     fileWriter.write('\ufeff');
                     
-                    CSVWriter writer = new CSVWriter(fileWriter);
+                    // استخدام الفاصلة المنقوطة للنسخ العربية من Excel
+                    ICSVWriter writer = new CSVWriterBuilder(fileWriter)
+                        .withSeparator(';')
+                        .build();
                     
                     // كتابة العناوين
                     String[] headers = {"معرف المنتج", "اسم المنتج", "الفئة", "سعر البيع", "سعر الشراء", "الكمية", "الحد الأدنى", "الباركود"};
@@ -239,7 +264,10 @@ public class CSVExportImportHelper {
                     // إضافة BOM للتعرف على UTF-8 في Excel
                     fileWriter.write('\ufeff');
                     
-                    CSVWriter writer = new CSVWriter(fileWriter);
+                    // استخدام الفاصلة المنقوطة للنسخ العربية من Excel
+                    ICSVWriter writer = new CSVWriterBuilder(fileWriter)
+                        .withSeparator(';')
+                        .build();
                     
                     // كتابة العناوين
                     String[] headers = {"معرف الفاتورة", "اسم العميل", "رقم هاتف العميل", "مدفوعة", "إجمالي المبلغ", "التاريخ"};
@@ -290,7 +318,10 @@ public class CSVExportImportHelper {
                     // إضافة BOM للتعرف على UTF-8 في Excel
                     fileWriter.write('\ufeff');
                     
-                    CSVWriter writer = new CSVWriter(fileWriter);
+                    // استخدام الفاصلة المنقوطة للنسخ العربية من Excel
+                    ICSVWriter writer = new CSVWriterBuilder(fileWriter)
+                        .withSeparator(';')
+                        .build();
                     
                     // كتابة العناوين
                     String[] headers = {"معرف الحركة", "معرف المنتج", "اسم المنتج", "الكمية", "نوع الحركة", "السبب", "التاريخ"};
@@ -358,7 +389,10 @@ public class CSVExportImportHelper {
                 context.getContentResolver().openInputStream(fileUri), 
                 java.nio.charset.StandardCharsets.UTF_8
             );
-            CSVReader reader = new CSVReader(isr);
+            // استخدام الفاصلة المنقوطة كفاصل للحقول
+            CSVReader reader = new CSVReaderBuilder(isr)
+                .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
+                .build();
             
             List<String[]> allData = reader.readAll();
             reader.close();
@@ -442,7 +476,10 @@ public class CSVExportImportHelper {
                 context.getContentResolver().openInputStream(fileUri), 
                 java.nio.charset.StandardCharsets.UTF_8
             );
-            CSVReader reader = new CSVReader(isr);
+            // استخدام الفاصلة المنقوطة كفاصل للحقول
+            CSVReader reader = new CSVReaderBuilder(isr)
+                .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
+                .build();
             
             List<String[]> allData = reader.readAll();
             reader.close();
@@ -634,7 +671,10 @@ public class CSVExportImportHelper {
         // إضافة BOM للتعرف على UTF-8 في Excel
         fileWriter.write('\ufeff');
         
-        CSVWriter writer = new CSVWriter(fileWriter);
+        // استخدام الفاصلة المنقوطة للنسخ العربية من Excel
+        ICSVWriter writer = new CSVWriterBuilder(fileWriter)
+            .withSeparator(';')
+            .build();
         
         // كتابة العناوين
         String[] headers = {"معرف العميل (اتركه فارغاً للعملاء الجدد)", "الاسم*", "رقم الهاتف*", "إجمالي الدين (اختياري)", "خط الطول (اختياري)", "خط العرض (اختياري)"};
@@ -655,7 +695,10 @@ public class CSVExportImportHelper {
         // إضافة BOM للتعرف على UTF-8 في Excel
         fileWriter.write('\ufeff');
         
-        CSVWriter writer = new CSVWriter(fileWriter);
+        // استخدام الفاصلة المنقوطة للنسخ العربية من Excel
+        ICSVWriter writer = new CSVWriterBuilder(fileWriter)
+            .withSeparator(';')
+            .build();
         
         // كتابة العناوين
         String[] headers = {"معرف المنتج (اتركه فارغاً للمنتجات الجديدة)", "اسم المنتج*", "الفئة*", "سعر البيع*", "سعر الشراء*", "الكمية*", "الحد الأدنى*", "الباركود (اختياري)"};
