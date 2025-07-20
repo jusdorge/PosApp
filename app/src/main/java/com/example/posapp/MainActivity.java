@@ -21,6 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import android.widget.TextView;
+import com.example.posapp.UserSession;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -51,6 +52,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Debug log
         android.util.Log.d("MainActivity", "onCreate called");
+        
+        // فحص حالة تسجيل الدخول
+        UserSession userSession = UserSession.getInstance(this);
+        if (!userSession.isLoggedIn() || !userSession.validateSession()) {
+            // إذا لم يكن المستخدم مسجل دخول، ارجع إلى شاشة تسجيل الدخول
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
         
         // تهيئة Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -142,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
                 .add(R.id.fragment_container, reportsFragment, "2").hide(reportsFragment)
                 .add(R.id.fragment_container, counterFragment, "1")
                 .commit();
+        
+        // تحديث header النافذة الجانبية
+        updateNavigationHeader();
     }
 
     private void showSelectCustomersLocationPage() {
@@ -247,15 +262,76 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void logoutUser() {
-        mAuth.signOut();
-        GoogleSignIn.getClient(this, new GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()).signOut();
+    public void logoutUser() {
+        // عرض حوار تأكيد تسجيل الخروج
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("تسجيل الخروج")
+                .setMessage("هل أنت متأكد من تسجيل الخروج؟")
+                .setPositiveButton("نعم", (dialog, which) -> {
+                    performLogout();
+                })
+                .setNegativeButton("إلغاء", null)
+                .show();
+    }
+    
+    /**
+     * تنفيذ عملية تسجيل الخروج الفعلية
+     */
+    private void performLogout() {
+        try {
+            // تنظيف جلسة المستخدم أولاً
+            UserSession userSession = UserSession.getInstance(this);
+            userSession.logoutUser();
+            
+            // تسجيل الخروج من Firebase Auth
+            mAuth.signOut();
+            
+            // تسجيل الخروج من Google Sign In
+            GoogleSignIn.getClient(this, new GoogleSignInOptions
+                    .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()).signOut();
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
+            // الانتقال إلى شاشة تسجيل الدخول
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Error during logout", e);
+            android.widget.Toast.makeText(this, "خطأ في تسجيل الخروج", android.widget.Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    /**
+     * تحديث header النافذة الجانبية مع معلومات المستخدم الحالي
+     */
+    private void updateNavigationHeader() {
+        try {
+            UserSession userSession = UserSession.getInstance(this);
+            if (userSession.isLoggedIn()) {
+                android.view.View headerView = navigationView.getHeaderView(0);
+                
+                TextView userNameTextView = headerView.findViewById(R.id.user_name);
+                TextView userEmailTextView = headerView.findViewById(R.id.user_email);
+                
+                com.example.posapp.model.User currentUser = userSession.getCurrentUser();
+                
+                if (userNameTextView != null) {
+                    String displayName = currentUser.getFullName();
+                    if (userSession.isGuestUser()) {
+                        displayName += " (ضيف)";
+                    }
+                    userNameTextView.setText(displayName);
+                }
+                
+                if (userEmailTextView != null) {
+                    String statusText = currentUser.getEmail() + "\n" + userSession.getUserStatusMessage();
+                    userEmailTextView.setText(statusText);
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "Error updating navigation header", e);
+        }
     }
 
     private void navigateToCustomersManagement() {
@@ -371,6 +447,25 @@ public class MainActivity extends AppCompatActivity {
         if (drawerToggle != null) {
             drawerToggle.syncState();
         }
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        
+        // فحص حالة تسجيل الدخول عند العودة للتطبيق
+        UserSession userSession = UserSession.getInstance(this);
+        if (!userSession.isLoggedIn() || !userSession.validateSession()) {
+            // إذا انتهت الجلسة، ارجع إلى شاشة تسجيل الدخول
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+        
+        // تحديث header النافذة الجانبية
+        updateNavigationHeader();
     }
 
     @Override

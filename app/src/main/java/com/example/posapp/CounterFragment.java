@@ -79,12 +79,12 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
             
             // إظهار نافذة الدفع
             CheckoutDialog dialog;
-            
-                    if (currentCustomer != null) {
-            dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice, currentCustomer);
-        } else {
-            dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice);
-        }
+    
+            if (currentCustomer != null) {
+                dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice, currentCustomer);
+            } else {
+                dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice);
+            }
             dialog.setOnInvoiceCompletedListener(() -> {
                 // مسح الفاتورة بعد الدفع
                 invoiceItems.clear();

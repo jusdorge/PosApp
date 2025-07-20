@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,8 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.example.posapp.model.Customer;
+import com.example.posapp.model.Permission;
+import com.example.posapp.model.Resource;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
@@ -29,6 +32,10 @@ public class MoreFragment extends Fragment {
     private CardView qrScannerCard;
     private CardView exportDataCard;
     private CardView importDataCard;
+    private CardView userManagementCard;
+    private CardView notificationsCard;
+    private TextView notificationBadge;
+    private CardView logoutCard;
     
     private FirebaseFirestore db;
     private CSVExportImportHelper csvHelper;
@@ -48,36 +55,186 @@ public class MoreFragment extends Fragment {
         qrScannerCard = view.findViewById(R.id.qrScannerCard);
         exportDataCard = view.findViewById(R.id.exportDataCard);
         importDataCard = view.findViewById(R.id.importDataCard);
+        userManagementCard = view.findViewById(R.id.userManagementCard);
+        notificationsCard = view.findViewById(R.id.notificationsCard);
+        notificationBadge = view.findViewById(R.id.notificationBadge);
+        logoutCard = view.findViewById(R.id.logoutCard);
+        
+        // إخفاء جميع الكارتات افتراضياً حتى يتم فحص الصلاحيات
+        hideAllCards();
         
         setupClickListeners();
+        
+        // تأخير قصير لضمان اكتمال تحميل بيانات المستخدم
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            if (isAdded()) {
+                setupCardVisibilityByPermissions();
+            }
+        }, 500);
         
         return view;
     }
     
     private void setupClickListeners() {
         customersManagementCard.setOnClickListener(v -> {
-            navigateToCustomersManagement();
+            PermissionHelper.executeWithPermission(getContext(), Resource.CUSTOMERS, Permission.READ, 
+                this::navigateToCustomersManagement);
         });
         
         productsManagementCard.setOnClickListener(v -> {
-            navigateToProductsManagement();
+            PermissionHelper.executeWithPermission(getContext(), Resource.PRODUCTS, Permission.READ, 
+                this::navigateToProductsManagement);
         });
         
         allInvoicesCard.setOnClickListener(v -> {
-            openAllInvoicesActivity();
+            PermissionHelper.executeWithPermission(getContext(), Resource.INVOICES, Permission.READ, 
+                this::openAllInvoicesActivity);
         });
         
         qrScannerCard.setOnClickListener(v -> {
-            openQRScanner();
+            PermissionHelper.executeWithAnyPermission(getContext(), Resource.CUSTOMERS, 
+                this::openQRScanner, Permission.READ, Permission.CREATE);
         });
         
         exportDataCard.setOnClickListener(v -> {
-            showExportOptionsDialog();
+            PermissionHelper.executeWithPermission(getContext(), Resource.BACKUP, Permission.EXPORT, 
+                this::showExportOptionsDialog);
         });
         
         importDataCard.setOnClickListener(v -> {
-            showImportOptionsDialog();
+            PermissionHelper.executeWithPermission(getContext(), Resource.BACKUP, Permission.IMPORT, 
+                this::showImportOptionsDialog);
         });
+        
+        userManagementCard.setOnClickListener(v -> {
+            PermissionHelper.executeWithPermission(getContext(), Resource.USERS, Permission.MANAGE_USERS, 
+                this::openUserManagement);
+        });
+        
+        notificationsCard.setOnClickListener(v -> {
+            PermissionHelper.executeWithAnyPermission(getContext(), Resource.USERS, 
+                this::openNotifications, Permission.MANAGE_USERS, Permission.READ);
+        });
+
+        logoutCard.setOnClickListener(v -> {
+            performLogout();
+        });
+    }
+    
+    private void setupCardVisibilityByPermissions() {
+        // استخدام فحص صامت لتجنب رسائل الخطأ أثناء التحميل
+        if (PermissionHelper.hasPermission(getContext(), Resource.CUSTOMERS, Permission.READ)) {
+            customersManagementCard.setVisibility(View.VISIBLE);
+        } else {
+            customersManagementCard.setVisibility(View.GONE);
+        }
+        
+        if (PermissionHelper.hasPermission(getContext(), Resource.PRODUCTS, Permission.READ)) {
+            productsManagementCard.setVisibility(View.VISIBLE);
+        } else {
+            productsManagementCard.setVisibility(View.GONE);
+        }
+        
+        if (PermissionHelper.hasPermission(getContext(), Resource.INVOICES, Permission.READ)) {
+            allInvoicesCard.setVisibility(View.VISIBLE);
+        } else {
+            allInvoicesCard.setVisibility(View.GONE);
+        }
+        
+        if (PermissionHelper.hasAnyPermission(getContext(), Resource.CUSTOMERS, Permission.READ, Permission.CREATE)) {
+            qrScannerCard.setVisibility(View.VISIBLE);
+        } else {
+            qrScannerCard.setVisibility(View.GONE);
+        }
+        
+        if (PermissionHelper.hasPermission(getContext(), Resource.BACKUP, Permission.EXPORT)) {
+            exportDataCard.setVisibility(View.VISIBLE);
+        } else {
+            exportDataCard.setVisibility(View.GONE);
+        }
+        
+        if (PermissionHelper.hasPermission(getContext(), Resource.BACKUP, Permission.IMPORT)) {
+            importDataCard.setVisibility(View.VISIBLE);
+        } else {
+            importDataCard.setVisibility(View.GONE);
+        }
+        
+        if (PermissionHelper.hasPermission(getContext(), Resource.USERS, Permission.MANAGE_USERS)) {
+            userManagementCard.setVisibility(View.VISIBLE);
+        } else {
+            userManagementCard.setVisibility(View.GONE);
+        }
+        
+        // عرض كارت الإشعارات للمديرين والموظفين
+        if (PermissionHelper.hasAnyPermission(getContext(), Resource.USERS, Permission.MANAGE_USERS, Permission.READ)) {
+            notificationsCard.setVisibility(View.VISIBLE);
+            updateNotificationBadge();
+        } else {
+            notificationsCard.setVisibility(View.GONE);
+        }
+        
+        // عرض كارت تسجيل الخروج للجميع (إذا كانوا مسجلين دخول)
+        UserSession userSession = UserSession.getInstance(getContext());
+        if (userSession != null && userSession.isLoggedIn()) {
+            logoutCard.setVisibility(View.VISIBLE);
+        } else {
+            logoutCard.setVisibility(View.GONE);
+        }
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        // تحديث رؤية الكارتات عند العودة للواجهة (بعد تسجيل الدخول مثلاً)
+        refreshCardVisibility();
+        
+        // عرض رسالة تحذيرية للمستخدمين الضيوف
+        showGuestWarningIfNeeded();
+    }
+    
+    /**
+     * عرض رسالة تحذيرية للمستخدمين الضيوف
+     */
+    private void showGuestWarningIfNeeded() {
+        UserSession userSession = UserSession.getInstance(getContext());
+        if (userSession.isGuestUser() && getContext() != null) {
+            // عرض Toast للضيوف مرة واحدة فقط
+            String prefKey = "guest_warning_shown_" + userSession.getCurrentUser().getUsername();
+            android.content.SharedPreferences prefs = getContext().getSharedPreferences("guest_prefs", android.content.Context.MODE_PRIVATE);
+            
+            if (!prefs.getBoolean(prefKey, false)) {
+                Toast.makeText(getContext(), 
+                    "أنت تستخدم حساب ضيف مؤقت - صلاحيات محدودة للعرض فقط", 
+                    Toast.LENGTH_LONG).show();
+                
+                // تحديد أنه تم عرض التحذير
+                prefs.edit().putBoolean(prefKey, true).apply();
+            }
+        }
+    }
+    
+    /**
+     * تحديث رؤية الكارتات حسب الصلاحيات الحالية
+     */
+    public void refreshCardVisibility() {
+        if (isAdded() && getContext() != null) {
+            setupCardVisibilityByPermissions();
+        }
+    }
+    
+    /**
+     * إخفاء جميع الكارتات (حالة افتراضية قبل فحص الصلاحيات)
+     */
+    private void hideAllCards() {
+        if (customersManagementCard != null) customersManagementCard.setVisibility(View.GONE);
+        if (productsManagementCard != null) productsManagementCard.setVisibility(View.GONE);
+        if (allInvoicesCard != null) allInvoicesCard.setVisibility(View.GONE);
+        if (qrScannerCard != null) qrScannerCard.setVisibility(View.GONE);
+        if (exportDataCard != null) exportDataCard.setVisibility(View.GONE);
+        if (importDataCard != null) importDataCard.setVisibility(View.GONE);
+        if (userManagementCard != null) userManagementCard.setVisibility(View.GONE);
+        if (notificationsCard != null) notificationsCard.setVisibility(View.GONE);
+        if (logoutCard != null) logoutCard.setVisibility(View.GONE);
     }
     
     private void showExportOptionsDialog() {
@@ -333,6 +490,121 @@ public class MoreFragment extends Fragment {
         startActivityForResult(intent, QR_SCANNER_REQUEST_CODE);
     }
     
+    private void openUserManagement() {
+        Intent intent = new Intent(getActivity(), UserManagementActivity.class);
+        startActivity(intent);
+    }
+    
+    /**
+     * فتح صفحة الإشعارات
+     */
+    private void openNotifications() {
+        // يمكن إنشاء Activity مخصص للإشعارات أو عرض dialog
+        showNotificationsDialog();
+    }
+
+    /**
+     * تنفيذ عملية تسجيل الخروج
+     */
+    private void performLogout() {
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle("تسجيل الخروج")
+                .setMessage("هل أنت متأكد من تسجيل الخروج؟")
+                .setPositiveButton("نعم", (dialog, which) -> {
+                    // استدعاء MainActivity لتنفيذ تسجيل الخروج
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).logoutUser();
+                    }
+                })
+                .setNegativeButton("لا", null)
+                .show();
+    }
+    
+    /**
+     * تحديث شارة الإشعارات
+     */
+    private void updateNotificationBadge() {
+        if (db != null && notificationBadge != null) {
+            db.collection("notifications")
+                .whereEqualTo("isRead", false)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int unreadCount = queryDocumentSnapshots.size();
+                    if (unreadCount > 0) {
+                        notificationBadge.setText(unreadCount + " إشعار جديد");
+                        notificationBadge.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                    } else {
+                        notificationBadge.setText("لا توجد إشعارات جديدة");
+                        notificationBadge.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    notificationBadge.setText("خطأ في تحميل الإشعارات");
+                });
+        }
+    }
+    
+    /**
+     * عرض حوار الإشعارات
+     */
+    private void showNotificationsDialog() {
+        if (db == null) return;
+        
+        db.collection("notifications")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(20)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                if (queryDocumentSnapshots.isEmpty()) {
+                    Toast.makeText(getContext(), "لا توجد إشعارات", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                StringBuilder notifications = new StringBuilder();
+                for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    String title = document.getString("title");
+                    String message = document.getString("message");
+                    Boolean isRead = document.getBoolean("isRead");
+                    
+                    notifications.append(isRead != null && !isRead ? "🔴 " : "✅ ");
+                    notifications.append(title).append("\n");
+                    notifications.append(message).append("\n\n");
+                }
+                
+                new android.app.AlertDialog.Builder(getContext())
+                    .setTitle("الإشعارات")
+                    .setMessage(notifications.toString())
+                    .setPositiveButton("تمييز كمقروء", (dialog, which) -> {
+                        markAllNotificationsAsRead();
+                    })
+                    .setNegativeButton("إغلاق", null)
+                    .show();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "خطأ في تحميل الإشعارات", Toast.LENGTH_SHORT).show();
+            });
+    }
+    
+    /**
+     * تمييز جميع الإشعارات كمقروءة
+     */
+    private void markAllNotificationsAsRead() {
+        if (db == null) return;
+        
+        db.collection("notifications")
+            .whereEqualTo("isRead", false)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    db.collection("notifications").document(document.getId())
+                        .update("isRead", true);
+                }
+                
+                Toast.makeText(getContext(), "تم تمييز الإشعارات كمقروءة", Toast.LENGTH_SHORT).show();
+                updateNotificationBadge();
+            });
+    }
+    
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -417,5 +689,98 @@ public class MoreFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "فشل في تحميل بيانات العميل: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    /**
+     * إنشاء مدير النظام يدوياً (للمطورين فقط)
+     * يمكن استدعاؤها من خلال Logcat أو في حالات الطوارئ
+     */
+    @SuppressWarnings("unused")
+    public void createEmergencyAdminDialog() {
+        // فحص وجود مديرين أولاً
+        ManualAdminCreator.checkAdminExists(getContext(), new ManualAdminCreator.AdminCheckCallback() {
+            @Override
+            public void onResult(boolean hasAdmin, int adminCount) {
+                if (hasAdmin) {
+                    Toast.makeText(getContext(), 
+                        "يوجد " + adminCount + " مدير نظام بالفعل", 
+                        Toast.LENGTH_LONG).show();
+                    return;
+                }
+                
+                // إذا لم يوجد أي مدير، اعرض خيارات الإنشاء
+                showEmergencyAdminOptions();
+            }
+            
+            @Override
+            public void onError(Exception error) {
+                Toast.makeText(getContext(), "خطأ في فحص المديرين: " + error.getMessage(), 
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+    
+    /**
+     * عرض خيارات إنشاء مدير النظام
+     */
+    private void showEmergencyAdminOptions() {
+        String[] options = {
+            "إنشاء المدير الافتراضي (admin@posapp.com)",
+            "إنشاء مدير مخصص"
+        };
+        
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle("إنشاء مدير النظام")
+                .setMessage("لا يوجد أي مدير نظام في قاعدة البيانات\n\nاختر طريقة الإنشاء:")
+                .setItems(options, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            // إنشاء المدير الافتراضي
+                            ManualAdminCreator.createDefaultAdmin(getContext());
+                            break;
+                        case 1:
+                            // إنشاء مدير مخصص
+                            showCustomAdminDialog();
+                            break;
+                    }
+                })
+                .setNegativeButton("إلغاء", null)
+                .show();
+    }
+    
+    /**
+     * حوار إنشاء مدير مخصص
+     */
+    private void showCustomAdminDialog() {
+        android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_create_account, null);
+        
+        android.widget.EditText fullNameEdit = dialogView.findViewById(R.id.fullNameEditText);
+        android.widget.EditText phoneEdit = dialogView.findViewById(R.id.phoneEditText);
+        
+        // تغيير hint لحقل الهاتف ليصبح للبريد الإلكتروني
+        phoneEdit.setHint("البريد الإلكتروني للمدير");
+        phoneEdit.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        
+        new android.app.AlertDialog.Builder(getContext())
+                .setTitle("إنشاء مدير نظام مخصص")
+                .setView(dialogView)
+                .setPositiveButton("إنشاء", (dialog, which) -> {
+                    String fullName = fullNameEdit.getText().toString().trim();
+                    String email = phoneEdit.getText().toString().trim();
+                    
+                    if (fullName.isEmpty() || email.isEmpty()) {
+                        Toast.makeText(getContext(), "يرجى ملء جميع الحقول", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    
+                    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        Toast.makeText(getContext(), "يرجى إدخال بريد إلكتروني صحيح", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    
+                    ManualAdminCreator.createEmergencyAdmin(getContext(), email, fullName);
+                })
+                .setNegativeButton("إلغاء", null)
+                .show();
     }
 }
