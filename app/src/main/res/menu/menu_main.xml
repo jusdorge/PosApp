@@ -44,7 +44,7 @@
     <item
         android:id="@+id/action_select_customer_location"
         android:icon="@drawable/ic_menu_add"
-        android:title="تحديد موقع العميل"
+        android:title="مواقع العملاء"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_logout"

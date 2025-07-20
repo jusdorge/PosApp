@@ -2,9 +2,11 @@ package com.example.posapp;
 
 import android.app.Application;
 import android.util.Log;
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 import com.google.firebase.FirebaseApp;
 
-public class MyPOSApplication extends Application {
+public class MyPOSApplication extends MultiDexApplication {
     private static final String TAG = "MyPOSApplication";
 
     @Override
@@ -21,5 +23,11 @@ public class MyPOSApplication extends Application {
         } catch (Exception e) {
             Log.e(TAG, "Firebase initialization failed", e);
         }
+    }
+
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

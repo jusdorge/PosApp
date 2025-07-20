@@ -9,10 +9,11 @@ android {
 
     defaultConfig {
         applicationId "com.example.posapp"
-        minSdk 24
+        minSdk 26
         targetSdk 35
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,6 +51,9 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
+    // CSV Files Support - Better Android compatibility
+    implementation 'com.opencsv:opencsv:5.7.1'
+
     // Android Core Dependencies
     implementation libs.appcompat
     implementation libs.material
@@ -57,6 +61,7 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.fragment
     implementation libs.firebase.auth
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     // Testing
     testImplementation libs.junit

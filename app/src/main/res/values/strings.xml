@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">نقطةالبيع </string>
+    <string name="app_name">نقطةبيع </string>
     <string name="inventoryManagement">إدارة المنتج</string>
     <string name="settings">الإعدادات</string>
     <string name="reports">التقارير</string>
@@ -22,4 +22,26 @@
     <string name="default_web_client_id">584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com</string>
     <string name="title_activity_all_invoices">جميع الفواتير</string>
     <string name="title_activity_qr_code">QR code طباعة</string>
+    
+    <!-- Excel Export/Import Strings -->
+    <string name="excel_export">تصدير إلى ملف بيانات</string>
+    <string name="excel_import">استيراد من ملف بيانات</string>
+    <string name="export_success">تم التصدير بنجاح</string>
+    <string name="export_failed">فشل في التصدير</string>
+    <string name="import_success">تم الاستيراد بنجاح</string>
+    <string name="import_failed">فشل في الاستيراد</string>
+    <string name="export_in_progress">جاري التصدير...</string>
+    <string name="import_in_progress">جاري الاستيراد...</string>
+    <string name="select_file">اختر ملف</string>
+    <string name="excel_file_extension">*.csv</string>
+    <string name="export_customers">تصدير العملاء</string>
+    <string name="export_products">تصدير المنتجات</string>
+    <string name="export_invoices">تصدير الفواتير</string>
+    <string name="export_all">تصدير الكل</string>
+    <string name="import_customers">استيراد العملاء</string>
+    <string name="import_products">استيراد المنتجات</string>
+    
+    <!-- CSV Arabic Support Instructions -->
+    <string name="csv_encoding_info">نصائح هامة لملفات CSV:\n• الملفات محفوظة بترميز UTF-8\n• لفتحها في Excel: Data > From Text/CSV > UTF-8\n• أو استخدم Google Sheets مباشرة</string>
+    <string name="csv_template_info">القالب جاهز للاستخدام:\n• املأ البيانات في الصفوف\n• لا تغير العناوين\n• احفظ كـ CSV عند الانتهاء</string>
 </resources>
