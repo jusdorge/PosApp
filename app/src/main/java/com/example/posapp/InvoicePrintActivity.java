@@ -57,6 +57,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
     private TextView totalAmountTextView;
     private Button printButton;
     private Button shareButton;
+    private Button saveAsBMPButton;
     private Button closeButton;
     
     private FirebaseFirestore db;
@@ -113,6 +114,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
         totalAmountTextView = findViewById(R.id.totalAmountTextView);
         printButton = findViewById(R.id.printButton);
         shareButton = findViewById(R.id.shareButton);
+        saveAsBMPButton = findViewById(R.id.saveAsBMPButton);
         closeButton = findViewById(R.id.closeButton);
         
         // إعداد RecyclerView
@@ -130,6 +132,14 @@ public class InvoicePrintActivity extends AppCompatActivity {
             }
         });
         
+        saveAsBMPButton.setOnClickListener(v -> {
+            try {
+                convertInvoiceToBMP();
+            } catch (Exception e) {
+                Toast.makeText(this, "خطأ في تحويل الفاتورة لصورة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        
         shareButton.setOnClickListener(v -> {
             try {
                 shareInvoice();
@@ -139,6 +149,88 @@ public class InvoicePrintActivity extends AppCompatActivity {
         });
         
         closeButton.setOnClickListener(v -> finish());
+    }
+    
+    /**
+     * تحويل الفاتورة إلى صورة BMP مع الحفاظ على النصوص العربية
+     */
+    private void convertInvoiceToBMP() {
+        if (currentInvoice == null) {
+            Toast.makeText(this, "لا يمكن تحويل الفاتورة، البيانات غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // عرض progress dialog
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage("جاري تحويل الفاتورة إلى صورة...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        
+        // تشغيل التحويل في background thread
+        new Thread(() -> {
+            try {
+                InvoiceToBMPConverter converter = new InvoiceToBMPConverter(this);
+                
+                converter.convertInvoiceToBMP(currentInvoice, new InvoiceToBMPConverter.ConvertCallback() {
+                    @Override
+                    public void onSuccess(java.io.File bmpFile, android.graphics.Bitmap bitmap) {
+                        runOnUiThread(() -> {
+                            progressDialog.dismiss();
+                            showBMPSaveSuccess(bmpFile, bitmap);
+                        });
+                    }
+                    
+                    @Override
+                    public void onError(String error) {
+                        runOnUiThread(() -> {
+                            progressDialog.dismiss();
+                            Toast.makeText(InvoicePrintActivity.this, 
+                                         "فشل في تحويل الفاتورة: " + error, 
+                                         Toast.LENGTH_LONG).show();
+                        });
+                    }
+                });
+                
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(InvoicePrintActivity.this, 
+                                 "خطأ في التحويل: " + e.getMessage(), 
+                                 Toast.LENGTH_LONG).show();
+                });
+            }
+        }).start();
+    }
+    
+    /**
+     * عرض نجاح حفظ الصورة مع خيارات المشاركة والعرض
+     */
+    private void showBMPSaveSuccess(java.io.File bmpFile, android.graphics.Bitmap bitmap) {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("تم الحفظ بنجاح!")
+                .setMessage("تم حفظ الفاتورة كصورة BMP بالنصوص العربية الكاملة\n\n" +
+                           "المسار: " + bmpFile.getAbsolutePath() + "\n\n" +
+                           "ماذا تريد أن تفعل؟")
+                .setPositiveButton("مشاركة الصورة", (dialog, which) -> {
+                    InvoiceToBMPConverter converter = new InvoiceToBMPConverter(this);
+                    converter.shareBMPFile(bmpFile);
+                })
+                .setNeutralButton("عرض الملف", (dialog, which) -> {
+                    try {
+                        Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                        android.net.Uri fileUri = androidx.core.content.FileProvider.getUriForFile(
+                            this, getPackageName() + ".fileprovider", bmpFile);
+                        viewIntent.setDataAndType(fileUri, "image/bmp");
+                        viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(viewIntent);
+                    } catch (Exception e) {
+                        Toast.makeText(this, "لا يوجد تطبيق لعرض الصورة: " + e.getMessage(), 
+                                     Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("حسناً", null)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
     }
 
     private void loadInvoiceData() {
