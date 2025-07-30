@@ -47,7 +47,7 @@ public class StockAdjustmentDialog extends DialogFragment {
     public static StockAdjustmentDialog newInstance(Product product) {
         StockAdjustmentDialog dialog = new StockAdjustmentDialog();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_PRODUCT, product.getId());
+        args.putSerializable(ARG_PRODUCT, product);
         dialog.setArguments(args);
         return dialog;
     }

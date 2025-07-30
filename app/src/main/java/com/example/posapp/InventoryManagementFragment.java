@@ -134,9 +134,13 @@ public class InventoryManagementFragment extends Fragment {
             filteredInventoryList.addAll(inventoryList);
         } else {
             for (Product product : inventoryList) {
-                if (product.getName().toLowerCase().contains(query.toLowerCase()) ||
+                if (product.getName().toLowerCase().contains(query.toLowerCase())
+                        /*||
+
                     product.getCategory().toLowerCase().contains(query.toLowerCase()) ||
-                    product.getBarcode().toLowerCase().contains(query.toLowerCase())) {
+                    product.getBarcode().toLowerCase().contains(query.toLowerCase())*/
+                    )
+                {
                     filteredInventoryList.add(product);
                 }
             }
