@@ -36,6 +36,7 @@ import com.example.posapp.model.InvoiceItem;
 import com.example.posapp.model.Product;
 import com.example.posapp.model.PaymentMethod;
 import com.example.posapp.model.StockMovement;
+import com.example.posapp.model.User;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;

@@ -18,6 +18,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.posapp.model.Product;
+import com.example.posapp.model.Invoice;
+import com.example.posapp.model.InvoiceItem;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -420,21 +422,105 @@ public class ReportsFragment extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     double totalSales = 0;
                     double totalProfit = 0;
+                    int totalInvoices = queryDocumentSnapshots.size();
+                    
+                    if (totalInvoices == 0) {
+                        totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                        totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                        return;
+                    }
+
+                    // مصفوفة لتتبع المعاملة غير المتزامنة
+                    final int[] processedInvoices = {0};
+                    final double[] finalTotalSales = {0.0};
+                    final double[] finalTotalProfit = {0.0};
 
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Double amount = document.getDouble("totalAmount");
                         if (amount != null) {
-                            totalSales += amount;
-                            totalProfit += amount * 0.3; // 30% profit margin
+                            finalTotalSales[0] += amount;
                         }
-                    }
 
-                    totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(totalSales));
-                    totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(totalProfit));
+                        // حساب الربح الفعلي من عناصر الفاتورة
+                        calculateInvoiceProfit(document, new ProfitCalculationCallback() {
+                            @Override
+                            public void onProfitCalculated(double invoiceProfit) {
+                                synchronized (processedInvoices) {
+                                    finalTotalProfit[0] += invoiceProfit;
+                                    processedInvoices[0]++;
+                                    
+                                    // إذا انتهينا من معالجة جميع الفواتير
+                                    if (processedInvoices[0] == totalInvoices) {
+                                        totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(finalTotalSales[0]));
+                                        totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(finalTotalProfit[0]));
+                                    }
+                                }
+                            }
+                        });
+                    }
                 })
                 .addOnFailureListener(e -> {
                     totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(0.0));
                     totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(0.0));
                 });
+    }
+    
+    /**
+     * حساب الربح الفعلي لفاتورة واحدة بناءً على تكلفة المنتجات
+     */
+    private void calculateInvoiceProfit(QueryDocumentSnapshot invoiceDoc, ProfitCalculationCallback callback) {
+        try {
+            Invoice invoice = invoiceDoc.toObject(Invoice.class);
+            if (invoice == null || invoice.getItems() == null || invoice.getItems().isEmpty()) {
+                callback.onProfitCalculated(0.0);
+                return;
+            }
+
+            final double[] invoiceProfit = {0.0};
+            final int[] processedItems = {0};
+            final int totalItems = invoice.getItems().size();
+
+            for (InvoiceItem item : invoice.getItems()) {
+                // الحصول على معلومات المنتج من قاعدة البيانات
+                db.collection("products")
+                    .document(item.getProductId())
+                    .get()
+                    .addOnSuccessListener(productDoc -> {
+                        synchronized (processedItems) {
+                            if (productDoc.exists()) {
+                                Double costPrice = productDoc.getDouble("costPrice");
+                                if (costPrice != null) {
+                                    // حساب الربح = (سعر البيع - سعر التكلفة) × الكمية
+                                    double itemProfit = (item.getPrice() - costPrice) * item.getQuantity();
+                                    invoiceProfit[0] += itemProfit;
+                                }
+                            }
+                            
+                            processedItems[0]++;
+                            if (processedItems[0] == totalItems) {
+                                callback.onProfitCalculated(invoiceProfit[0]);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        synchronized (processedItems) {
+                            processedItems[0]++;
+                            if (processedItems[0] == totalItems) {
+                                callback.onProfitCalculated(invoiceProfit[0]);
+                            }
+                        }
+                    });
+            }
+        } catch (Exception e) {
+            android.util.Log.e("ReportsFragment", "Error calculating invoice profit", e);
+            callback.onProfitCalculated(0.0);
+        }
+    }
+    
+    /**
+     * واجهة للتعامل مع العمليات غير المتزامنة لحساب الربح
+     */
+    private interface ProfitCalculationCallback {
+        void onProfitCalculated(double profit);
     }
 }

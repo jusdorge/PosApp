@@ -15,8 +15,16 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * مولد أرقام الفواتير المخصص
- * ينشئ أرقام فواتير مركبة من رموز المستخدم + رقم تسلسلي
- * مثال: AM001, AM002, SM015
+ * ينشئ أرقام فواتير مركبة من رموز المستخدم (من البريد الإلكتروني) + رقم تسلسلي
+ * 
+ * أمثلة على رموز المستخدمين من البريد الإلكتروني:
+ * - ahmed.mohamed@company.com → AHME001, AHME002...
+ * - sara.ali@example.org → SARA001, SARA002...
+ * - m.hassan123@gmail.com → MHAS001, MHAS002...
+ * - user123@domain.com → USER001, USER002...
+ * 
+ * إذا لم يكن هناك بريد إلكتروني، يستخدم الاسم الكامل:
+ * - أحمد محمد → AM001, AM002...
  */
 public class InvoiceNumberGenerator {
     private static final String TAG = "InvoiceNumberGenerator";
@@ -63,11 +71,79 @@ public class InvoiceNumberGenerator {
     }
     
     /**
-     * إنشاء رمز المستخدم من الاسم الكامل
+     * إنشاء رمز المستخدم من البريد الإلكتروني
+     * 
+     * أمثلة:
+     * - ahmed.mohamed@gmail.com → AHME
+     * - sara123@company.org → SARA  
+     * - m.hassan@example.com → MHAS
+     * - user@domain.co.uk → USER
+     * - test123@site.net → TEST
+     * 
      * @param user المستخدم
-     * @return رمز المستخدم (2-3 أحرف)
+     * @return رمز المستخدم (2-4 أحرف)
      */
     private String generateUserCode(User user) {
+        String email = user.getEmail();
+        
+        // إذا لم يكن هناك بريد إلكتروني، استخدم الاسم الكامل كبديل
+        if (email == null || email.trim().isEmpty() || !email.contains("@")) {
+            return generateUserCodeFromName(user);
+        }
+        
+        // استخراج الجزء الأول من البريد الإلكتروني (قبل @)
+        String localPart = email.split("@")[0].trim();
+        
+        // تنظيف البريد من الأرقام والرموز الخاصة للحصول على الأحرف فقط
+        String cleanPart = localPart.replaceAll("[^a-zA-Z]", "");
+        
+        // إذا لم تبق أحرف كافية، استخدم الجزء الأصلي مع معالجة خاصة
+        if (cleanPart.length() < 2) {
+            cleanPart = localPart.replaceAll("[^a-zA-Z0-9]", "");
+        }
+        
+        StringBuilder userCode = new StringBuilder();
+        
+        if (cleanPart.length() >= 4) {
+            // استخدم أول 4 أحرف
+            userCode.append(cleanPart.substring(0, 4).toUpperCase());
+        } else if (cleanPart.length() >= 2) {
+            // استخدم الأحرف المتاحة وأضف أحرف من نهاية البريد إذا لزم الأمر
+            userCode.append(cleanPart.toUpperCase());
+            
+            // إذا كان أقل من 3 أحرف، أضف أحرف من نهاية الجزء المحلي
+            if (userCode.length() < 3 && localPart.length() > cleanPart.length()) {
+                String remaining = localPart.replaceAll("[a-zA-Z]", "");
+                for (char c : remaining.toCharArray()) {
+                    if (Character.isDigit(c) && userCode.length() < 4) {
+                        userCode.append(c);
+                    }
+                }
+            }
+        } else {
+            // إذا لم نحصل على أحرف كافية، استخدم backup من الاسم
+            return generateUserCodeFromName(user);
+        }
+        
+        // التأكد من أن الرمز بطول 2-4 أحرف
+        String result = userCode.toString();
+        if (result.length() < 2) {
+            // إضافة رقم أو حرف للوصول للحد الأدنى
+            result += "1";
+        }
+        if (result.length() > 4) {
+            result = result.substring(0, 4);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * إنشاء رمز المستخدم من الاسم الكامل (طريقة بديلة)
+     * @param user المستخدم
+     * @return رمز المستخدم
+     */
+    private String generateUserCodeFromName(User user) {
         String fullName = user.getFullName();
         if (fullName == null || fullName.trim().isEmpty()) {
             // استخدام اسم المستخدم كبديل
