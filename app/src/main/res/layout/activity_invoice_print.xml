@@ -156,6 +156,18 @@
                 android:layout_marginTop="8dp">
 
                 <Button
+                    android:id="@+id/editButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="@string/edit_invoice"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@drawable/ic_edit"
+                    android:drawablePadding="8dp" />
+
+                <Button
                     android:id="@+id/saveAsBMPButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -166,6 +178,16 @@
                     android:textColor="@android:color/white"
                     android:drawableTop="@android:drawable/ic_menu_camera"
                     android:drawablePadding="8dp" />
+
+            </LinearLayout>
+
+            <!-- الصف الثالث من الأزرار -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
 
                 <Button
                     android:id="@+id/shareButton"

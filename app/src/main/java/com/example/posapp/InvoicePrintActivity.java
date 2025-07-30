@@ -59,6 +59,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
     private TextView totalAmountTextView;
     private Button printButton;
     private Button printImageButton;
+    private Button editButton;
     private Button shareButton;
     private Button saveAsBMPButton;
     private Button closeButton;
@@ -117,6 +118,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
         totalAmountTextView = findViewById(R.id.totalAmountTextView);
         printButton = findViewById(R.id.printButton);
         printImageButton = findViewById(R.id.printImageButton);
+        editButton = findViewById(R.id.editButton);
         shareButton = findViewById(R.id.shareButton);
         saveAsBMPButton = findViewById(R.id.saveAsBMPButton);
         closeButton = findViewById(R.id.closeButton);
@@ -141,6 +143,14 @@ public class InvoicePrintActivity extends AppCompatActivity {
                 showImagePrintingInfo();
             } catch (Exception e) {
                 Toast.makeText(this, "خطأ في طباعة الصورة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        editButton.setOnClickListener(v -> {
+            try {
+                showEditInvoiceDialog();
+            } catch (Exception e) {
+                Toast.makeText(this, "خطأ في فتح تعديل الفاتورة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         
@@ -1058,6 +1068,115 @@ public class InvoicePrintActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    private void showEditInvoiceDialog() {
+        if (currentInvoice == null || invoiceItems == null || invoiceItems.isEmpty()) {
+            Toast.makeText(this, getString(R.string.no_items_to_edit), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // تبديل المحول لدعم التعديل
+        enableEditMode();
+    }
+
+    private void enableEditMode() {
+        // إنشاء محول جديد مع إمكانية التعديل
+        EditableInvoicePrintItemAdapter editableAdapter = new EditableInvoicePrintItemAdapter(invoiceItems);
+        editableAdapter.setOnItemEditListener((item, position) -> {
+            EditInvoiceItemDialog dialog = EditInvoiceItemDialog.newInstance(item, position);
+            dialog.setOnItemUpdatedListener((updatedItem, itemPosition) -> {
+                // تحديث البند في القائمة
+                invoiceItems.set(itemPosition, updatedItem);
+                editableAdapter.notifyItemChanged(itemPosition);
+                
+                // إعادة حساب المجموع
+                recalculateTotal();
+                
+                // إظهار خيارات الحفظ
+                showSaveChangesDialog();
+            });
+            dialog.show(getSupportFragmentManager(), "EditInvoiceItemDialog");
+        });
+
+        itemsRecyclerView.setAdapter(editableAdapter);
+        
+        // تغيير نص الزر
+        editButton.setText(getString(R.string.finish_editing));
+        editButton.setOnClickListener(v -> disableEditMode());
+        
+        Toast.makeText(this, getString(R.string.edit_mode_enabled), Toast.LENGTH_LONG).show();
+    }
+
+    private void disableEditMode() {
+        // العودة للمحول العادي
+        itemsAdapter = new InvoicePrintItemAdapter(invoiceItems);
+        itemsRecyclerView.setAdapter(itemsAdapter);
+        
+        // إعادة تعيين نص الزر ووظيفته
+        editButton.setText(getString(R.string.edit_invoice));
+        editButton.setOnClickListener(v -> {
+            try {
+                showEditInvoiceDialog();
+            } catch (Exception e) {
+                Toast.makeText(this, "خطأ في فتح تعديل الفاتورة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        Toast.makeText(this, getString(R.string.edit_mode_disabled), Toast.LENGTH_SHORT).show();
+    }
+
+    private void recalculateTotal() {
+        double newTotal = 0;
+        for (InvoiceItem item : invoiceItems) {
+            newTotal += item.getPrice() * item.getQuantity();
+        }
+        
+        // تحديث المجموع في واجهة المستخدم
+        totalAmountTextView.setText(String.format("المجموع: %.2f دج", newTotal));
+        
+        // تحديث المجموع في كائن الفاتورة
+        if (currentInvoice != null) {
+            currentInvoice.setTotalAmount(newTotal);
+        }
+    }
+
+    private void showSaveChangesDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.save_changes))
+                .setMessage(getString(R.string.save_changes_question))
+                .setPositiveButton("حفظ", (dialog, which) -> saveInvoiceChanges())
+                .setNegativeButton("لاحقاً", null)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
+    }
+
+    private void saveInvoiceChanges() {
+        if (currentInvoice == null) {
+            Toast.makeText(this, "خطأ: بيانات الفاتورة غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // إظهار progress dialog
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.saving_changes));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        // تحديث بنود الفاتورة
+        currentInvoice.setItems(invoiceItems);
+        
+        // حفظ في قاعدة البيانات
+        db.collection("invoices").document(currentInvoice.getId())
+                .set(currentInvoice)
+                .addOnSuccessListener(aVoid -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(this, getString(R.string.changes_saved), Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(this, getString(R.string.save_failed) + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 
     public static Intent createIntent(android.content.Context context, String invoiceId) {

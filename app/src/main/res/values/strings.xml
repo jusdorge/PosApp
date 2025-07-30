@@ -25,6 +25,19 @@
     <string name="location_service_disabled">يرجى تفعيل خدمة تحديد الموقع</string>
     <string name="current_location_set">تم تحديد موقعك الحالي</string>
     <string name="location_error">خطأ في الوصول للموقع</string>
+    
+    <!-- Invoice Edit Strings -->
+    <string name="edit_invoice">تعديل الفاتورة</string>
+    <string name="finish_editing">إنهاء التعديل</string>
+    <string name="edit_mode_enabled">وضع التعديل مفعل - اضغط على أي بند لتعديله</string>
+    <string name="edit_mode_disabled">تم إنهاء وضع التعديل</string>
+    <string name="click_to_edit">اضغط للتعديل</string>
+    <string name="save_changes">حفظ التغييرات</string>
+    <string name="save_changes_question">هل تريد حفظ التغييرات في الفاتورة؟</string>
+    <string name="saving_changes">جاري حفظ التغييرات...</string>
+    <string name="changes_saved">تم حفظ التغييرات بنجاح</string>
+    <string name="save_failed">فشل في حفظ التغييرات</string>
+    <string name="no_items_to_edit">لا توجد بنود في الفاتورة للتعديل</string>
     <string name="default_web_client_id">584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com</string>
     <string name="title_activity_all_invoices">جميع الفواتير</string>
     <string name="title_activity_qr_code">QR code طباعة</string>
