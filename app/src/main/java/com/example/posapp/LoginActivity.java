@@ -43,272 +43,196 @@ public class LoginActivity extends AppCompatActivity {
     private SignInButton googleSignInButton;
     private UserSession userSession;
 
+    // ============================================================================
+    private static final String[] AUTHORIZED_ADMINS = {
+        "jusdorge@gmail.com",  // 🔴 غير هذا لبريدك الإلكتروني الفعلي
+        // "admin2@company.com",  // مثال لإضافة مدير آخر
+        // يمكن إضافة المزيد حسب الحاجة
+    };
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        Log.d(TAG, "✓ LoginActivity onCreate started");
         
         try {
-            // تحقق من أن Firebase تم تهيئته
-            if (FirebaseApp.getApps(this).isEmpty()) {
-                Log.d(TAG, "Firebase not initialized, initializing now");
-                FirebaseApp.initializeApp(this);
-            }
-
-            // تهيئة Firebase Auth و Firestore
+            setContentView(R.layout.activity_login);
+            Log.d(TAG, "✓ Layout set");
+            
+            // تهيئة Firebase
             mAuth = FirebaseAuth.getInstance();
             db = FirebaseFirestore.getInstance();
             userSession = UserSession.getInstance(this);
+            Log.d(TAG, "✓ Firebase and UserSession initialized");
             
-            Log.d(TAG, "Firebase initialized successfully");
+            // التحقق من تسجيل الدخول المسبق
+            if (userSession.isLoggedIn() && userSession.validateSession()) {
+                Log.d(TAG, "User already logged in - redirecting to MainActivity");
+                startMainActivity();
+                return;
+            }
+            
+            // تهيئة العناصر
+            initializeViews();
+            Log.d(TAG, "✓ Views initialized");
+            
+            // إعداد Google Sign In
+            setupGoogleSignIn();
+            Log.d(TAG, "✓ Google Sign In setup");
+            
+            Log.d(TAG, "✓ LoginActivity onCreate completed");
+            
         } catch (Exception e) {
-            Log.e(TAG, "Firebase initialization failed", e);
-            Toast.makeText(this, "فشل في تهيئة Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            return;
+            Log.e(TAG, "❌ Error in onCreate", e);
+            Toast.makeText(this, "خطأ في تهيئة شاشة تسجيل الدخول: " + e.getMessage(), 
+                    Toast.LENGTH_LONG).show();
         }
-        
-        // إنشاء مدير نظام افتراضي إذا لزم الأمر
-        userSession.createDefaultAdminIfNeeded();
-        // إنشاء مدير النظام الافتراضي إذا لم يكن موجوداً
-        //ManualAdminCreator.createDefaultAdmin(getContext());
-        //إنشاء مدير مخصص
-//        ManualAdminCreator.createEmergencyAdmin(this,
-//                "jusdorge@gmail.com",
-//                "مدير النظام");
-        // تهيئة Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        
-        // ربط العناصر
+    }
+    
+    private void initializeViews() {
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
         googleSignInButton = findViewById(R.id.googleSignInButton);
-
-        // التحقق من جلسة مستخدم موجودة
-        if (userSession.isLoggedIn() && userSession.validateSession()) {
-            startMainActivity();
-            return;
-        }
-
-        loginButton.setOnClickListener(v -> loginUser());
+        
+        // إعداد مستمعات الأحداث
+        loginButton.setOnClickListener(v -> performEmailLogin());
         googleSignInButton.setOnClickListener(v -> signInWithGoogle());
     }
-
-    private void signInWithGoogle() {
-        try {
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, RC_SIGN_IN);
-        } catch (Exception e) {
-            Log.e(TAG, "Google Sign In failed", e);
-            Toast.makeText(this, "فشل في تسجيل الدخول: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+    
+    private void setupGoogleSignIn() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
+    
+    private void performEmailLogin() {
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
+        
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "يرجى إدخال البريد الإلكتروني وكلمة المرور", Toast.LENGTH_SHORT).show();
+            return;
         }
+        
+        Log.d(TAG, "Attempting email login for: " + email);
+        Toast.makeText(this, "جاري تسجيل الدخول...", Toast.LENGTH_SHORT).show();
+        
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Email login successful");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            loadUserData(user.getEmail());
+                        }
+                    } else {
+                        Log.w(TAG, "Email login failed", task.getException());
+                        Toast.makeText(this, "فشل تسجيل الدخول: " + 
+                                (task.getException() != null ? task.getException().getMessage() : "خطأ غير معروف"), 
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+    
+    private void signInWithGoogle() {
+        Log.d(TAG, "Starting Google Sign In");
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
     
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
+                Log.d(TAG, "Google sign in successful: " + account.getEmail());
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 Log.w(TAG, "Google sign in failed", e);
-                Toast.makeText(this,"فشل تسجيل الدخول باستخدام Google: " + e.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "فشل تسجيل الدخول عبر Google: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }
-
+    
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                        if (firebaseUser != null) {
-                            loadUserData(firebaseUser.getEmail());
+                        Log.d(TAG, "Firebase auth with Google successful");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            loadUserData(user.getEmail());
                         }
                     } else {
-                        Toast.makeText(LoginActivity.this,
-                                "فشل تسجيل الدخول: " + task.getException().getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void loginUser() {
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
-
-        if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "يرجى ملء جميع الحقول", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // تسجيل الدخول باستخدام Firebase Auth
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        loadUserData(email);
-                    } else {
-                        String errorMessage = "فشل تسجيل الدخول: ";
-                        if (task.getException() != null) {
-                            errorMessage += task.getException().getMessage();
-                        }
-                        
-                        // عرض رسالة الخطأ مع خيار التشخيص
-                        new android.app.AlertDialog.Builder(this)
-                                .setTitle("خطأ في تسجيل الدخول")
-                                .setMessage(errorMessage + "\n\nهل تريد تشخيص المشكلة؟")
-                                .setPositiveButton("تشخيص المشكلة", (dialog, which) -> {
-                                    runDiagnostic();
-                                })
-                                .setNegativeButton("إعادة المحاولة", null)
-                                .setNeutralButton("إنشاء مدير", (dialog, which) -> {
-                                    showCreateAdminDialog(email);
-                                })
-                                .show();
+                        Log.w(TAG, "Firebase auth with Google failed", task.getException());
+                        Toast.makeText(this, "فشل المصادقة: " + 
+                                (task.getException() != null ? task.getException().getMessage() : "خطأ غير معروف"), 
+                                Toast.LENGTH_LONG).show();
                     }
                 });
     }
     
     /**
-     * تحميل بيانات المستخدم من Firestore - نسخة محسنة
+     * فحص ما إذا كان المستخدم مدير مصرح له
      */
-    private void loadUserData(String email) {
-        Toast.makeText(this, "جاري البحث عن المستخدم...", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "=== Starting comprehensive user search for: " + email + " ===");
+    private boolean isAuthorizedAdmin(String email) {
+        if (email == null) return false;
         
-        // البحث الشامل بدون أي شروط إضافية
-        db.collection("users")
-                .whereEqualTo("email", email)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int userCount = queryDocumentSnapshots.size();
-                    Log.d(TAG, "Search result: Found " + userCount + " users with email: " + email);
-                    
-                    if (userCount > 0) {
-                        // طباعة تفاصيل كل مستخدم للتشخيص
-                        int userIndex = 0;
-                        for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            userIndex++;
-                            Log.d(TAG, "User #" + userIndex + " - Document ID: " + document.getId());
-                            
-                            try {
-                                java.util.Map<String, Object> data = document.getData();
-                                Log.d(TAG, "  Raw data: " + data.toString());
-                                
-                                // محاولة قراءة المستخدم
-                                User user = parseUserFromDocument(document, email);
-                                if (user != null) {
-                                    Log.d(TAG, "  Parsed user: " + user.getFullName() + " (Active: " + user.isActive() + ")");
-                                    
-                                    // تسجيل الدخول بنجاح
-                                    performUserLogin(user);
-                                    return;
-                                }
-                                
-                            } catch (Exception e) {
-                                Log.e(TAG, "  Error processing user #" + userIndex + ": " + e.getMessage());
-                                
-                                // محاولة الإصلاح اليدوي
-                                User manualUser = createUserFromRawData(document, email);
-                                if (manualUser != null) {
-                                    Log.d(TAG, "  Manually created user: " + manualUser.getFullName());
-                                    performUserLogin(manualUser);
-                                    return;
-                                }
-                            }
-                        }
-                        
-                        // إذا وصلنا هنا، فلم نتمكن من معالجة أي مستخدم
-                        Log.e(TAG, "Failed to process any of the " + userCount + " found users");
-                        showUserProcessingError(email, userCount);
-                        
-                    } else {
-                        // لا يوجد مستخدمين
-                        Log.w(TAG, "No users found with email: " + email);
-                        showUserNotFoundDialog(email);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Database query failed for email: " + email, e);
-                    Toast.makeText(this, "خطأ في الاتصال بقاعدة البيانات: " + e.getMessage(), 
-                            Toast.LENGTH_LONG).show();
-                    showDatabaseError(email, e);
-                });
-    }
-    
-    /**
-     * تحليل المستخدم من المستند
-     */
-    private User parseUserFromDocument(com.google.firebase.firestore.QueryDocumentSnapshot document, String email) {
-        try {
-            User user = document.toObject(User.class);
-            user.setId(document.getId());
-            
-            // التأكد من أن البريد الإلكتروني صحيح
-            if (user.getEmail() == null || !user.getEmail().equals(email)) {
-                user.setEmail(email);
+        for (String authorizedEmail : AUTHORIZED_ADMINS) {
+            if (authorizedEmail.equalsIgnoreCase(email.trim())) {
+                return true;
             }
-            
-            // إصلاح الحقول المطلوبة
-            fixRequiredFields(user, email);
-            
-            return user;
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to parse user from document: " + document.getId(), e);
-            return null;
         }
+        return false;
     }
     
     /**
-     * إنشاء مستخدم من البيانات الخام
+     * فحص صلاحية دور المستخدم مع الحماية الأمنية
      */
-    private User createUserFromRawData(com.google.firebase.firestore.QueryDocumentSnapshot document, String email) {
-        try {
-            java.util.Map<String, Object> data = document.getData();
-            
-            User user = new User();
-            user.setId(document.getId());
-            user.setEmail(email);
-            
-            // استخراج البيانات بأمان
-            user.setFullName(extractString(data, "fullName", email.split("@")[0]));
-            user.setUsername(extractString(data, "username", email.split("@")[0]));
-            user.setPhone(extractString(data, "phone", ""));
-            
-            // التعامل مع الدور
-            String roleStr = extractString(data, "role", "EMPLOYEE");
-            user.setRole(parseUserRole(roleStr));
-            
-            // التعامل مع حالة التفعيل
-            user.setActive(extractBoolean(data, "isActive", true));
-            
-            // التوقيتات
-            user.setCreatedAt(extractTimestamp(data, "createdAt", com.google.firebase.Timestamp.now()));
-            
-            Log.d(TAG, "Manually created user: " + user.getFullName() + " with role: " + user.getRole());
-            
-            return user;
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to create user from raw data", e);
-            return null;
+    private boolean validateUserRole(User user) {
+        if (user == null || user.getEmail() == null) {
+            return false;
         }
+        
+        String email = user.getEmail();
+        UserRole currentRole = user.getRole();
+        
+        // إذا كان المستخدم مدير، يجب أن يكون في القائمة المصرح بها
+        if (currentRole == UserRole.ADMIN) {
+            boolean isAuthorized = isAuthorizedAdmin(email);
+            
+            if (!isAuthorized) {
+                // تسجيل محاولة دخول غير مصرح بها كمدير
+                Log.w(TAG, "⚠️ SECURITY ALERT: Unauthorized admin access attempt by: " + email);
+                
+                // تقليل صلاحيات المستخدم فوراً
+                user.setRole(UserRole.EMPLOYEE);
+                Log.i(TAG, "User role downgraded to EMPLOYEE for security: " + email);
+                
+                // إشعار أمني
+                Toast.makeText(this, "تم رفض محاولة دخول غير مصرح بها كمدير", Toast.LENGTH_LONG).show();
+                
+                return false;
+            } else {
+                Log.i(TAG, "✅ Authorized admin login: " + email);
+                return true;
+            }
+        }
+        
+        // للأدوار الأخرى (موظف، مدير فرع، مشاهد) - مسموح
+        return true;
     }
     
     /**
-     * إصلاح الحقول المطلوبة
+     * إصلاح الحقول المطلوبة مع حماية أمنية
      */
     private void fixRequiredFields(User user, String email) {
         boolean needsUpdate = false;
@@ -325,10 +249,22 @@ public class LoginActivity extends AppCompatActivity {
             needsUpdate = true;
         }
         
-        // إصلاح الدور
+        // إصلاح الدور مع حماية المدراء
         if (user.getRole() == null) {
-            user.setRole(UserRole.EMPLOYEE);
+            // تحديد الدور الافتراضي
+            if (isAuthorizedAdmin(email)) {
+                user.setRole(UserRole.ADMIN);
+                Log.i(TAG, "✅ Authorized admin role assigned to: " + email);
+            } else {
+                user.setRole(UserRole.EMPLOYEE);
+                Log.d(TAG, "Default employee role assigned to: " + email);
+            }
             needsUpdate = true;
+        } else {
+            // التحقق من صحة الدور الموجود
+            if (!validateUserRole(user)) {
+                needsUpdate = true; // الدور تم تعديله في validateUserRole
+            }
         }
         
         // إصلاح التفعيل
@@ -344,10 +280,42 @@ public class LoginActivity extends AppCompatActivity {
         }
         
         if (needsUpdate) {
-            Log.d(TAG, "Fixed required fields for user: " + email);
+            Log.d(TAG, "Fixed required fields for user: " + email + " with role: " + user.getRole());
         }
     }
     
+    /**
+     * تحميل بيانات المستخدم من Firestore - الدالة الأساسية
+     */
+    private void loadUserData(String email) {
+        Toast.makeText(this, "جاري البحث عن المستخدم...", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "=== Starting user search for: " + email + " ===");
+        
+        // البحث الشامل بدون أي شروط إضافية
+        db.collection("users")
+                .whereEqualTo("email", email)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int userCount = queryDocumentSnapshots.size();
+                    Log.d(TAG, "Search result: Found " + userCount + " users with email: " + email);
+                    
+                    if (userCount > 0) {
+                        // معالجة المستخدمين الموجودين
+                        processFoundUsers(queryDocumentSnapshots, email);
+                    } else {
+                        // لا يوجد مستخدمين
+                        Log.w(TAG, "No users found with email: " + email);
+                        showUserNotFoundDialog(email);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Database query failed for email: " + email, e);
+                    Toast.makeText(this, "خطأ في الاتصال بقاعدة البيانات: " + e.getMessage(), 
+                            Toast.LENGTH_LONG).show();
+                    showDatabaseError(email, e);
+                });
+    }
+
     /**
      * تسجيل دخول المستخدم
      */
@@ -1255,6 +1223,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }

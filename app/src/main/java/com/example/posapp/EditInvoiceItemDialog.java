@@ -97,7 +97,7 @@ public class EditInvoiceItemDialog extends DialogFragment {
                     int quantity = Integer.parseInt(quantityEditText.getText().toString());
                     updateTotalPrice(totalPriceText, price, quantity);
                 } catch (NumberFormatException e) {
-                    totalPriceText.setText("0.00 دج");
+                    totalPriceText.setText(CurrencyUtils.formatCurrency(0.0));
                 }
             }
 
@@ -117,7 +117,7 @@ public class EditInvoiceItemDialog extends DialogFragment {
                     int quantity = s.toString().isEmpty() ? 0 : Integer.parseInt(s.toString());
                     updateTotalPrice(totalPriceText, price, quantity);
                 } catch (NumberFormatException e) {
-                    totalPriceText.setText("0.00 دج");
+                    totalPriceText.setText(CurrencyUtils.formatCurrency(0.0));
                 }
             }
 
@@ -163,6 +163,6 @@ public class EditInvoiceItemDialog extends DialogFragment {
 
     private void updateTotalPrice(TextView totalPriceText, double price, int quantity) {
         double total = price * quantity;
-        totalPriceText.setText(String.format("%.2f دج", total));
+        totalPriceText.setText(CurrencyUtils.formatCurrency(total));
     }
 } 

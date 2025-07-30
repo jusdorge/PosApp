@@ -72,7 +72,7 @@ public class InvoiceItemAdapter extends RecyclerView.Adapter<InvoiceItemAdapter.
 
         void bindProduct(Product product) {
             productNameText.setText(product.getName());
-            productPriceText.setText("السعر: " + product.getDefaultPrice() + " ريال");
+            productPriceText.setText("السعر: " + CurrencyUtils.formatCurrency(product.getDefaultPrice()));
             productCategoryText.setText(product.getCategory());
             
             // تنظيف الحقول وإعادة تعيين القيم الافتراضية

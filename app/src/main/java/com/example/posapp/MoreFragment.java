@@ -208,6 +208,9 @@ public class MoreFragment extends Fragment {
         // تحديث رؤية الكارتات عند العودة للواجهة (بعد تسجيل الدخول مثلاً)
         refreshCardVisibility();
         
+        // تحديث شارة الإشعارات عند عودة الشاشة
+        updateNotificationBadge();
+        
         // عرض رسالة تحذيرية للمستخدمين الضيوف
         showGuestWarningIfNeeded();
     }
@@ -563,6 +566,79 @@ public class MoreFragment extends Fragment {
                     notificationBadge.setText("خطأ في تحميل الإشعارات");
                 });
         }
+        
+        // فحص المخزون المنخفض وإنشاء إشعارات
+        checkLowStockAndCreateNotifications();
+    }
+    
+    /**
+     * فحص المخزون المنخفض وإنشاء إشعارات تلقائية
+     */
+    private void checkLowStockAndCreateNotifications() {
+        if (db == null) return;
+        
+        db.collection("products")
+            .whereLessThanOrEqualTo("stock", 5) // المنتجات التي مخزونها 5 أو أقل
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    String productName = document.getString("name");
+                    Long stock = document.getLong("stock");
+                    String productId = document.getId();
+                    
+                    if (productName != null && stock != null) {
+                        // فحص ما إذا كان هناك إشعار حديث لهذا المنتج
+                        checkAndCreateLowStockNotification(productId, productName, stock.intValue());
+                    }
+                }
+            })
+            .addOnFailureListener(e -> {
+                NetworkErrorHandler.handleFirestoreError(getContext(), e, "فحص المخزون المنخفض");
+            });
+    }
+    
+    /**
+     * إنشاء إشعار للمخزون المنخفض إذا لم يكن موجوداً
+     */
+    private void checkAndCreateLowStockNotification(String productId, String productName, int stock) {
+        // فحص وجود إشعار حديث (آخر 24 ساعة) لنفس المنتج
+        long oneDayAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000);
+        com.google.firebase.Timestamp oneDayAgoTimestamp = new com.google.firebase.Timestamp(oneDayAgo / 1000, 0);
+        
+        db.collection("notifications")
+            .whereEqualTo("type", "low_stock")
+            .whereEqualTo("productId", productId)
+            .whereGreaterThan("timestamp", oneDayAgoTimestamp)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                if (queryDocumentSnapshots.isEmpty()) {
+                    // لا يوجد إشعار حديث، إنشاء إشعار جديد
+                    createLowStockNotification(productId, productName, stock);
+                }
+            });
+    }
+    
+    /**
+     * إنشاء إشعار المخزون المنخفض
+     */
+    private void createLowStockNotification(String productId, String productName, int stock) {
+        java.util.Map<String, Object> notification = new java.util.HashMap<>();
+        notification.put("type", "low_stock");
+        notification.put("productId", productId);
+        notification.put("title", "تنبيه: مخزون منخفض");
+        notification.put("message", "المنتج \"" + productName + "\" مخزونه منخفض (" + stock + " قطع متبقية)");
+        notification.put("timestamp", com.google.firebase.Timestamp.now());
+        notification.put("isRead", false);
+        notification.put("priority", stock <= 2 ? "high" : "medium");
+        
+        db.collection("notifications")
+            .add(notification)
+            .addOnSuccessListener(doc -> {
+                android.util.Log.d("MoreFragment", "Low stock notification created for: " + productName);
+            })
+            .addOnFailureListener(e -> {
+                NetworkErrorHandler.handleFirestoreError(getContext(), e, "إنشاء إشعار المخزون المنخفض");
+            });
     }
     
     /**
@@ -602,7 +678,7 @@ public class MoreFragment extends Fragment {
                     .show();
             })
             .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "خطأ في تحميل الإشعارات", Toast.LENGTH_SHORT).show();
+                NetworkErrorHandler.handleFirestoreError(getContext(), e, "تحميل الإشعارات");
             });
     }
     

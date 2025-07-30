@@ -102,7 +102,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
             double totalDebt = customer.getTotalDebt();
             if (totalDebt > 0) {
                 customerDebtTextView.setVisibility(View.VISIBLE);
-                customerDebtTextView.setText(String.format("%.2f دج", totalDebt));
+                customerDebtTextView.setText(CurrencyUtils.formatCurrency(totalDebt));
             } else {
                 customerDebtTextView.setVisibility(View.GONE);
             }

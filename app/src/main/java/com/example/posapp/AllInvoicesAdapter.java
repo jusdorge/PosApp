@@ -71,7 +71,7 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
         }
         
         public void bind(Invoice invoice) {
-            tvInvoiceNumber.setText("فاتورة #" + (invoice.getId() != null ? invoice.getId().substring(0, Math.min(8, invoice.getId().length())) : ""));
+            tvInvoiceNumber.setText("فاتورة #" + invoice.getDisplayNumber());
             tvCustomerName.setText("العميل: " + (invoice.getCustomerName() != null ? invoice.getCustomerName() : "غير محدد"));
             
             if (invoice.getDate() != null) {
@@ -80,7 +80,7 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
                 tvInvoiceDate.setText("التاريخ: غير محدد");
             }
             
-            tvTotalAmount.setText(String.format("المبلغ: %.2f دج", invoice.getTotalAmount()));
+            tvTotalAmount.setText("المبلغ: " + CurrencyUtils.formatCurrency(invoice.getTotalAmount()));
             
             if (invoice.isPaid()) {
                 tvPaymentStatus.setText("نقدي");

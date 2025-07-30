@@ -15,17 +15,15 @@ import java.util.Map;
 public class ReportsUtils {
 
     public static String formatCurrency(double amount) {
-        return String.format("DA%.2f", amount);
+        return CurrencyUtils.formatCurrencyForReports(amount);
     }
 
     public static String formatDate(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd", new Locale("ar"));
-        return formatter.format(date);
+        return ArabicNumberUtils.formatShortDateWithArabicNumbers(date);
     }
 
     public static String formatDateTime(Date date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm", new Locale("ar"));
-        return formatter.format(date);
+        return ArabicNumberUtils.formatDateTimeWithArabicNumbers(date);
     }
 
     public static Date getStartOfDay(Calendar calendar) {
@@ -57,7 +55,8 @@ public class ReportsUtils {
             return "أمس";
         } else {
             SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("ar"));
-            return dayFormat.format(calendar.getTime());
+            String dayName = dayFormat.format(calendar.getTime());
+            return ArabicNumberUtils.convertToArabicNumbers(dayName);
         }
     }
 

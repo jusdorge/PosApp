@@ -34,6 +34,7 @@ import com.example.posapp.model.CustomerDebt;
 import com.example.posapp.model.Invoice;
 import com.example.posapp.model.InvoiceItem;
 import com.example.posapp.model.Product;
+import com.example.posapp.model.PaymentMethod;
 import com.example.posapp.model.StockMovement;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Timestamp;
@@ -73,6 +74,10 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
     private TextView noResultsTextView;
     private Button addNewCustomerButton;
     private Button searchContactsButton;
+    private RadioGroup paymentMethodRadioGroup;
+    private TextView totalAmountTextView;
+    private Button cancelButton;
+    private Button confirmButton;
 
     private CustomerSearchAdapter searchAdapter;
     private List<Customer> searchResults;
@@ -143,10 +148,13 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         noResultsTextView = view.findViewById(R.id.noResultsTextView);
         addNewCustomerButton = view.findViewById(R.id.addNewCustomerButton);
         searchContactsButton = view.findViewById(R.id.searchContactsButton);
-        RadioGroup paymentMethodRadioGroup = view.findViewById(R.id.paymentMethodRadioGroup);
-        TextView totalAmountTextView = view.findViewById(R.id.totalAmountTextView);
-        Button cancelButton = view.findViewById(R.id.cancelButton);
-        Button confirmButton = view.findViewById(R.id.confirmButton);
+        paymentMethodRadioGroup = view.findViewById(R.id.paymentMethodRadioGroup);
+        totalAmountTextView = view.findViewById(R.id.totalAmountTextView);
+        cancelButton = view.findViewById(R.id.cancelButton);
+        confirmButton = view.findViewById(R.id.confirmButton);
+
+        // إضافة طرق الدفع برمجياً
+        addPaymentMethodOptions(paymentMethodRadioGroup);
 
         // إعداد RecyclerView للبحث
         searchAdapter = new CustomerSearchAdapter(searchResults);
@@ -169,7 +177,7 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         }
 
         // عرض المجموع
-        totalAmountTextView.setText(String.format("%.2f ريال", totalAmount));
+        totalAmountTextView.setText(CurrencyUtils.formatCurrency(totalAmount));
 
         // إضافة مستمع للبحث في حقل الاسم
         customerNameEditText.addTextChangedListener(new TextWatcher() {
@@ -242,11 +250,15 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
 
             // تحديد طريقة الدفع
             int selectedId = paymentMethodRadioGroup.getCheckedRadioButtonId();
-            RadioButton selectedRadioButton = view.findViewById(selectedId);
-            boolean isPaid = selectedRadioButton.getId() == R.id.cashRadioButton;
+            if (selectedId == -1) {
+                Toast.makeText(getContext(), "الرجاء اختيار طريقة الدفع", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            PaymentMethod selectedPaymentMethod = getSelectedPaymentMethod(selectedId);
 
             // حفظ الفاتورة
-            saveInvoice(customerName, phoneNumber, isPaid);
+            saveInvoice(customerName, phoneNumber, selectedPaymentMethod);
         });
 
         builder.setView(view);
@@ -479,24 +491,51 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         }
     }
 
-    private void saveInvoice(String customerName, String phoneNumber, boolean isPaid) {
-        // إنشاء كائن الفاتورة
-        Timestamp now = new Timestamp(new Date());
-        Invoice invoice = new Invoice(customerName, phoneNumber, isPaid, totalAmount, now, invoiceItems);
+    private void saveInvoice(String customerName, String phoneNumber, PaymentMethod selectedPaymentMethod) {
+        // الحصول على المستخدم الحالي
+        UserSession userSession = UserSession.getInstance(getContext());
+        User currentUser = userSession.getCurrentUser();
+        
+        if (currentUser == null) {
+            Toast.makeText(getContext(), "خطأ: لا يمكن تحديد المستخدم الحالي", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // البدء بعملية كتابة مجمعة (batch) لضمان اتساق البيانات
-        WriteBatch batch = db.batch();
+        // إنشاء رقم الفاتورة المخصص
+        InvoiceNumberGenerator numberGenerator = new InvoiceNumberGenerator(getContext());
+        numberGenerator.generateInvoiceNumber(currentUser)
+            .thenAccept(customInvoiceNumber -> {
+                // إنشاء كائن الفاتورة مع الرقم المخصص
+                Timestamp now = new Timestamp(new Date());
+                Invoice invoice = new Invoice(customerName, phoneNumber, selectedPaymentMethod, 
+                    totalAmount, now, invoiceItems, customInvoiceNumber, currentUser.getId());
 
-        // إضافة الفاتورة
-        DocumentReference invoiceRef = db.collection("invoices").document();
-        invoice.setId(invoiceRef.getId());
-        batch.set(invoiceRef, invoice);
+                // البدء بعملية كتابة مجمعة (batch) لضمان اتساق البيانات
+                WriteBatch batch = db.batch();
+
+                // إضافة الفاتورة
+                DocumentReference invoiceRef = db.collection("invoices").document();
+                invoice.setId(invoiceRef.getId());
+                batch.set(invoiceRef, invoice);
+                
+                // متابعة عملية الحفظ
+                continueInvoiceSaving(batch, invoice, selectedPaymentMethod, phoneNumber, customerName);
+            })
+            .exceptionally(throwable -> {
+                android.util.Log.e("CheckoutDialog", "Error generating invoice number", throwable);
+                Toast.makeText(getContext(), "خطأ في إنشاء رقم الفاتورة: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                return null;
+            });
+    }
+    
+    private void continueInvoiceSaving(WriteBatch batch, Invoice invoice, PaymentMethod selectedPaymentMethod, 
+                                     String phoneNumber, String customerName) {
 
         // تحديث المخزون لكل منتج في الفاتورة
-        updateInventoryForInvoice(batch, invoiceRef.getId(), invoiceItems);
+        updateInventoryForInvoice(batch, invoice.getId(), invoiceItems);
 
         // إذا كانت الفاتورة غير مدفوعة (دين)، أضف إلى العميل
-        if (!isPaid) {
+        if (selectedPaymentMethod.isDebt()) {
             // البحث عن العميل أولاً
             db.collection("customers")
                     .whereEqualTo("phone", phoneNumber)
@@ -504,12 +543,13 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         // تحديث عملية الكتابة المجمعة
                         WriteBatch newBatch = db.batch();
+                        DocumentReference invoiceRef = db.collection("invoices").document(invoice.getId());
                         newBatch.set(invoiceRef, invoice);
 
                         if (queryDocumentSnapshots.isEmpty()) {
                             // إنشاء عميل جديد
                             Customer customer = new Customer(customerName, phoneNumber);
-                            customer.addDebt(invoiceRef.getId(), totalAmount, now);
+                            customer.addDebt(invoice.getId(), invoice.getTotalAmount(), invoice.getDate());
 
                             DocumentReference customerRef = db.collection("customers").document();
                             customer.setId(customerRef.getId());
@@ -519,7 +559,7 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
                             DocumentReference customerRef = queryDocumentSnapshots.getDocuments().get(0).getReference();
 
                             // إضافة الدين الجديد
-                            CustomerDebt newDebt = new CustomerDebt(invoiceRef.getId(), totalAmount, now);
+                            CustomerDebt newDebt = new CustomerDebt(invoice.getId(), invoice.getTotalAmount(), invoice.getDate());
 
                             // نحتاج لتحميل العميل بالكامل بدلاً من محاولة تحديث الديون مباشرة
                             Customer customer = queryDocumentSnapshots.getDocuments().get(0).toObject(Customer.class);
@@ -628,5 +668,43 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
                 // لكن لا نريد إيقاف العملية الأساسية
                 android.util.Log.w("CheckoutDialog", "فشل في تسجيل حركة المخزون: " + e.getMessage());
             });
+    }
+
+    private void addPaymentMethodOptions(RadioGroup paymentMethodRadioGroup) {
+        PaymentMethod[] methods = PaymentMethod.values();
+        
+        for (int i = 0; i < methods.length; i++) {
+            PaymentMethod method = methods[i];
+            RadioButton radioButton = new RadioButton(requireContext());
+            
+            // تعيين ID فريد لكل RadioButton
+            radioButton.setId(View.generateViewId());
+            radioButton.setText(method.getDisplayWithIcon());
+            radioButton.setTextSize(16);
+            radioButton.setPadding(16, 12, 16, 12);
+            radioButton.setTag(method); // حفظ نوع الدفع في tag
+            
+            // تلوين النص حسب نوع الدفع
+            if (method.isDebt()) {
+                radioButton.setTextColor(getResources().getColor(R.color.reportWarning));
+            } else {
+                radioButton.setTextColor(getResources().getColor(R.color.reportSuccess));
+            }
+            
+            paymentMethodRadioGroup.addView(radioButton);
+            
+            // تعيين الطريقة الافتراضية (نقداً)
+            if (method == PaymentMethod.CASH) {
+                radioButton.setChecked(true);
+            }
+        }
+    }
+    
+    private PaymentMethod getSelectedPaymentMethod(int selectedId) {
+        RadioButton selectedRadioButton = paymentMethodRadioGroup.findViewById(selectedId);
+        if (selectedRadioButton != null && selectedRadioButton.getTag() instanceof PaymentMethod) {
+            return (PaymentMethod) selectedRadioButton.getTag();
+        }
+        return PaymentMethod.CASH; // Default to cash if no match
     }
 }

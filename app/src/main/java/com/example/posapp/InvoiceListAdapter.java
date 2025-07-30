@@ -80,8 +80,7 @@ public class InvoiceListAdapter extends RecyclerView.Adapter<InvoiceListAdapter.
             invoiceTimeTextView.setText(timeString);
             
             // رقم الفاتورة
-            String invoiceId = invoice.getId().substring(0, 6).toUpperCase(); // اختصار لرقم الفاتورة
-            invoiceIdTextView.setText("#" + invoiceId);
+            invoiceIdTextView.setText("#" + invoice.getDisplayNumber());
             
             // حالة الفاتورة
             if (invoice.isPaid()) {
@@ -97,7 +96,7 @@ public class InvoiceListAdapter extends RecyclerView.Adapter<InvoiceListAdapter.
             customerPhoneTextView.setText(invoice.getCustomerPhone());
             
             // المجموع وعدد المنتجات
-            invoiceTotalTextView.setText(String.format("%.2f ريال", invoice.getTotalAmount()));
+            invoiceTotalTextView.setText(CurrencyUtils.formatCurrency(invoice.getTotalAmount()));
             
             int itemsCount = invoice.getItems() != null ? invoice.getItems().size() : 0;
             invoiceItemsCountTextView.setText(itemsCount + " منتجات");

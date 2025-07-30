@@ -205,7 +205,7 @@ public class AllInvoicesActivity extends AppCompatActivity {
         }
         
         tvTotalInvoices.setText("عدد الفواتير: " + totalInvoices);
-        tvTotalAmount.setText(String.format("المجموع الكلي: %.2f دج", totalAmount));
+                    tvTotalAmount.setText("المجموع الكلي: " + CurrencyUtils.formatCurrency(totalAmount));
     }
     
     private void openInvoicePrintActivity(Invoice invoice) {

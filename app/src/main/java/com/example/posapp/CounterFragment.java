@@ -262,6 +262,6 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         for (InvoiceItem item : invoiceItems) {
             totalPrice += item.getQuantity()*item.getPrice();
         }
-        totalPriceTextView.setText(String.format("%.2f ريال", totalPrice));
+        totalPriceTextView.setText(CurrencyUtils.formatCurrency(totalPrice));
     }
 } 

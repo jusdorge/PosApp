@@ -285,7 +285,7 @@ public class CSVExportImportHelper {
                         }
                         
                         String[] data = {
-                            invoice.getId() != null ? invoice.getId() : "",
+                            invoice.getDisplayNumber(),
                             invoice.getCustomerName() != null ? invoice.getCustomerName() : "",
                             invoice.getCustomerPhone() != null ? invoice.getCustomerPhone() : "",
                             invoice.isPaid() ? "نعم" : "لا",

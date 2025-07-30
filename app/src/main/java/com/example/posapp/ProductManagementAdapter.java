@@ -91,7 +91,7 @@ public class ProductManagementAdapter extends RecyclerView.Adapter<ProductManage
 
         void bind(Product product) {
             productNameTextView.setText(product.getName());
-            productPriceTextView.setText(String.format("%.2f دج", product.getCostPrice()));
+            productPriceTextView.setText(CurrencyUtils.formatCurrency(product.getCostPrice()));
             productQuantityTextView.setText(String.valueOf(product.getQuantity()));
             productBarcodeTextView.setText(product.getBarcode());
 

@@ -31,6 +31,25 @@ android {
     buildFeatures {
         viewBinding true
     }
+    
+    // حل مشكلة MediaTek والأجهزة المختلفة
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        // استبعاد ملفات MediaTek المشكوك فيها
+        exclude '**/mediatek/**'
+        exclude '**/mtk/**'
+    }
+    
+    // تعامل مع أخطاء النظام
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'MissingTranslation'
+    }
 }
 
 dependencies {

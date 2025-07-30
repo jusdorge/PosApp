@@ -1,6 +1,9 @@
 package com.example.posapp.model;
 
-public class InvoiceItem {
+import java.io.Serializable;
+
+public class InvoiceItem implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String productId;
     private String productName;
     private double price;

@@ -103,7 +103,7 @@
                 android:id="@+id/invoiceTotalTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="150.00 ريال"
+                android:text="150.00 دج"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold" />

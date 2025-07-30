@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.posapp.model.Invoice;
 import com.example.posapp.model.InvoiceItem;
+import com.example.posapp.model.PaymentMethod;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
@@ -44,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class InvoicePrintActivity extends AppCompatActivity {
+public class InvoicePrintActivity extends AppCompatActivity implements EditPaymentMethodDialog.OnPaymentMethodChangedListener {
     private static final String TAG = "InvoicePrintActivity";
     private static final String ARG_INVOICE_ID = "invoice_id";
     private static final UUID PRINTER_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -63,6 +64,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
     private Button shareButton;
     private Button saveAsBMPButton;
     private Button closeButton;
+    private Button editPaymentMethodButton;  // زر تعديل طريقة الدفع الجديد
     
     private FirebaseFirestore db;
     private String invoiceId;
@@ -122,6 +124,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
         shareButton = findViewById(R.id.shareButton);
         saveAsBMPButton = findViewById(R.id.saveAsBMPButton);
         closeButton = findViewById(R.id.closeButton);
+        editPaymentMethodButton = findViewById(R.id.editPaymentMethodButton); // ربط الزر
         
         // إعداد RecyclerView
         itemsAdapter = new InvoicePrintItemAdapter(invoiceItems);
@@ -151,6 +154,15 @@ public class InvoicePrintActivity extends AppCompatActivity {
                 showEditInvoiceDialog();
             } catch (Exception e) {
                 Toast.makeText(this, "خطأ في فتح تعديل الفاتورة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        // زر تعديل طريقة الدفع
+        editPaymentMethodButton.setOnClickListener(v -> {
+            try {
+                showEditPaymentMethodDialog();
+            } catch (Exception e) {
+                Toast.makeText(this, "خطأ في فتح تعديل طريقة الدفع: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         
@@ -485,7 +497,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
 
     private void displayInvoiceData() {
         // عرض معلومات الفاتورة
-        invoiceNumberTextView.setText("رقم الفاتورة: " + currentInvoice.getId());
+        invoiceNumberTextView.setText("رقم الفاتورة: " + currentInvoice.getDisplayNumber());
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         invoiceDateTextView.setText("التاريخ: " + dateFormat.format(currentInvoice.getDate().toDate()));
@@ -493,10 +505,10 @@ public class InvoicePrintActivity extends AppCompatActivity {
         customerNameTextView.setText("العميل: " + (currentInvoice.getCustomerName() != null ? currentInvoice.getCustomerName() : "غير محدد"));
         customerPhoneTextView.setText("الهاتف: " + (currentInvoice.getCustomerPhone() != null ? currentInvoice.getCustomerPhone() : "غير محدد"));
         
-        String paymentMethod = currentInvoice.isPaid() ? "نقدي" : "آجل";
-        paymentMethodTextView.setText("طريقة الدفع: " + paymentMethod);
+        // عرض طريقة الدفع باستخدام النظام الجديد
+        updatePaymentMethodDisplay();
         
-        totalAmountTextView.setText(String.format("المجموع: %.2f دج", currentInvoice.getTotalAmount()));
+        totalAmountTextView.setText("المجموع: " + CurrencyUtils.formatCurrency(currentInvoice.getTotalAmount()));
         
         // عرض عناصر الفاتورة
         if (currentInvoice.getItems() != null) {
@@ -565,13 +577,8 @@ public class InvoicePrintActivity extends AppCompatActivity {
             Toast.makeText(this, "يرجى تفعيل البلوتوث أولاً", Toast.LENGTH_SHORT).show();
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
+                // طلب أذونات البلوتوث المطلوبة
+                requestBluetoothPermissions();
                 return;
             }
             startActivityForResult(enableBtIntent, 1);
@@ -761,7 +768,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
         
         // معلومات الفاتورة
         qrData.append("INVOICE_INFO\n");
-        qrData.append("Invoice: ").append(currentInvoice.getId()).append("\n");
+        qrData.append("Invoice: ").append(currentInvoice.getDisplayNumber()).append("\n");
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         qrData.append("Date: ").append(dateFormat.format(currentInvoice.getDate().toDate())).append("\n");
@@ -854,7 +861,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
             
             // معلومات الفاتورة
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-            outputStream.write(("Invoice No: " + currentInvoice.getId() + "\n").getBytes(encoding));
+            outputStream.write(("Invoice No: " + currentInvoice.getDisplayNumber() + "\n").getBytes(encoding));
             outputStream.write(("Date: " + dateFormat.format(currentInvoice.getDate().toDate()) + "\n").getBytes(encoding));
             String customerName = currentInvoice.getCustomerName() != null ? 
                 convertArabicToEnglish(currentInvoice.getCustomerName()) : "N/A";
@@ -980,7 +987,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
             
             invoiceText.append("=== فاتورة مبيعات ===\n\n");
-            invoiceText.append("رقم الفاتورة: ").append(currentInvoice.getId() != null ? currentInvoice.getId() : "غير محدد").append("\n");
+            invoiceText.append("رقم الفاتورة: ").append(currentInvoice.getDisplayNumber()).append("\n");
             
             if (currentInvoice.getDate() != null) {
                 try {
@@ -993,8 +1000,9 @@ public class InvoicePrintActivity extends AppCompatActivity {
             invoiceText.append("العميل: ").append(currentInvoice.getCustomerName() != null ? currentInvoice.getCustomerName() : "غير محدد").append("\n");
             invoiceText.append("الهاتف: ").append(currentInvoice.getCustomerPhone() != null ? currentInvoice.getCustomerPhone() : "غير محدد").append("\n");
             
-            String paymentMethod = currentInvoice.isPaid() ? "نقدي" : "آجل";
-            invoiceText.append("طريقة الدفع: ").append(paymentMethod).append("\n\n");
+            // استخدام النظام الجديد لطريقة الدفع
+            PaymentMethod paymentMethod = currentInvoice.getPaymentMethod();
+            invoiceText.append("طريقة الدفع: ").append(paymentMethod.getDisplayWithIcon()).append("\n\n");
             
             invoiceText.append("=== العناصر ===\n");
             if (invoiceItems != null && !invoiceItems.isEmpty()) {
@@ -1008,8 +1016,10 @@ public class InvoicePrintActivity extends AppCompatActivity {
                             double price = item.getPrice();
                             double total = quantity * price;
                             
-                            invoiceText.append(String.format("الكمية: %d × %.2f = %.2f دج\n\n", 
-                                    quantity, price, total));
+                            invoiceText.append(String.format("الكمية: %d × %s = %s\n\n", 
+                                    quantity, 
+                                    CurrencyUtils.formatCurrency(price),
+                                    CurrencyUtils.formatCurrency(total)));
                         } catch (Exception e) {
                             invoiceText.append("عنصر غير صالح\n\n");
                         }
@@ -1022,7 +1032,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
             // التأكد من أن المبلغ الإجمالي ليس null
             try {
                 double totalAmount = currentInvoice.getTotalAmount();
-                invoiceText.append(String.format("المجموع الكلي: %.2f دج", totalAmount));
+                invoiceText.append("المجموع الكلي: " + CurrencyUtils.formatCurrency(totalAmount));
             } catch (Exception e) {
                 invoiceText.append("المجموع الكلي: غير متوفر");
             }
@@ -1030,7 +1040,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_TEXT, invoiceText.toString());
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "فاتورة رقم " + (currentInvoice.getId() != null ? currentInvoice.getId() : "غير محدد"));
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "فاتورة رقم " + currentInvoice.getDisplayNumber());
             
             try {
                 startActivity(Intent.createChooser(shareIntent, "مشاركة الفاتورة"));
@@ -1133,7 +1143,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
         }
         
         // تحديث المجموع في واجهة المستخدم
-        totalAmountTextView.setText(String.format("المجموع: %.2f دج", newTotal));
+        totalAmountTextView.setText("المجموع: " + CurrencyUtils.formatCurrency(newTotal));
         
         // تحديث المجموع في كائن الفاتورة
         if (currentInvoice != null) {
@@ -1184,4 +1194,100 @@ public class InvoicePrintActivity extends AppCompatActivity {
         intent.putExtra(ARG_INVOICE_ID, invoiceId);
         return intent;
     }
+
+    @Override
+    public void onPaymentMethodChanged(PaymentMethod newPaymentMethod) {
+        if (currentInvoice != null) {
+            // تحديث طريقة الدفع في الفاتورة
+            currentInvoice.setPaymentMethod(newPaymentMethod);
+            
+            // تحديث العرض
+            updatePaymentMethodDisplay();
+            
+            // عرض حوار لحفظ التغييرات
+            showSavePaymentMethodChangesDialog(newPaymentMethod);
+        }
+    }
+    
+    /**
+     * عرض حوار تعديل طريقة الدفع
+     */
+    private void showEditPaymentMethodDialog() {
+        if (currentInvoice == null) {
+            Toast.makeText(this, "خطأ: بيانات الفاتورة غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        EditPaymentMethodDialog dialog = EditPaymentMethodDialog.newInstance(currentInvoice);
+        dialog.show(getSupportFragmentManager(), "EditPaymentMethodDialog");
+    }
+    
+    /**
+     * تحديث عرض طريقة الدفع
+     */
+    private void updatePaymentMethodDisplay() {
+        if (currentInvoice != null && paymentMethodTextView != null) {
+            PaymentMethod method = currentInvoice.getPaymentMethod();
+            paymentMethodTextView.setText("طريقة الدفع: " + method.getDisplayWithIcon());
+            
+            // تغيير لون النص حسب نوع الدفع
+            if (method == PaymentMethod.CREDIT) {
+                paymentMethodTextView.setTextColor(getResources().getColor(R.color.reportWarning));
+            } else {
+                paymentMethodTextView.setTextColor(getResources().getColor(R.color.reportSuccess));
+            }
+        }
+    }
+    
+    /**
+     * عرض حوار لحفظ تغييرات طريقة الدفع
+     */
+    private void showSavePaymentMethodChangesDialog(PaymentMethod newMethod) {
+        new AlertDialog.Builder(this)
+                .setTitle("حفظ التغييرات")
+                .setMessage("هل تريد حفظ تغيير طريقة الدفع إلى: " + newMethod.getDisplayWithIcon() + "؟")
+                .setPositiveButton("حفظ", (dialog, which) -> {
+                    savePaymentMethodChanges(newMethod);
+                })
+                .setNegativeButton("إلغاء", (dialog, which) -> {
+                    // الرجوع للطريقة السابقة
+                    loadInvoiceData();
+                })
+                .setCancelable(false)
+                .show();
+    }
+    
+    /**
+     * حفظ تغييرات طريقة الدفع في قاعدة البيانات
+     */
+    private void savePaymentMethodChanges(PaymentMethod newMethod) {
+        if (currentInvoice == null || invoiceId == null) {
+            Toast.makeText(this, "خطأ: بيانات الفاتورة غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // إظهار رسالة التحميل
+        Toast.makeText(this, "جاري حفظ التغييرات...", Toast.LENGTH_SHORT).show();
+        
+        // تحديث الفاتورة في قاعدة البيانات
+        db.collection("invoices").document(invoiceId)
+                .update("paymentMethod", newMethod.name(), 
+                       "isPaid", newMethod.isLegacyPaid())
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "✅ تم حفظ طريقة الدفع بنجاح", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Payment method updated successfully: " + newMethod.getDisplayName());
+                    
+                    // تحديث العرض النهائي
+                    updatePaymentMethodDisplay();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "❌ فشل في حفظ التغييرات: " + e.getMessage(), 
+                            Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Failed to update payment method", e);
+                    
+                    // الرجوع للحالة السابقة
+                    loadInvoiceData();
+                });
+    }
+
 } 

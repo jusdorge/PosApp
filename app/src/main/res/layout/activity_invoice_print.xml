@@ -69,6 +69,18 @@
                 android:text="طريقة الدفع: "
                 android:textSize="16sp"
                 android:textStyle="bold" />
+                
+            <!-- زر تعديل طريقة الدفع -->
+            <Button
+                android:id="@+id/editPaymentMethodButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💳 تعديل طريقة الدفع"
+                android:textSize="14sp"
+                android:background="@color/reportInfo"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="8dp"
+                android:padding="8dp" />
         </LinearLayout>
 
         <!-- عناصر الفاتورة -->

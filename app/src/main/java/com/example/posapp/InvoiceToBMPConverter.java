@@ -17,6 +17,7 @@ import androidx.core.content.FileProvider;
 
 import com.example.posapp.model.Invoice;
 import com.example.posapp.model.InvoiceItem;
+import com.example.posapp.model.PaymentMethod;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -77,7 +78,7 @@ public class InvoiceToBMPConverter {
             Bitmap invoiceBitmap = createInvoiceBitmap(invoice, compactMode);
             
             // حفظ الصورة
-            String fileName = "فاتورة_" + invoice.getId() + "_" + 
+            String fileName = "فاتورة_" + invoice.getDisplayNumber().replaceAll("[^a-zA-Z0-9]", "_") + "_" + 
                             (compactMode ? "مضغوطة_" : "") +
                             System.currentTimeMillis() + ".bmp";
             File savedFile = saveBitmapAsBMP(invoiceBitmap, fileName);
@@ -203,15 +204,13 @@ public class InvoiceToBMPConverter {
         paint.setTextAlign(Paint.Align.RIGHT);
         
         // معلومات الفاتورة
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", new Locale("ar", "SA"));
-        
         currentY += NORMAL_TEXT_SIZE;
-        String invoiceId = invoice.getId() != null ? invoice.getId() : "غير محدد";
-        drawArabicText(canvas, "رقم الفاتورة: " + invoiceId, rightMargin, currentY, paint);
+        String invoiceNumber = invoice.getDisplayNumber();
+        drawArabicText(canvas, "رقم الفاتورة: " + invoiceNumber, rightMargin, currentY, paint);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
         if (invoice.getDate() != null) {
-            String dateStr = dateFormat.format(invoice.getDate().toDate());
+            String dateStr = ArabicNumberUtils.formatPrintDateWithArabicNumbers(invoice.getDate().toDate());
             drawArabicText(canvas, "التاريخ: " + dateStr, rightMargin, currentY, paint);
         }
         
@@ -224,8 +223,9 @@ public class InvoiceToBMPConverter {
         drawArabicText(canvas, "هاتف العميل: " + customerPhone, rightMargin, currentY, paint);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
-        String paymentMethod = invoice.isPaid() ? "نقدي" : "آجل";
-        drawArabicText(canvas, "طريقة الدفع: " + paymentMethod, rightMargin, currentY, paint);
+        // استخدام النظام الجديد لطريقة الدفع
+        PaymentMethod paymentMethod = invoice.getPaymentMethod();
+        drawArabicText(canvas, "طريقة الدفع: " + paymentMethod.getDisplayWithIcon(), rightMargin, currentY, paint);
         
         currentY += LINE_SPACING * 2;
         
@@ -263,8 +263,10 @@ public class InvoiceToBMPConverter {
                 paint.setColor(Color.GRAY);
                 
                 String details = String.format(new Locale("ar", "SA"), 
-                    "الكمية: %d × %.2f = %.2f دج", 
-                    item.getQuantity(), item.getPrice(), item.getQuantity() * item.getPrice());
+                    "الكمية: %d × %s = %s", 
+                    item.getQuantity(), 
+                    CurrencyUtils.formatCurrency(item.getPrice()),
+                    CurrencyUtils.formatCurrency(item.getQuantity() * item.getPrice()));
                 drawArabicText(canvas, details, rightMargin, currentY, paint);
                 
                 // العودة للإعدادات العادية
@@ -304,7 +306,7 @@ public class InvoiceToBMPConverter {
         paint.setColor(Color.parseColor("#2196F3")); // اللون الأزرق
         
         currentY += HEADER_TEXT_SIZE;
-        String totalText = String.format(new Locale("ar", "SA"), "المجموع الكلي: %.2f دج", invoice.getTotalAmount());
+        String totalText = "المجموع الكلي: " + CurrencyUtils.formatCurrency(invoice.getTotalAmount());
         drawArabicText(canvas, totalText, rightMargin, currentY, paint);
         
         currentY += LINE_SPACING * 2;
@@ -381,16 +383,15 @@ public class InvoiceToBMPConverter {
     private String generateSimpleQRData(Invoice invoice) {
         StringBuilder qrData = new StringBuilder();
         
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", new Locale("ar", "SA"));
-        
-        qrData.append("فاتورة: ").append(invoice.getId() != null ? invoice.getId() : "N/A").append("\n");
+        qrData.append("فاتورة: ").append(invoice.getDisplayNumber()).append("\n");
         
         if (invoice.getDate() != null) {
-            qrData.append("تاريخ: ").append(dateFormat.format(invoice.getDate().toDate())).append("\n");
+            String dateStr = ArabicNumberUtils.formatShortDateWithArabicNumbers(invoice.getDate().toDate());
+            qrData.append("تاريخ: ").append(dateStr).append("\n");
         }
         
         qrData.append("عميل: ").append(invoice.getCustomerName() != null ? invoice.getCustomerName() : "N/A").append("\n");
-        qrData.append("مجموع: ").append(String.format(new Locale("ar", "SA"), "%.2f دج", invoice.getTotalAmount())).append("\n");
+        qrData.append("مجموع: ").append(CurrencyUtils.formatCurrency(invoice.getTotalAmount())).append("\n");
         qrData.append("حالة: ").append(invoice.isPaid() ? "مدفوع" : "آجل");
         
         return qrData.toString();

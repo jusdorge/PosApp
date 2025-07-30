@@ -177,7 +177,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         
         customerNameTextView.setText(customer.getName());
         customerPhoneTextView.setText(customer.getPhone());
-        totalDebtTextView.setText(String.format("%.2f دج", customer.getTotalDebt()));
+        totalDebtTextView.setText(CurrencyUtils.formatCurrency(customer.getTotalDebt()));
 
         latitude = customer.getLatitude();
         longitude = customer.getLongitude();

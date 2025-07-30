@@ -71,11 +71,11 @@ public class CustomerTransactionsAdapter extends RecyclerView.Adapter<CustomerTr
             // تنسيق المبلغ والألوان
             if (transaction.isPayment()) {
                 // المدفوعات باللون الأخضر
-                amountTextView.setText(String.format("+ %.2f دج", transaction.getAmount()));
+                amountTextView.setText(CurrencyUtils.formatWithSign(transaction.getAmount(), true));
                 amountTextView.setBackgroundResource(R.drawable.payment_background);
             } else {
                 // الديون باللون الأحمر
-                amountTextView.setText(String.format("- %.2f دج", transaction.getAmount()));
+                amountTextView.setText(CurrencyUtils.formatWithSign(transaction.getAmount(), false));
                 amountTextView.setBackgroundResource(R.drawable.debt_background);
             }
         }

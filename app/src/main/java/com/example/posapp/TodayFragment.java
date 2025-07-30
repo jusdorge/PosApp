@@ -30,6 +30,8 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     private RecyclerView invoicesRecyclerView;
     private TextView emptyInvoicesTextView;
     private TextView totalSalesTextView;
+    private TextView cashSalesTextView;
+    private TextView creditSalesTextView;
     private TextView invoiceCountTextView;
     private TextView todayDateTextView;
     
@@ -47,6 +49,8 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         invoicesRecyclerView = view.findViewById(R.id.invoicesRecyclerView);
         emptyInvoicesTextView = view.findViewById(R.id.emptyInvoicesTextView);
         totalSalesTextView = view.findViewById(R.id.totalSalesTextView);
+        cashSalesTextView = view.findViewById(R.id.cashSalesTextView);
+        creditSalesTextView = view.findViewById(R.id.creditSalesTextView);
         invoiceCountTextView = view.findViewById(R.id.invoiceCountTextView);
         todayDateTextView = view.findViewById(R.id.todayDateTextView);
         
@@ -61,9 +65,8 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         // إعداد Firestore
         db = FirebaseFirestore.getInstance();
         
-        // عرض تاريخ اليوم
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("ar"));
-        String todayDate = dateFormat.format(new Date());
+        // عرض تاريخ اليوم بأرقام عربية
+        String todayDate = ArabicNumberUtils.formatLongDateWithArabicNumbers(new Date());
         todayDateTextView.setText("فواتير " + todayDate);
         
         // تحميل فواتير اليوم
@@ -125,24 +128,35 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                 if (queryDocumentSnapshots.isEmpty()) {
                     // عرض رسالة إذا لم تكن هناك فواتير
                     showEmptyView(true);
-                    updateSummary(0, 0.0);
+                    updateSummary(0, 0.0, 0.0, 0.0);
                     return;
                 }
                 
                 double totalSales = 0.0;
+                double cashSales = 0.0;
+                double creditSales = 0.0;
                 
                 for (int i = 0; i < queryDocumentSnapshots.size(); i++) {
                     Invoice invoice = queryDocumentSnapshots.getDocuments().get(i).toObject(Invoice.class);
                     if (invoice != null) {
                         invoice.setId(queryDocumentSnapshots.getDocuments().get(i).getId());
                         invoiceList.add(invoice);
-                        totalSales += invoice.getTotalAmount();
+                        
+                        double amount = invoice.getTotalAmount();
+                        totalSales += amount;
+                        
+                        // تحديد نوع الدفع
+                        if (isInvoicePaid(invoice)) {
+                            cashSales += amount;
+                        } else {
+                            creditSales += amount;
+                        }
                     }
                 }
                 
                 adapter.notifyDataSetChanged();
                 showEmptyView(false);
-                updateSummary(invoiceList.size(), totalSales);
+                updateSummary(invoiceList.size(), totalSales, cashSales, creditSales);
             })
             .addOnFailureListener(e -> {
                 showEmptyView(true);
@@ -160,9 +174,29 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         }
     }
     
-    private void updateSummary(int count, double total) {
+    private void updateSummary(int count, double total, double cashSales, double creditSales) {
         invoiceCountTextView.setText("عدد الفواتير: " + count);
-        totalSalesTextView.setText(String.format("إجمالي المبيعات: %.2f ريال", total));
+        totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrency(total));
+        
+        // عرض تفصيل المبيعات النقدية والدين
+        if (cashSalesTextView != null) {
+            cashSalesTextView.setText("💵 المبيعات النقدية: " + CurrencyUtils.formatCurrency(cashSales));
+        }
+        if (creditSalesTextView != null) {
+            creditSalesTextView.setText("📝 المبيعات بالدين: " + CurrencyUtils.formatCurrency(creditSales));
+        }
+    }
+    
+    /**
+     * تحديد ما إذا كانت الفاتورة مدفوعة نقداً أم بالدين
+     */
+    private boolean isInvoicePaid(Invoice invoice) {
+        // فحص طريقة الدفع الجديدة أولاً
+        if (invoice.getPaymentMethod() != null) {
+            return invoice.getPaymentMethod().isLegacyPaid();
+        }
+        // الرجوع للطريقة القديمة
+        return invoice.isPaid();
     }
     
     @Override

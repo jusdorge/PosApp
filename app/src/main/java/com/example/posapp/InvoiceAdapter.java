@@ -70,9 +70,9 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
 
         void bindInvoiceItem(InvoiceItem item, int position) {
             itemNameText.setText(item.getProductName());
-            itemPriceText.setText(item.getPrice() + " ريال");
+            itemPriceText.setText(CurrencyUtils.formatCurrency(item.getPrice()));
             itemQuantityText.setText(String.valueOf(item.getQuantity()));
-            itemTotalText.setText(item.getTotal() + " ريال");
+            itemTotalText.setText(CurrencyUtils.formatCurrency(item.getTotal()));
 
             deleteButton.setOnClickListener(v -> {
                 if (deleteListener != null) {

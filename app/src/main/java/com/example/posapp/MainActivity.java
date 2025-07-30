@@ -31,16 +31,16 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
 
     // للحفاظ على الFragments وتجنب إعادة إنشائها
-    private final FragmentManager fragmentManager = getSupportFragmentManager();
-    private Fragment counterFragment = new CounterFragment();
-    private Fragment itemsFragment = new ItemsFragment();
-    private Fragment todayFragment = new TodayFragment();
-    private Fragment reportsFragment = new ReportsFragment();
-    private Fragment moreFragment = new MoreFragment();
+    private FragmentManager fragmentManager;
+    private Fragment counterFragment;
+    private Fragment itemsFragment;
+    private Fragment todayFragment;
+    private Fragment reportsFragment;
+    private Fragment moreFragment;
     private Fragment customersFragment = null; // سيتم إنشاؤها عند الحاجة
     private Fragment productsManagementFragment = null; // سيتم إنشاؤها عند الحاجة
     private Fragment inventoryManagementFragment = null; // سيتم إنشاؤها عند الحاجة
-    private Fragment activeFragment = counterFragment;
+    private Fragment activeFragment;
 
     // متغير لتتبع ما إذا كنا في شاشة من القائمة الجانبية
     private boolean isInDrawerFragment = false;
@@ -48,29 +48,69 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        
         // Debug log
-        android.util.Log.d("MainActivity", "onCreate called");
+        android.util.Log.d("MainActivity", "✓ onCreate called");
         
-        // فحص حالة تسجيل الدخول
-        UserSession userSession = UserSession.getInstance(this);
-        if (!userSession.isLoggedIn() || !userSession.validateSession()) {
-            // إذا لم يكن المستخدم مسجل دخول، ارجع إلى شاشة تسجيل الدخول
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            return;
-        }
-        
-        // تهيئة Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
+        try {
+            setContentView(R.layout.activity_main);
+            android.util.Log.d("MainActivity", "✓ Layout set");
+            
+            // تهيئة FragmentManager والـ Fragments
+            fragmentManager = getSupportFragmentManager();
+            counterFragment = new CounterFragment();
+            itemsFragment = new ItemsFragment();
+            todayFragment = new TodayFragment();
+            reportsFragment = new ReportsFragment();
+            moreFragment = new MoreFragment();
+            activeFragment = counterFragment;
+            android.util.Log.d("MainActivity", "✓ Fragments initialized");
+            
+            // فحص حالة تسجيل الدخول
+            android.util.Log.d("MainActivity", "Checking user session...");
+            UserSession userSession = UserSession.getInstance(this);
+            android.util.Log.d("MainActivity", "✓ UserSession obtained");
+            
+            if (!userSession.isLoggedIn()) {
+                android.util.Log.d("MainActivity", "User not logged in - redirecting to login");
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                return;
+            }
+            
+            if (!userSession.validateSession()) {
+                android.util.Log.d("MainActivity", "Session invalid - redirecting to login");
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                return;
+            }
+            
+            android.util.Log.d("MainActivity", "✓ User session valid");
+            
+            // تهيئة Firebase Auth
+            mAuth = FirebaseAuth.getInstance();
+            android.util.Log.d("MainActivity", "✓ Firebase Auth initialized");
 
+            // إعداد UI
+            setupUI();
+            android.util.Log.d("MainActivity", "✓ UI setup completed");
+            
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "❌ Error in onCreate", e);
+            Toast.makeText(this, "خطأ في تهيئة التطبيق: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    private void setupUI() {
         // إعداد Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        android.util.Log.d("MainActivity", "✓ Toolbar setup");
 
         // إعداد DrawerLayout و NavigationView
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -80,9 +120,11 @@ public class MainActivity extends AppCompatActivity {
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+        android.util.Log.d("MainActivity", "✓ Drawer setup");
 
         // الحصول على مرجع لـ BottomNavigationView
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+        android.util.Log.d("MainActivity", "✓ Bottom navigation setup");
 
         // مستمع لعناصر القائمة الجانبية
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -145,18 +187,25 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         });
+        android.util.Log.d("MainActivity", "✓ Navigation listeners setup");
 
-        // إضافة جميع الFragments الأساسية مع إخفائها (ما عدا CounterFragment)
-        fragmentManager.beginTransaction()
-                .add(R.id.fragment_container, moreFragment, "5").hide(moreFragment)
-                .add(R.id.fragment_container, itemsFragment, "4").hide(itemsFragment)
-                .add(R.id.fragment_container, todayFragment, "3").hide(todayFragment)
-                .add(R.id.fragment_container, reportsFragment, "2").hide(reportsFragment)
-                .add(R.id.fragment_container, counterFragment, "1")
-                .commit();
+        try {
+            // إضافة جميع الFragments الأساسية مع إخفائها (ما عدا CounterFragment)
+            fragmentManager.beginTransaction()
+                    .add(R.id.fragment_container, moreFragment, "5").hide(moreFragment)
+                    .add(R.id.fragment_container, itemsFragment, "4").hide(itemsFragment)
+                    .add(R.id.fragment_container, todayFragment, "3").hide(todayFragment)
+                    .add(R.id.fragment_container, reportsFragment, "2").hide(reportsFragment)
+                    .add(R.id.fragment_container, counterFragment, "1")
+                    .commit();
+            android.util.Log.d("MainActivity", "✓ Fragments added to container");
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "❌ Error adding fragments", e);
+        }
         
         // تحديث header النافذة الجانبية
         updateNavigationHeader();
+        android.util.Log.d("MainActivity", "✓ Navigation header updated");
     }
 
     private void showSelectCustomersLocationPage() {

@@ -79,7 +79,7 @@ public class CustomerInvoicesAdapter extends RecyclerView.Adapter<CustomerInvoic
 
         void bind(Invoice invoice) {
             // تنسيق رقم الفاتورة
-            invoiceIdTextView.setText(String.format("فاتورة #%s", invoice.getId().substring(0, 8)));
+            invoiceIdTextView.setText("فاتورة #" + invoice.getDisplayNumber());
             
             // تنسيق التاريخ
             Timestamp timestamp = invoice.getDate();
@@ -92,7 +92,7 @@ public class CustomerInvoicesAdapter extends RecyclerView.Adapter<CustomerInvoic
             invoiceItemsCountTextView.setText(String.format("%d منتجات", itemsCount));
             
             // المبلغ الإجمالي
-            invoiceAmountTextView.setText(String.format("%.2f دج", invoice.getTotalAmount()));
+            invoiceAmountTextView.setText(CurrencyUtils.formatCurrency(invoice.getTotalAmount()));
             
             // حالة الدفع
             if (invoice.isPaid()) {

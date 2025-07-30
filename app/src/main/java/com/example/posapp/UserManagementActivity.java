@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -31,6 +32,59 @@ public class UserManagementActivity extends AppCompatActivity {
     private List<User> usersList;
     private FirebaseFirestore db;
     private UserSession userSession;
+    
+    // ============================================================================
+    // قائمة المدراء المصرح لهم فقط 
+    // 🔴 مهم جداً: أضف هنا فقط البريد الإلكتروني للمدراء المصرح لهم
+    // 🔴 يجب تطابق هذه القائمة مع نفس القائمة في LoginActivity
+    // ============================================================================
+    private static final String[] AUTHORIZED_ADMINS = {
+        "jusdorge@gmail.com",  // 🔴 غير هذا لبريدك الإلكتروني الفعلي
+        // "admin2@company.com",  // مثال لإضافة مدير آخر
+        // يمكن إضافة المزيد حسب الحاجة
+    };
+    
+    /**
+     * فحص ما إذا كان المستخدم مدير مصرح له
+     */
+    private boolean isAuthorizedAdmin(String email) {
+        if (email == null) return false;
+        
+        for (String authorizedEmail : AUTHORIZED_ADMINS) {
+            if (authorizedEmail.equalsIgnoreCase(email.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * التحقق من صحة تغيير الدور (حماية أمنية)
+     */
+    private boolean validateRoleChange(User user, UserRole newRole) {
+        // إذا كان الدور الجديد مدير
+        if (newRole == UserRole.ADMIN) {
+            boolean isAuthorized = isAuthorizedAdmin(user.getEmail());
+            
+            if (!isAuthorized) {
+                // منع إعطاء صلاحيات المدير لغير المصرح لهم
+                Toast.makeText(this, "❌ غير مسموح: هذا المستخدم غير مصرح له بصلاحيات المدير", Toast.LENGTH_LONG).show();
+                Log.w("UserManagement", "⚠️ SECURITY: Attempted to assign admin role to unauthorized user: " + user.getEmail());
+                return false;
+            }
+        }
+        
+        // إذا كان المستخدم الحالي مدير مصرح له، لا يمكن تقليل صلاحياته
+        if (user.getRole() == UserRole.ADMIN && isAuthorizedAdmin(user.getEmail())) {
+            if (newRole != UserRole.ADMIN) {
+                Toast.makeText(this, "❌ غير مسموح: لا يمكن تغيير دور المدير الأساسي", Toast.LENGTH_LONG).show();
+                Log.w("UserManagement", "⚠️ SECURITY: Attempted to downgrade authorized admin: " + user.getEmail());
+                return false;
+            }
+        }
+        
+        return true;
+    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +117,12 @@ public class UserManagementActivity extends AppCompatActivity {
         PermissionHelper.setViewVisibilityByPermission(this, addUserFab, Resource.USERS, Permission.CREATE);
         
         addUserFab.setOnClickListener(v -> showAddUserDialog());
+        
+        // ربط زر أدوات المستخدمين
+        Button toolsButton = findViewById(R.id.toolsButton);
+        if (toolsButton != null) {
+            toolsButton.setOnClickListener(v -> showFixUsersDialog());
+        }
         
         usersListView.setOnItemClickListener((parent, view, position, id) -> {
             User selectedUser = usersList.get(position);
@@ -179,6 +239,12 @@ public class UserManagementActivity extends AppCompatActivity {
     }
     
     private void createUser(String username, String email, String fullName, String phone, UserRole role) {
+        // فحص الحماية الأمنية قبل إنشاء المستخدم
+        User tempUser = new User(username, email, fullName, role);
+        if (!validateRoleChange(tempUser, role)) {
+            return; // إيقاف العملية إذا فشل فحص الأمان
+        }
+        
         User newUser = new User(username, email, fullName, role);
         newUser.setPhone(phone);
         newUser.setCreatedBy(userSession.getCurrentUser().getId());
@@ -189,8 +255,12 @@ public class UserManagementActivity extends AppCompatActivity {
                     newUser.setId(documentReference.getId());
                     usersList.add(newUser);
                     adapter.notifyDataSetChanged();
-                    
                     Toast.makeText(this, "تم إنشاء المستخدم بنجاح", Toast.LENGTH_SHORT).show();
+                    
+                    // سجل أمني لإنشاء المدراء
+                    if (role == UserRole.ADMIN) {
+                        Log.i("UserManagement", "✅ SECURITY: New authorized admin created: " + email);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error creating user", e);
@@ -285,23 +355,49 @@ public class UserManagementActivity extends AppCompatActivity {
     }
     
     private void showDeleteUserDialog(User user) {
+        // منع حذف المدراء المصرح لهم
+        if (user.getRole() == UserRole.ADMIN && isAuthorizedAdmin(user.getEmail())) {
+            Toast.makeText(this, "❌ غير مسموح: لا يمكن حذف المدير الأساسي", Toast.LENGTH_LONG).show();
+            Log.w("UserManagement", "⚠️ SECURITY: Attempted to delete authorized admin: " + user.getEmail());
+            return;
+        }
+        
         new AlertDialog.Builder(this)
-                .setTitle("حذف المستخدم")
-                .setMessage("هل أنت متأكد من حذف المستخدم: " + user.getFullName() + "؟\n\nهذا الإجراء لا يمكن التراجع عنه.")
+                .setTitle("تأكيد الحذف")
+                .setMessage("هل أنت متأكد من حذف المستخدم: " + user.getFullName() + "؟")
                 .setPositiveButton("حذف", (dialog, which) -> {
-                    deleteUser(user);
+                    db.collection("users").document(user.getId())
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                usersList.remove(user);
+                                adapter.notifyDataSetChanged();
+                                Toast.makeText(this, "تم حذف المستخدم", Toast.LENGTH_SHORT).show();
+                                Log.i("UserManagement", "User deleted: " + user.getEmail());
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error deleting user", e);
+                                Toast.makeText(this, "خطأ في حذف المستخدم: " + e.getMessage(), 
+                                        Toast.LENGTH_LONG).show();
+                            });
                 })
                 .setNegativeButton("إلغاء", null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
     
     private void updateUser(User user) {
+        // التحقق من الحماية الأمنية قبل التحديث
+        // ملاحظة: هذا لحماية المدراء الموجودين، الفحص الأساسي يحدث في شاشة التعديل
+        
         db.collection("users").document(user.getId())
                 .set(user)
                 .addOnSuccessListener(aVoid -> {
                     adapter.notifyDataSetChanged();
-                    Toast.makeText(this, "تم تحديث المستخدم", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "تم تحديث المستخدم بنجاح", Toast.LENGTH_SHORT).show();
+                    
+                    // سجل أمني للتحديثات المتعلقة بالمدراء
+                    if (user.getRole() == UserRole.ADMIN) {
+                        Log.i("UserManagement", "✅ SECURITY: Admin user updated: " + user.getEmail());
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error updating user", e);
@@ -311,18 +407,33 @@ public class UserManagementActivity extends AppCompatActivity {
     }
     
     private void deleteUser(User user) {
-        db.collection("users").document(user.getId())
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    usersList.remove(user);
-                    adapter.notifyDataSetChanged();
-                    Toast.makeText(this, "تم حذف المستخدم", Toast.LENGTH_SHORT).show();
+        // منع حذف المدراء المصرح لهم
+        if (user.getRole() == UserRole.ADMIN && isAuthorizedAdmin(user.getEmail())) {
+            Toast.makeText(this, "❌ غير مسموح: لا يمكن حذف المدير الأساسي", Toast.LENGTH_LONG).show();
+            Log.w("UserManagement", "⚠️ SECURITY: Attempted to delete authorized admin: " + user.getEmail());
+            return;
+        }
+        
+        new AlertDialog.Builder(this)
+                .setTitle("تأكيد الحذف")
+                .setMessage("هل أنت متأكد من حذف المستخدم: " + user.getFullName() + "؟")
+                .setPositiveButton("حذف", (dialog, which) -> {
+                    db.collection("users").document(user.getId())
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                usersList.remove(user);
+                                adapter.notifyDataSetChanged();
+                                Toast.makeText(this, "تم حذف المستخدم", Toast.LENGTH_SHORT).show();
+                                Log.i("UserManagement", "User deleted: " + user.getEmail());
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error deleting user", e);
+                                Toast.makeText(this, "خطأ في حذف المستخدم: " + e.getMessage(), 
+                                        Toast.LENGTH_LONG).show();
+                            });
                 })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error deleting user", e);
-                    Toast.makeText(this, "خطأ في حذف المستخدم: " + e.getMessage(), 
-                            Toast.LENGTH_LONG).show();
-                });
+                .setNegativeButton("إلغاء", null)
+                .show();
     }
     
     /**
@@ -527,10 +638,11 @@ public class UserManagementActivity extends AppCompatActivity {
     }
     
     /**
-     * إصلاح مستخدم واحد
+     * إصلاح مستخدم واحد مع الحماية الأمنية
      */
     private void fixSingleUser(User user) {
         boolean needsUpdate = false;
+        UserRole originalRole = user.getRole();
         
         // إصلاح التفعيل
         if (!user.isActive()) {
@@ -538,10 +650,24 @@ public class UserManagementActivity extends AppCompatActivity {
             needsUpdate = true;
         }
         
-        // إصلاح الدور
+        // إصلاح الدور مع حماية المدراء
         if (user.getRole() == null) {
-            user.setRole(UserRole.EMPLOYEE);
+            // تحديد الدور المناسب بناءً على الصلاحيات
+            if (isAuthorizedAdmin(user.getEmail())) {
+                user.setRole(UserRole.ADMIN);
+                Log.i("UserManagement", "✅ SECURITY: Restored admin role for authorized user: " + user.getEmail());
+            } else {
+                user.setRole(UserRole.EMPLOYEE);
+            }
             needsUpdate = true;
+        } else if (user.getRole() == UserRole.ADMIN) {
+            // حماية المدراء: التأكد من أنهم مصرح لهم
+            if (!isAuthorizedAdmin(user.getEmail())) {
+                user.setRole(UserRole.EMPLOYEE);
+                needsUpdate = true;
+                Log.w("UserManagement", "⚠️ SECURITY: Downgraded unauthorized admin to employee: " + user.getEmail());
+                Toast.makeText(this, "تم تقليل صلاحيات مستخدم غير مصرح له: " + user.getEmail(), Toast.LENGTH_LONG).show();
+            }
         }
         
         // إصلاح الاسم
@@ -550,9 +676,23 @@ public class UserManagementActivity extends AppCompatActivity {
             needsUpdate = true;
         }
         
+        // إصلاح اسم المستخدم
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            user.setUsername(user.getEmail().split("@")[0]);
+            needsUpdate = true;
+        }
+        
         if (needsUpdate) {
             updateUser(user);
-            Toast.makeText(this, "تم إصلاح المستخدم: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+            
+            String message = "تم إصلاح المستخدم: " + user.getEmail();
+            if (originalRole != user.getRole()) {
+                message += " (تم تغيير الدور من " + 
+                    (originalRole != null ? originalRole.getDisplayName() : "غير محدد") + 
+                    " إلى " + user.getRole().getDisplayName() + ")";
+            }
+            
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, "المستخدم لا يحتاج إصلاح", Toast.LENGTH_SHORT).show();
         }

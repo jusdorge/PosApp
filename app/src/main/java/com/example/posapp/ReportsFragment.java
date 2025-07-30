@@ -60,6 +60,7 @@ public class ReportsFragment extends Fragment {
     private TextView bestCustomerDescTextView;
     private TextView paymentMethodTitleTextView;
     private TextView cashValueTextView;
+    private TextView creditValueTextView;
     private TextView sellerTitleTextView;
     private TextView sellerNameTextView;
     private TextView sellerDescTextView;
@@ -111,6 +112,7 @@ public class ReportsFragment extends Fragment {
         bestCustomerDescTextView = view.findViewById(R.id.bestCustomerDescTextView);
         paymentMethodTitleTextView = view.findViewById(R.id.paymentMethodTitleTextView);
         cashValueTextView = view.findViewById(R.id.cashValueTextView);
+        creditValueTextView = view.findViewById(R.id.creditValueTextView);
         sellerTitleTextView = view.findViewById(R.id.sellerTitleTextView);
         sellerNameTextView = view.findViewById(R.id.sellerNameTextView);
         sellerDescTextView = view.findViewById(R.id.sellerDescTextView);
@@ -154,7 +156,7 @@ public class ReportsFragment extends Fragment {
     }
 
     private void updateSelectedDateDisplay() {
-        String dateString = dateFormat.format(selectedDate.getTime());
+        String dateString = ArabicNumberUtils.formatShortDateWithArabicNumbers(selectedDate.getTime());
         selectedDateTextView.setText("تقرير ليوم: " + dateString);
     }
 
@@ -271,11 +273,12 @@ public class ReportsFragment extends Fragment {
     }
 
     private void loadTaxInfo() {
-        taxValueTextView.setText("DA0.00");
+        // Static tax value for now
+        taxValueTextView.setText(CurrencyUtils.formatCurrencyForReports(0.0));
     }
 
     private void loadDiscountInfo() {
-        discountValueTextView.setText("DA0.00");
+        discountValueTextView.setText(CurrencyUtils.formatCurrencyForReports(0.0));
     }
 
     private void loadAverageSales() {
@@ -287,7 +290,7 @@ public class ReportsFragment extends Fragment {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots.isEmpty()) {
-                        avgSalesValueTextView.setText("DA0.00");
+                        avgSalesValueTextView.setText(CurrencyUtils.formatCurrencyForReports(0.0));
                         return;
                     }
 
@@ -303,10 +306,10 @@ public class ReportsFragment extends Fragment {
                     }
 
                     double average = count > 0 ? totalAmount / count : 0;
-                    avgSalesValueTextView.setText(String.format("DA%.2f", average));
+                    avgSalesValueTextView.setText(CurrencyUtils.formatCurrencyForReports(average));
                 })
                 .addOnFailureListener(e -> {
-                    avgSalesValueTextView.setText("DA0.00");
+                    avgSalesValueTextView.setText(CurrencyUtils.formatCurrencyForReports(0.0));
                 });
     }
 
@@ -350,23 +353,56 @@ public class ReportsFragment extends Fragment {
         db.collection("invoices")
                 .whereGreaterThanOrEqualTo("date", dateRange[0])
                 .whereLessThanOrEqualTo("date", dateRange[1])
-                .whereEqualTo("isPaid", true)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     double totalCash = 0;
+                    double totalCredit = 0;
 
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Double amount = document.getDouble("totalAmount");
                         if (amount != null) {
-                            totalCash += amount;
+                            // فحص طريقة الدفع
+                            String paymentMethodString = document.getString("paymentMethod");
+                            Boolean isPaid = document.getBoolean("isPaid");
+                            
+                            if (isInvoiceCash(paymentMethodString, isPaid)) {
+                                totalCash += amount;
+                            } else {
+                                totalCredit += amount;
+                            }
                         }
                     }
 
-                    cashValueTextView.setText(String.format("نقدي : DA%.2f", totalCash));
+                    cashValueTextView.setText("💵 نقدي: " + CurrencyUtils.formatCurrencyForReports(totalCash));
+                    if (creditValueTextView != null) {
+                        creditValueTextView.setText("📝 دين: " + CurrencyUtils.formatCurrencyForReports(totalCredit));
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    cashValueTextView.setText("نقدي : DA0.00");
+                    cashValueTextView.setText("💵 نقدي: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                    if (creditValueTextView != null) {
+                        creditValueTextView.setText("📝 دين: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                    }
                 });
+    }
+    
+    /**
+     * تحديد ما إذا كانت الفاتورة نقدية أم دين
+     */
+    private boolean isInvoiceCash(String paymentMethodString, Boolean isPaid) {
+        // فحص طريقة الدفع الجديدة أولاً
+        if (paymentMethodString != null && !paymentMethodString.isEmpty()) {
+            try {
+                com.example.posapp.model.PaymentMethod paymentMethod = 
+                    com.example.posapp.model.PaymentMethod.valueOf(paymentMethodString);
+                return paymentMethod.isLegacyPaid();
+            } catch (IllegalArgumentException e) {
+                // إذا فشل في التحويل، نستخدم الطريقة القديمة
+            }
+        }
+        
+        // الرجوع للطريقة القديمة
+        return isPaid != null && isPaid;
     }
 
     private void loadSellerInfo() {
@@ -393,12 +429,12 @@ public class ReportsFragment extends Fragment {
                         }
                     }
 
-                    totalSalesTextView.setText(String.format("إجمالي المبيعات: DA%.2f", totalSales));
-                    totalProfitTextView.setText(String.format("إجمالي الربح: DA%.2f", totalProfit));
+                    totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(totalSales));
+                    totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(totalProfit));
                 })
                 .addOnFailureListener(e -> {
-                    totalSalesTextView.setText("إجمالي المبيعات: DA0.00");
-                    totalProfitTextView.setText("إجمالي الربح: DA0.00");
+                    totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                    totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(0.0));
                 });
     }
 }
