@@ -117,10 +117,74 @@ public class BMPGalleryActivity extends AppCompatActivity {
         new androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("خيارات الملف")
             .setMessage("الملف: " + bmpFile.getName())
-            .setPositiveButton("مشاركة", (dialog, which) -> shareBMPFile(bmpFile))
-            .setNeutralButton("عرض", (dialog, which) -> openBMPFile(bmpFile))
+            .setPositiveButton("طباعة", (dialog, which) -> printBMPFile(bmpFile))
+            .setNeutralButton("مشاركة", (dialog, which) -> shareBMPFile(bmpFile))
             .setNegativeButton("حذف", (dialog, which) -> deleteBMPFile(bmpFile))
             .show();
+    }
+    
+    /**
+     * طباعة ملف BMP
+     */
+    private void printBMPFile(File bmpFile) {
+        try {
+            // قراءة الصورة من الملف
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), options);
+            
+            if (bitmap == null) {
+                Toast.makeText(this, "فشل في قراءة الصورة", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            // إنشاء printer وطباعة الصورة
+            BMPPrinter bmpPrinter = new BMPPrinter(this);
+            
+            bmpPrinter.printBitmap(bitmap, new BMPPrinter.PrintCallback() {
+                @Override
+                public void onPrintStart() {
+                    runOnUiThread(() -> {
+                        Toast.makeText(BMPGalleryActivity.this, "بدء الطباعة...", Toast.LENGTH_SHORT).show();
+                    });
+                }
+                
+                @Override
+                public void onPrintProgress(String message) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(BMPGalleryActivity.this, message, Toast.LENGTH_SHORT).show();
+                    });
+                }
+                
+                @Override
+                public void onPrintSuccess() {
+                    runOnUiThread(() -> {
+                        new androidx.appcompat.app.AlertDialog.Builder(BMPGalleryActivity.this)
+                            .setTitle("تمت الطباعة بنجاح!")
+                            .setMessage("تم طباعة الصورة بنجاح على الطابعة")
+                            .setPositiveButton("حسناً", null)
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
+                    });
+                }
+                
+                @Override
+                public void onPrintError(String error) {
+                    runOnUiThread(() -> {
+                        new androidx.appcompat.app.AlertDialog.Builder(BMPGalleryActivity.this)
+                            .setTitle("فشل في الطباعة")
+                            .setMessage("حدث خطأ أثناء الطباعة:\n\n" + error)
+                            .setPositiveButton("حسناً", null)
+                            .setNegativeButton("إعادة المحاولة", (d, w) -> printBMPFile(bmpFile))
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                    });
+                }
+            });
+            
+        } catch (Exception e) {
+            Toast.makeText(this, "خطأ في تحضير الطباعة: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
     
     /**

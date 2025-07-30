@@ -25,8 +25,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
+import android.util.Log;
 
 public class QRCodePrintActivity extends AppCompatActivity {
+    private static final String TAG = "QRCodePrintActivity";
     private static final UUID PRINTER_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final int BLUETOOTH_PERMISSION_REQUEST_CODE = 1001;
     
@@ -297,7 +299,13 @@ public class QRCodePrintActivity extends AppCompatActivity {
             outputStream.write(new byte[]{0x1D, 0x56, 0x41, 0x10});
             
             outputStream.flush();
-            Thread.sleep(1000);
+            // إضافة تأخير قبل إغلاق الاتصال
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Log.w(TAG, "Sleep interrupted before closing connection", e);
+                Thread.currentThread().interrupt();
+            }
             
             if (bluetoothSocket != null && bluetoothSocket.isConnected()) {
                 bluetoothSocket.close();
@@ -310,10 +318,6 @@ public class QRCodePrintActivity extends AppCompatActivity {
         } catch (IOException e) {
             runOnUiThread(() -> {
                 Toast.makeText(this, "فشل في طباعة QR Code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
-        } catch (InterruptedException e) {
-            runOnUiThread(() -> {
-                Toast.makeText(this, "تم مقاطعة عملية الطباعة", Toast.LENGTH_SHORT).show();
             });
         } catch (Exception e) {
             runOnUiThread(() -> {

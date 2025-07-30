@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class InvoicePrintActivity extends AppCompatActivity {
+    private static final String TAG = "InvoicePrintActivity";
     private static final String ARG_INVOICE_ID = "invoice_id";
     private static final UUID PRINTER_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final int BLUETOOTH_PERMISSION_REQUEST_CODE = 1001;
@@ -56,6 +58,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
     private RecyclerView itemsRecyclerView;
     private TextView totalAmountTextView;
     private Button printButton;
+    private Button printImageButton;
     private Button shareButton;
     private Button saveAsBMPButton;
     private Button closeButton;
@@ -113,6 +116,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
         itemsRecyclerView = findViewById(R.id.itemsRecyclerView);
         totalAmountTextView = findViewById(R.id.totalAmountTextView);
         printButton = findViewById(R.id.printButton);
+        printImageButton = findViewById(R.id.printImageButton);
         shareButton = findViewById(R.id.shareButton);
         saveAsBMPButton = findViewById(R.id.saveAsBMPButton);
         closeButton = findViewById(R.id.closeButton);
@@ -126,9 +130,17 @@ public class InvoicePrintActivity extends AppCompatActivity {
     private void setupButtons() {
         printButton.setOnClickListener(v -> {
             try {
-                showPrinterSelectionDialog();
+                showPrintingOptions();
             } catch (Exception e) {
-                Toast.makeText(this, "خطأ في فتح قائمة الطابعات: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "خطأ في فتح خيارات الطباعة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        printImageButton.setOnClickListener(v -> {
+            try {
+                showImagePrintingInfo();
+            } catch (Exception e) {
+                Toast.makeText(this, "خطأ في طباعة الصورة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         
@@ -149,6 +161,213 @@ public class InvoicePrintActivity extends AppCompatActivity {
         });
         
         closeButton.setOnClickListener(v -> finish());
+    }
+    
+    /**
+     * عرض خيارات الطباعة مع الشرح
+     */
+    private void showPrintingOptions() {
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("خيارات الطباعة")
+            .setMessage("اختر نوع الطباعة المناسب:\n\n" +
+                       "📄 الطباعة النصية:\n" +
+                       "• سريعة ومتوافقة مع جميع الطابعات\n" +
+                       "• تحويل النصوص العربية لأحرف لاتينية\n" +
+                       "• مناسبة للاستخدام اليومي\n\n" +
+                       "🖼️ طباعة الصورة:\n" +
+                       "• الحفاظ على النصوص العربية الأصلية\n" +
+                       "• جودة عالية ووضوح تام\n" +
+                       "• قد تستغرق وقتاً أطول")
+            .setPositiveButton("طباعة نصية", (dialog, which) -> {
+                showPrinterSelectionDialog();
+            })
+            .setNeutralButton("طباعة الصورة", (dialog, which) -> {
+                printInvoiceAsImage();
+            })
+            .setNegativeButton("إلغاء", null)
+            .setIcon(android.R.drawable.ic_menu_info_details)
+            .show();
+    }
+    
+    /**
+     * عرض معلومات طباعة الصورة مع خيار التأكيد
+     */
+    private void showImagePrintingInfo() {
+        new android.app.AlertDialog.Builder(this)
+            .setTitle("طباعة الصورة العربية")
+            .setMessage("اختر نوع الطباعة:\n\n" +
+                       "📄 **طباعة عادية:**\n" +
+                       "• نصوص عربية كاملة\n" +
+                       "• QR Code مع تفاصيل شاملة\n" +
+                       "• جودة عالية (وقت أطول)\n\n" +
+                       "⚡ **طباعة مضغوطة (موصى بها):**\n" +
+                       "• نصوص عربية محسنة\n" +
+                       "• حجم أصغر وسرعة أكبر\n" +
+                       "• مناسبة للطابعات الحرارية\n" +
+                       "• أقل استهلاكاً للذاكرة\n\n" +
+                       "⏱️ الطباعة المضغوطة أسرع وأكثر استقراراً")
+            .setPositiveButton("طباعة مضغوطة ⚡", (dialog, which) -> {
+                printInvoiceAsImageCompact();
+            })
+            .setNeutralButton("طباعة عادية 📄", (dialog, which) -> {
+                printInvoiceAsImage();
+            })
+            .setNegativeButton("إلغاء", null)
+            .setIcon(android.R.drawable.ic_menu_camera)
+            .show();
+    }
+    
+    /**
+     * طباعة الفاتورة كصورة مع النصوص العربية الكاملة
+     */
+    private void printInvoiceAsImage() {
+        if (currentInvoice == null) {
+            Toast.makeText(this, "لا يمكن طباعة الفاتورة، البيانات غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // عرض progress dialog
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage("جاري إنشاء الصورة للطباعة...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        
+        // إنشاء الصورة في background thread
+        new Thread(() -> {
+            try {
+                InvoiceToBMPConverter converter = new InvoiceToBMPConverter(this);
+                
+                converter.convertInvoiceToBMP(currentInvoice, new InvoiceToBMPConverter.ConvertCallback() {
+                    @Override
+                    public void onSuccess(java.io.File bmpFile, android.graphics.Bitmap bitmap) {
+                        runOnUiThread(() -> {
+                            progressDialog.dismiss();
+                            // الآن طباعة الصورة
+                            printBitmapImage(bitmap);
+                        });
+                    }
+                    
+                    @Override
+                    public void onError(String error) {
+                        runOnUiThread(() -> {
+                            progressDialog.dismiss();
+                            Toast.makeText(InvoicePrintActivity.this, 
+                                         "فشل في إنشاء صورة الفاتورة: " + error, 
+                                         Toast.LENGTH_LONG).show();
+                        });
+                    }
+                });
+                
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(InvoicePrintActivity.this, 
+                                 "خطأ في إنشاء الصورة: " + e.getMessage(), 
+                                 Toast.LENGTH_LONG).show();
+                });
+            }
+        }).start();
+    }
+    
+    /**
+     * طباعة الفاتورة كصورة مضغوطة (أسرع وأكثر استقراراً)
+     */
+    private void printInvoiceAsImageCompact() {
+        if (currentInvoice == null) {
+            Toast.makeText(this, "لا يمكن طباعة الفاتورة، البيانات غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // عرض progress dialog
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage("جاري إنشاء صورة مضغوطة للطباعة...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        
+        // إنشاء الصورة في background thread
+        new Thread(() -> {
+            try {
+                InvoiceToBMPConverter converter = new InvoiceToBMPConverter(this);
+                
+                // إنشاء صورة مضغوطة
+                converter.convertInvoiceToBMP(currentInvoice, true, new InvoiceToBMPConverter.ConvertCallback() {
+                    @Override
+                    public void onSuccess(java.io.File bmpFile, android.graphics.Bitmap bitmap) {
+                        runOnUiThread(() -> {
+                            progressDialog.dismiss();
+                            // الآن طباعة الصورة
+                            printBitmapImage(bitmap);
+                        });
+                    }
+                    
+                    @Override
+                    public void onError(String error) {
+                        runOnUiThread(() -> {
+                            progressDialog.dismiss();
+                            Toast.makeText(InvoicePrintActivity.this, 
+                                         "فشل في إنشاء الصورة المضغوطة: " + error, 
+                                         Toast.LENGTH_LONG).show();
+                        });
+                    }
+                });
+                
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(InvoicePrintActivity.this, 
+                                 "خطأ في إنشاء الصورة: " + e.getMessage(), 
+                                 Toast.LENGTH_LONG).show();
+                });
+            }
+        }).start();
+    }
+    
+    /**
+     * طباعة صورة البيتماب على الطابعة
+     */
+    private void printBitmapImage(android.graphics.Bitmap bitmap) {
+        BMPPrinter bmpPrinter = new BMPPrinter(this);
+        
+        bmpPrinter.printBitmap(bitmap, new BMPPrinter.PrintCallback() {
+            @Override
+            public void onPrintStart() {
+                runOnUiThread(() -> {
+                    Toast.makeText(InvoicePrintActivity.this, "بدء الطباعة...", Toast.LENGTH_SHORT).show();
+                });
+            }
+            
+            @Override
+            public void onPrintProgress(String message) {
+                runOnUiThread(() -> {
+                    Toast.makeText(InvoicePrintActivity.this, message, Toast.LENGTH_SHORT).show();
+                });
+            }
+            
+            @Override
+            public void onPrintSuccess() {
+                runOnUiThread(() -> {
+                    new android.app.AlertDialog.Builder(InvoicePrintActivity.this)
+                        .setTitle("تمت الطباعة بنجاح!")
+                        .setMessage("تم طباعة فاتورة الصورة بالنصوص العربية الكاملة على الطابعة")
+                        .setPositiveButton("حسناً", null)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .show();
+                });
+            }
+            
+            @Override
+            public void onPrintError(String error) {
+                runOnUiThread(() -> {
+                    new android.app.AlertDialog.Builder(InvoicePrintActivity.this)
+                        .setTitle("فشل في الطباعة")
+                        .setMessage("حدث خطأ أثناء طباعة الصورة:\n\n" + error)
+                        .setPositiveButton("حسناً", null)
+                        .setNegativeButton("إعادة المحاولة", (dialog, which) -> printBitmapImage(bitmap))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                });
+            }
+        });
     }
     
     /**
@@ -424,6 +643,11 @@ public class InvoicePrintActivity extends AppCompatActivity {
                 } catch (IOException closeException) {
                     // تجاهل أخطاء الإغلاق
                 }
+            } catch (InterruptedException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "تم مقاطعة عملية الطباعة", Toast.LENGTH_SHORT).show();
+                });
+                Thread.currentThread().interrupt(); // استعادة حالة المقاطعة
             } catch (SecurityException e) {
                 runOnUiThread(() -> {
                     Toast.makeText(this, "ليس لديك صلاحية للاتصال بالطابعة", Toast.LENGTH_SHORT).show();
@@ -603,7 +827,7 @@ public class InvoicePrintActivity extends AppCompatActivity {
         outputStream.write(new byte[]{0x1B, 0x61, 0x00});
     }
 
-    private void printInvoice() {
+    private void printInvoice() throws InterruptedException {
         try {
             OutputStream outputStream = bluetoothSocket.getOutputStream();
             
@@ -655,7 +879,13 @@ public class InvoicePrintActivity extends AppCompatActivity {
                 itemNumber++;
                 
                 // إضافة تأخير صغير بين العناصر
-                Thread.sleep(50);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    Log.w(TAG, "Sleep interrupted during item printing", e);
+                    Thread.currentThread().interrupt();
+                    break; // الخروج من الحلقة في حالة المقاطعة
+                }
             }
             
             // توسيط للمجموع
@@ -701,7 +931,12 @@ public class InvoicePrintActivity extends AppCompatActivity {
             outputStream.flush();
             
             // إضافة تأخير قبل إغلاق الاتصال
-            Thread.sleep(1000);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Log.w(TAG, "Sleep interrupted before closing connection", e);
+                Thread.currentThread().interrupt();
+            }
             
             // إغلاق الاتصال
             if (bluetoothSocket != null && bluetoothSocket.isConnected()) {
@@ -715,10 +950,6 @@ public class InvoicePrintActivity extends AppCompatActivity {
         } catch (IOException e) {
             runOnUiThread(() -> {
                 Toast.makeText(this, "فشل في طباعة الفاتورة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
-        } catch (InterruptedException e) {
-            runOnUiThread(() -> {
-                Toast.makeText(this, "تم مقاطعة عملية الطباعة", Toast.LENGTH_SHORT).show();
             });
         } catch (Exception e) {
             runOnUiThread(() -> {

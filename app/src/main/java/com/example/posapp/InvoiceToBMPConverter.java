@@ -38,17 +38,17 @@ import java.util.Map;
 public class InvoiceToBMPConverter {
     private static final String TAG = "InvoiceToBMPConverter";
     
-    // إعدادات الصورة
-    private static final int IMAGE_WIDTH = 800;   // عرض الصورة
-    private static final int IMAGE_HEIGHT = 1200; // ارتفاع الصورة الافتراضي (سيتم التعديل حسب المحتوى)
-    private static final int PADDING = 40;         // الحشو الجانبي
-    private static final int LINE_SPACING = 10;   // المسافة بين الأسطر
+    // إعدادات الصورة - مقاسات أصغر للطابعات الحرارية
+    private static final int IMAGE_WIDTH = 384;   // عرض مناسب للطابعات الحرارية (48mm * 8 dpi)
+    private static final int IMAGE_HEIGHT = 800;  // ارتفاع أقل لتوفير الذاكرة
+    private static final int PADDING = 20;         // حشو أقل لتوفير المساحة
+    private static final int LINE_SPACING = 6;     // مسافات مضغوطة
     
-    // إعدادات الخطوط
-    private static final int TITLE_TEXT_SIZE = 32;      // حجم خط العنوان
-    private static final int HEADER_TEXT_SIZE = 24;     // حجم خط العناوين الفرعية
-    private static final int NORMAL_TEXT_SIZE = 20;     // حجم الخط العادي
-    private static final int SMALL_TEXT_SIZE = 16;      // حجم الخط الصغير
+    // إعدادات الخطوط - أحجام مناسبة للطابعات الصغيرة
+    private static final int TITLE_TEXT_SIZE = 20;      // حجم خط العنوان
+    private static final int HEADER_TEXT_SIZE = 16;     // حجم خط العناوين الفرعية
+    private static final int NORMAL_TEXT_SIZE = 14;     // حجم الخط العادي
+    private static final int SMALL_TEXT_SIZE = 12;      // حجم الخط الصغير
     
     private Context context;
     
@@ -57,9 +57,16 @@ public class InvoiceToBMPConverter {
     }
     
     /**
-     * تحويل فاتورة إلى صورة BMP
+     * تحويل فاتورة إلى صورة BMP (مع خيار المضغوطة)
      */
     public void convertInvoiceToBMP(Invoice invoice, ConvertCallback callback) {
+        convertInvoiceToBMP(invoice, false, callback); // افتراضياً مع QR Code
+    }
+    
+    /**
+     * تحويل فاتورة إلى صورة BMP مع خيار ضغط
+     */
+    public void convertInvoiceToBMP(Invoice invoice, boolean compactMode, ConvertCallback callback) {
         if (invoice == null) {
             callback.onError("الفاتورة غير موجودة");
             return;
@@ -67,10 +74,11 @@ public class InvoiceToBMPConverter {
         
         try {
             // إنشاء الـ bitmap
-            Bitmap invoiceBitmap = createInvoiceBitmap(invoice);
+            Bitmap invoiceBitmap = createInvoiceBitmap(invoice, compactMode);
             
             // حفظ الصورة
             String fileName = "فاتورة_" + invoice.getId() + "_" + 
+                            (compactMode ? "مضغوطة_" : "") +
                             System.currentTimeMillis() + ".bmp";
             File savedFile = saveBitmapAsBMP(invoiceBitmap, fileName);
             
@@ -87,11 +95,11 @@ public class InvoiceToBMPConverter {
     }
     
     /**
-     * إنشاء bitmap للفاتورة
+     * إنشاء bitmap للفاتورة مع خيار الضغط
      */
-    private Bitmap createInvoiceBitmap(Invoice invoice) {
+    private Bitmap createInvoiceBitmap(Invoice invoice, boolean compactMode) {
         // حساب الارتفاع المطلوب
-        int requiredHeight = calculateRequiredHeight(invoice);
+        int requiredHeight = calculateRequiredHeight(invoice, compactMode);
         
         // إنشاء bitmap
         Bitmap bitmap = Bitmap.createBitmap(IMAGE_WIDTH, requiredHeight, Bitmap.Config.ARGB_8888);
@@ -101,55 +109,71 @@ public class InvoiceToBMPConverter {
         canvas.drawColor(Color.WHITE);
         
         // رسم الفاتورة
-        int currentY = drawInvoiceContent(canvas, invoice);
+        int currentY = drawInvoiceContent(canvas, invoice, compactMode);
         
         return bitmap;
     }
     
     /**
-     * حساب الارتفاع المطلوب للفاتورة
+     * حساب الارتفاع المطلوب للفاتورة مع خيار الضغط
      */
-    private int calculateRequiredHeight(Invoice invoice) {
+    private int calculateRequiredHeight(Invoice invoice, boolean compactMode) {
         int height = PADDING * 2; // الحشو العلوي والسفلي
         
         // العنوان الرئيسي
         height += TITLE_TEXT_SIZE + LINE_SPACING * 2;
         
-        // معلومات الفاتورة الأساسية (6 أسطر تقريباً)
-        height += (NORMAL_TEXT_SIZE + LINE_SPACING) * 7;
+        // معلومات الفاتورة الأساسية (5 أسطر)
+        height += (NORMAL_TEXT_SIZE + LINE_SPACING) * 6;
         
         // خط فاصل
-        height += 20;
+        height += 25;
         
         // عنوان العناصر
         height += HEADER_TEXT_SIZE + LINE_SPACING;
         
-        // العناصر
+        // العناصر (مضغوطة إذا كان في الوضع المضغوط)
         if (invoice.getItems() != null) {
-            height += invoice.getItems().size() * (NORMAL_TEXT_SIZE + SMALL_TEXT_SIZE + LINE_SPACING * 3);
+            int maxItems = compactMode ? Math.min(invoice.getItems().size(), 8) : invoice.getItems().size();
+            height += maxItems * (NORMAL_TEXT_SIZE + SMALL_TEXT_SIZE + LINE_SPACING * 2);
         }
         
         // خط فاصل
-        height += 20;
+        height += 25;
         
         // المجموع
         height += (HEADER_TEXT_SIZE + LINE_SPACING) * 2;
         
-        // QR Code
-        height += 200; // حجم QR Code + مسافة
+        // QR Code (فقط في الوضع العادي)
+        if (!compactMode) {
+            height += 120; // حجم QR Code + مسافة
+        }
         
         // النهاية
         height += NORMAL_TEXT_SIZE + LINE_SPACING * 2;
         
-        return Math.max(height, IMAGE_HEIGHT);
+        return Math.max(height, compactMode ? 600 : IMAGE_HEIGHT);
     }
     
     /**
-     * رسم محتوى الفاتورة على Canvas
+     * رسم محتوى الفاتورة على Canvas مع دعم الوضع المضغوط
      */
-    private int drawInvoiceContent(Canvas canvas, Invoice invoice) {
+    private int drawInvoiceContent(Canvas canvas, Invoice invoice, boolean compactMode) {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
+        paint.setSubpixelText(true); // تحسين جودة النص
+        paint.setFilterBitmap(true); // تحسين جودة الرسم
+        paint.setDither(true); // تحسين الألوان
+        
+        // إعداد الخط العربي
+        try {
+            Typeface arabicTypeface = Typeface.create("serif", Typeface.NORMAL);
+            paint.setTypeface(arabicTypeface);
+        } catch (Exception e) {
+            // استخدام الخط الافتراضي إذا فشل تحميل الخط العربي
+            paint.setTypeface(Typeface.DEFAULT);
+        }
+        
         paint.setTextAlign(Paint.Align.RIGHT); // النص العربي من اليمين
         paint.setColor(Color.BLACK);
         
@@ -159,82 +183,89 @@ public class InvoiceToBMPConverter {
         
         // العنوان الرئيسي
         paint.setTextSize(TITLE_TEXT_SIZE);
-        paint.setTypeface(Typeface.DEFAULT_BOLD);
+        paint.setTypeface(Typeface.create(paint.getTypeface(), Typeface.BOLD));
         paint.setTextAlign(Paint.Align.CENTER);
         currentY += TITLE_TEXT_SIZE;
-        canvas.drawText("فاتورة مبيعات", IMAGE_WIDTH / 2, currentY, paint);
+        
+        // رسم العنوان مع تحسين للعربية
+        String title = compactMode ? "فاتورة مبيعات - مضغوطة" : "فاتورة مبيعات";
+        drawArabicText(canvas, title, IMAGE_WIDTH / 2, currentY, paint);
         currentY += LINE_SPACING * 2;
         
         // رسم خط فاصل
-        paint.setStrokeWidth(2);
+        paint.setStrokeWidth(3);
         canvas.drawLine(leftMargin, currentY, rightMargin, currentY, paint);
-        currentY += 20;
+        currentY += 25;
         
         // العودة للنص العادي
         paint.setTextSize(NORMAL_TEXT_SIZE);
-        paint.setTypeface(Typeface.DEFAULT);
+        paint.setTypeface(Typeface.create(paint.getTypeface(), Typeface.NORMAL));
         paint.setTextAlign(Paint.Align.RIGHT);
         
         // معلومات الفاتورة
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", new Locale("ar"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", new Locale("ar", "SA"));
         
         currentY += NORMAL_TEXT_SIZE;
-        canvas.drawText("رقم الفاتورة: " + (invoice.getId() != null ? invoice.getId() : "غير محدد"), 
-                       rightMargin, currentY, paint);
+        String invoiceId = invoice.getId() != null ? invoice.getId() : "غير محدد";
+        drawArabicText(canvas, "رقم الفاتورة: " + invoiceId, rightMargin, currentY, paint);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
         if (invoice.getDate() != null) {
-            canvas.drawText("التاريخ: " + dateFormat.format(invoice.getDate().toDate()), 
-                           rightMargin, currentY, paint);
+            String dateStr = dateFormat.format(invoice.getDate().toDate());
+            drawArabicText(canvas, "التاريخ: " + dateStr, rightMargin, currentY, paint);
         }
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
-        canvas.drawText("اسم العميل: " + (invoice.getCustomerName() != null ? invoice.getCustomerName() : "غير محدد"), 
-                       rightMargin, currentY, paint);
+        String customerName = invoice.getCustomerName() != null ? invoice.getCustomerName() : "غير محدد";
+        drawArabicText(canvas, "اسم العميل: " + customerName, rightMargin, currentY, paint);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
-        canvas.drawText("هاتف العميل: " + (invoice.getCustomerPhone() != null ? invoice.getCustomerPhone() : "غير محدد"), 
-                       rightMargin, currentY, paint);
+        String customerPhone = invoice.getCustomerPhone() != null ? invoice.getCustomerPhone() : "غير محدد";
+        drawArabicText(canvas, "هاتف العميل: " + customerPhone, rightMargin, currentY, paint);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
         String paymentMethod = invoice.isPaid() ? "نقدي" : "آجل";
-        canvas.drawText("طريقة الدفع: " + paymentMethod, rightMargin, currentY, paint);
+        drawArabicText(canvas, "طريقة الدفع: " + paymentMethod, rightMargin, currentY, paint);
         
         currentY += LINE_SPACING * 2;
         
         // رسم خط فاصل
         canvas.drawLine(leftMargin, currentY, rightMargin, currentY, paint);
-        currentY += 20;
+        currentY += 25;
         
         // عنوان العناصر
         paint.setTextSize(HEADER_TEXT_SIZE);
-        paint.setTypeface(Typeface.DEFAULT_BOLD);
+        paint.setTypeface(Typeface.create(paint.getTypeface(), Typeface.BOLD));
         currentY += HEADER_TEXT_SIZE;
-        canvas.drawText("عناصر الفاتورة", rightMargin, currentY, paint);
+        String itemsTitle = compactMode ? "العناصر (أهم 8)" : "عناصر الفاتورة";
+        drawArabicText(canvas, itemsTitle, rightMargin, currentY, paint);
         currentY += LINE_SPACING;
         
         // رسم العناصر
         paint.setTextSize(NORMAL_TEXT_SIZE);
-        paint.setTypeface(Typeface.DEFAULT);
+        paint.setTypeface(Typeface.create(paint.getTypeface(), Typeface.NORMAL));
         
         if (invoice.getItems() != null && !invoice.getItems().isEmpty()) {
             int itemNumber = 1;
-            for (InvoiceItem item : invoice.getItems()) {
+            int maxItemsToDraw = compactMode ? Math.min(invoice.getItems().size(), 8) : invoice.getItems().size();
+            for (int i = 0; i < maxItemsToDraw; i++) {
+                InvoiceItem item = invoice.getItems().get(i);
                 currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
                 
                 // اسم المنتج مع الرقم التسلسلي
-                String productLine = itemNumber + ". " + (item.getProductName() != null ? item.getProductName() : "منتج غير محدد");
-                canvas.drawText(productLine, rightMargin, currentY, paint);
+                String productName = item.getProductName() != null ? item.getProductName() : "منتج غير محدد";
+                String productLine = itemNumber + ". " + productName;
+                drawArabicText(canvas, productLine, rightMargin, currentY, paint);
                 
                 // تفاصيل السعر والكمية
                 currentY += SMALL_TEXT_SIZE + LINE_SPACING;
                 paint.setTextSize(SMALL_TEXT_SIZE);
                 paint.setColor(Color.GRAY);
                 
-                String details = String.format(new Locale("ar"), 
+                String details = String.format(new Locale("ar", "SA"), 
                     "الكمية: %d × %.2f = %.2f دج", 
                     item.getQuantity(), item.getPrice(), item.getQuantity() * item.getPrice());
-                canvas.drawText(details, rightMargin, currentY, paint);
+                drawArabicText(canvas, details, rightMargin, currentY, paint);
                 
                 // العودة للإعدادات العادية
                 paint.setTextSize(NORMAL_TEXT_SIZE);
@@ -243,10 +274,21 @@ public class InvoiceToBMPConverter {
                 currentY += LINE_SPACING;
                 itemNumber++;
             }
+            
+            // إضافة رسالة إذا كان هناك المزيد من العناصر في الوضع المضغوط
+            if (compactMode && invoice.getItems().size() > 8) {
+                currentY += SMALL_TEXT_SIZE + LINE_SPACING;
+                paint.setTextSize(SMALL_TEXT_SIZE);
+                paint.setColor(Color.GRAY);
+                drawArabicText(canvas, "... و " + (invoice.getItems().size() - 8) + " عناصر أخرى", 
+                              rightMargin, currentY, paint);
+                paint.setTextSize(NORMAL_TEXT_SIZE);
+                paint.setColor(Color.BLACK);
+            }
         } else {
             currentY += NORMAL_TEXT_SIZE;
             paint.setColor(Color.GRAY);
-            canvas.drawText("لا توجد عناصر في هذه الفاتورة", rightMargin, currentY, paint);
+            drawArabicText(canvas, "لا توجد عناصر في هذه الفاتورة", rightMargin, currentY, paint);
             paint.setColor(Color.BLACK);
         }
         
@@ -254,61 +296,65 @@ public class InvoiceToBMPConverter {
         
         // رسم خط فاصل
         canvas.drawLine(leftMargin, currentY, rightMargin, currentY, paint);
-        currentY += 20;
+        currentY += 25;
         
         // المجموع الكلي
         paint.setTextSize(HEADER_TEXT_SIZE);
-        paint.setTypeface(Typeface.DEFAULT_BOLD);
+        paint.setTypeface(Typeface.create(paint.getTypeface(), Typeface.BOLD));
         paint.setColor(Color.parseColor("#2196F3")); // اللون الأزرق
         
         currentY += HEADER_TEXT_SIZE;
-        String totalText = String.format(new Locale("ar"), "المجموع الكلي: %.2f دج", invoice.getTotalAmount());
-        canvas.drawText(totalText, rightMargin, currentY, paint);
+        String totalText = String.format(new Locale("ar", "SA"), "المجموع الكلي: %.2f دج", invoice.getTotalAmount());
+        drawArabicText(canvas, totalText, rightMargin, currentY, paint);
         
         currentY += LINE_SPACING * 2;
         
-        // إضافة QR Code
-        currentY = drawQRCode(canvas, invoice, currentY);
+        // إضافة QR Code (فقط في الوضع العادي)
+        if (!compactMode) {
+            currentY = drawQRCode(canvas, invoice, currentY);
+        }
         
         // رسالة الشكر
         paint.setTextSize(NORMAL_TEXT_SIZE);
-        paint.setTypeface(Typeface.DEFAULT);
+        paint.setTypeface(Typeface.create(paint.getTypeface(), Typeface.NORMAL));
         paint.setColor(Color.BLACK);
         paint.setTextAlign(Paint.Align.CENTER);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
-        canvas.drawText("شكراً لتعاملكم معنا", IMAGE_WIDTH / 2, currentY, paint);
+        String thankYouMessage = compactMode ? "شكراً لكم" : "شكراً لتعاملكم معنا";
+        drawArabicText(canvas, thankYouMessage, IMAGE_WIDTH / 2, currentY, paint);
         
         return currentY;
     }
     
     /**
-     * رسم QR Code على الفاتورة
+     * رسم QR Code على الفاتورة (حجم أصغر)
      */
     private int drawQRCode(Canvas canvas, Invoice invoice, int startY) {
         try {
-            // إنشاء محتوى QR Code
-            String qrData = generateQRData(invoice);
+            // إنشاء محتوى QR Code مبسط
+            String qrData = generateSimpleQRData(invoice);
             
-            // إنشاء QR Code
+            // إنشاء QR Code بحجم أصغر
             QRCodeWriter writer = new QRCodeWriter();
             Map<EncodeHintType, Object> hints = new HashMap<>();
             hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
-            hints.put(EncodeHintType.MARGIN, 1);
+            hints.put(EncodeHintType.MARGIN, 0); // بدون هوامش
+            hints.put(EncodeHintType.ERROR_CORRECTION, com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.L); // أقل تصحيح للأخطاء
             
-            BitMatrix bitMatrix = writer.encode(qrData, BarcodeFormat.QR_CODE, 150, 150, hints);
+            BitMatrix bitMatrix = writer.encode(qrData, BarcodeFormat.QR_CODE, 80, 80, hints); // حجم أصغر 80x80
             
             // تحويل إلى Bitmap
-            Bitmap qrBitmap = Bitmap.createBitmap(150, 150, Bitmap.Config.RGB_565);
-            for (int x = 0; x < 150; x++) {
-                for (int y = 0; y < 150; y++) {
+            Bitmap qrBitmap = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+            for (int x = 0; x < 80; x++) {
+                for (int y = 0; y < 80; y++) {
                     qrBitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
                 }
             }
             
             // رسم QR Code في المنتصف
-            int qrX = (IMAGE_WIDTH - 150) / 2;
-            int qrY = startY + 20;
+            int qrX = (IMAGE_WIDTH - 80) / 2;
+            int qrY = startY + 15;
             canvas.drawBitmap(qrBitmap, qrX, qrY, null);
             
             // إضافة نص تحت QR Code
@@ -318,8 +364,8 @@ public class InvoiceToBMPConverter {
             paint.setColor(Color.GRAY);
             paint.setTextAlign(Paint.Align.CENTER);
             
-            int textY = qrY + 150 + SMALL_TEXT_SIZE + 10;
-            canvas.drawText("امسح الكود للحصول على تفاصيل الفاتورة", IMAGE_WIDTH / 2, textY, paint);
+            int textY = qrY + 80 + SMALL_TEXT_SIZE + 8;
+            drawArabicText(canvas, "QR للتفاصيل", IMAGE_WIDTH / 2, textY, paint);
             
             return textY + LINE_SPACING;
             
@@ -330,35 +376,22 @@ public class InvoiceToBMPConverter {
     }
     
     /**
-     * إنشاء محتوى QR Code
+     * إنشاء محتوى QR Code مبسط لتوفير المساحة
      */
-    private String generateQRData(Invoice invoice) {
+    private String generateSimpleQRData(Invoice invoice) {
         StringBuilder qrData = new StringBuilder();
         
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", new Locale("ar"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", new Locale("ar", "SA"));
         
-        qrData.append("=== فاتورة مبيعات ===\n");
-        qrData.append("رقم الفاتورة: ").append(invoice.getId() != null ? invoice.getId() : "غير محدد").append("\n");
+        qrData.append("فاتورة: ").append(invoice.getId() != null ? invoice.getId() : "N/A").append("\n");
         
         if (invoice.getDate() != null) {
-            qrData.append("التاريخ: ").append(dateFormat.format(invoice.getDate().toDate())).append("\n");
+            qrData.append("تاريخ: ").append(dateFormat.format(invoice.getDate().toDate())).append("\n");
         }
         
-        qrData.append("العميل: ").append(invoice.getCustomerName() != null ? invoice.getCustomerName() : "غير محدد").append("\n");
-        qrData.append("الهاتف: ").append(invoice.getCustomerPhone() != null ? invoice.getCustomerPhone() : "غير محدد").append("\n");
-        qrData.append("الدفع: ").append(invoice.isPaid() ? "نقدي" : "آجل").append("\n");
-        qrData.append("المجموع: ").append(String.format(new Locale("ar"), "%.2f دج", invoice.getTotalAmount())).append("\n");
-        
-        if (invoice.getItems() != null) {
-            qrData.append("\nالعناصر:\n");
-            int itemNumber = 1;
-            for (InvoiceItem item : invoice.getItems()) {
-                qrData.append(itemNumber).append(". ").append(item.getProductName()).append("\n");
-                qrData.append("   ").append(item.getQuantity()).append(" × ").append(item.getPrice()).append(" = ")
-                      .append(item.getQuantity() * item.getPrice()).append(" دج\n");
-                itemNumber++;
-            }
-        }
+        qrData.append("عميل: ").append(invoice.getCustomerName() != null ? invoice.getCustomerName() : "N/A").append("\n");
+        qrData.append("مجموع: ").append(String.format(new Locale("ar", "SA"), "%.2f دج", invoice.getTotalAmount())).append("\n");
+        qrData.append("حالة: ").append(invoice.isPaid() ? "مدفوع" : "آجل");
         
         return qrData.toString();
     }
@@ -492,6 +525,71 @@ public class InvoiceToBMPConverter {
             Toast.makeText(context, "فشل في مشاركة الملف: " + e.getMessage(), 
                          Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    /**
+     * رسم النص العربي مع تحسينات خاصة
+     */
+    private void drawArabicText(Canvas canvas, String text, float x, float y, Paint paint) {
+        if (text == null || text.trim().isEmpty()) {
+            return;
+        }
+        
+        try {
+            // حفظ إعدادات الرسم الحالية
+            Paint.Align originalAlign = paint.getTextAlign();
+            
+            // تحسين إعدادات الرسم للنصوص العربية
+            paint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
+            paint.setHinting(Paint.HINTING_ON);
+            
+            // تحسين جودة النص العربي
+            Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+            
+            // التحقق من اتجاه النص
+            if (containsArabic(text)) {
+                // للنصوص العربية، تأكد من الاتجاه الصحيح
+                paint.setTextScaleX(1.0f); // تأكد من عدم تشويه النص
+                
+                // رسم النص مع تحسين المسافات
+                canvas.drawText(text, x, y, paint);
+            } else {
+                // للنصوص الإنجليزية أو الأرقام
+                canvas.drawText(text, x, y, paint);
+            }
+            
+            // استعادة الإعدادات الأصلية
+            paint.setTextAlign(originalAlign);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error drawing Arabic text: " + text, e);
+            // رسم النص بطريقة بديلة
+            try {
+                canvas.drawText(text, x, y, paint);
+            } catch (Exception fallbackError) {
+                Log.e(TAG, "Fallback drawing also failed", fallbackError);
+            }
+        }
+    }
+    
+    /**
+     * تحقق مما إذا كان النص يحتوي على أحرف عربية
+     */
+    private boolean containsArabic(String text) {
+        if (text == null) return false;
+        
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            // نطاق الأحرف العربية في Unicode
+            if ((c >= 0x0600 && c <= 0x06FF) || // Arabic
+                (c >= 0x0750 && c <= 0x077F) || // Arabic Supplement  
+                (c >= 0x08A0 && c <= 0x08FF) || // Arabic Extended-A
+                (c >= 0xFB50 && c <= 0xFDFF) || // Arabic Presentation Forms-A
+                (c >= 0xFE70 && c <= 0xFEFF)) {  // Arabic Presentation Forms-B
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
