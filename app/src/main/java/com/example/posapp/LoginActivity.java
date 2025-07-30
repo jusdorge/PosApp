@@ -181,52 +181,617 @@ public class LoginActivity extends AppCompatActivity {
     }
     
     /**
-     * تحميل بيانات المستخدم من Firestore
+     * تحميل بيانات المستخدم من Firestore - نسخة محسنة
      */
     private void loadUserData(String email) {
-        Toast.makeText(this, "جاري تحميل بيانات المستخدم...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "جاري البحث عن المستخدم...", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "=== Starting comprehensive user search for: " + email + " ===");
         
+        // البحث الشامل بدون أي شروط إضافية
         db.collection("users")
                 .whereEqualTo("email", email)
-                .whereEqualTo("isActive", true)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        try {
-                            // المستخدم موجود في قاعدة البيانات
-                            QueryDocumentSnapshot document = (QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
-                            User user = document.toObject(User.class);
-                            user.setId(document.getId());
+                    int userCount = queryDocumentSnapshots.size();
+                    Log.d(TAG, "Search result: Found " + userCount + " users with email: " + email);
+                    
+                    if (userCount > 0) {
+                        // طباعة تفاصيل كل مستخدم للتشخيص
+                        int userIndex = 0;
+                        for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            userIndex++;
+                            Log.d(TAG, "User #" + userIndex + " - Document ID: " + document.getId());
                             
-                            // التحقق من صحة دور المستخدم وإصلاحه إذا لزم الأمر
-                            if (user.getRole() == null) {
-                                user.setRole(UserRole.EMPLOYEE); // دور افتراضي
-                                updateUserInFirebase(user);
+                            try {
+                                java.util.Map<String, Object> data = document.getData();
+                                Log.d(TAG, "  Raw data: " + data.toString());
+                                
+                                // محاولة قراءة المستخدم
+                                User user = parseUserFromDocument(document, email);
+                                if (user != null) {
+                                    Log.d(TAG, "  Parsed user: " + user.getFullName() + " (Active: " + user.isActive() + ")");
+                                    
+                                    // تسجيل الدخول بنجاح
+                                    performUserLogin(user);
+                                    return;
+                                }
+                                
+                            } catch (Exception e) {
+                                Log.e(TAG, "  Error processing user #" + userIndex + ": " + e.getMessage());
+                                
+                                // محاولة الإصلاح اليدوي
+                                User manualUser = createUserFromRawData(document, email);
+                                if (manualUser != null) {
+                                    Log.d(TAG, "  Manually created user: " + manualUser.getFullName());
+                                    performUserLogin(manualUser);
+                                    return;
+                                }
                             }
-                            
-                            // تسجيل دخول المستخدم في الجلسة
-                            userSession.loginUser(user);
-                            
-                            Toast.makeText(this, "مرحباً " + user.getFullName(), Toast.LENGTH_SHORT).show();
-                            startMainActivity();
-                            
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error deserializing user data", e);
-                            // محاولة إصلاح البيانات التالفة
-                            com.google.firebase.firestore.DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-                            handleCorruptedUserData(documentSnapshot, email);
                         }
+                        
+                        // إذا وصلنا هنا، فلم نتمكن من معالجة أي مستخدم
+                        Log.e(TAG, "Failed to process any of the " + userCount + " found users");
+                        showUserProcessingError(email, userCount);
+                        
                     } else {
-                        // المستخدم غير موجود، قد نحتاج لإنشاء حساب جديد
+                        // لا يوجد مستخدمين
+                        Log.w(TAG, "No users found with email: " + email);
                         showUserNotFoundDialog(email);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error loading user data", e);
-                    Toast.makeText(this, "خطأ في تحميل بيانات المستخدم: " + e.getMessage(), 
+                    Log.e(TAG, "Database query failed for email: " + email, e);
+                    Toast.makeText(this, "خطأ في الاتصال بقاعدة البيانات: " + e.getMessage(), 
                             Toast.LENGTH_LONG).show();
-                    mAuth.signOut(); // تسجيل خروج من Firebase Auth
+                    showDatabaseError(email, e);
                 });
+    }
+    
+    /**
+     * تحليل المستخدم من المستند
+     */
+    private User parseUserFromDocument(com.google.firebase.firestore.QueryDocumentSnapshot document, String email) {
+        try {
+            User user = document.toObject(User.class);
+            user.setId(document.getId());
+            
+            // التأكد من أن البريد الإلكتروني صحيح
+            if (user.getEmail() == null || !user.getEmail().equals(email)) {
+                user.setEmail(email);
+            }
+            
+            // إصلاح الحقول المطلوبة
+            fixRequiredFields(user, email);
+            
+            return user;
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to parse user from document: " + document.getId(), e);
+            return null;
+        }
+    }
+    
+    /**
+     * إنشاء مستخدم من البيانات الخام
+     */
+    private User createUserFromRawData(com.google.firebase.firestore.QueryDocumentSnapshot document, String email) {
+        try {
+            java.util.Map<String, Object> data = document.getData();
+            
+            User user = new User();
+            user.setId(document.getId());
+            user.setEmail(email);
+            
+            // استخراج البيانات بأمان
+            user.setFullName(extractString(data, "fullName", email.split("@")[0]));
+            user.setUsername(extractString(data, "username", email.split("@")[0]));
+            user.setPhone(extractString(data, "phone", ""));
+            
+            // التعامل مع الدور
+            String roleStr = extractString(data, "role", "EMPLOYEE");
+            user.setRole(parseUserRole(roleStr));
+            
+            // التعامل مع حالة التفعيل
+            user.setActive(extractBoolean(data, "isActive", true));
+            
+            // التوقيتات
+            user.setCreatedAt(extractTimestamp(data, "createdAt", com.google.firebase.Timestamp.now()));
+            
+            Log.d(TAG, "Manually created user: " + user.getFullName() + " with role: " + user.getRole());
+            
+            return user;
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to create user from raw data", e);
+            return null;
+        }
+    }
+    
+    /**
+     * إصلاح الحقول المطلوبة
+     */
+    private void fixRequiredFields(User user, String email) {
+        boolean needsUpdate = false;
+        
+        // إصلاح الاسم
+        if (user.getFullName() == null || user.getFullName().trim().isEmpty()) {
+            user.setFullName(email.split("@")[0]);
+            needsUpdate = true;
+        }
+        
+        // إصلاح اسم المستخدم
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            user.setUsername(email.split("@")[0]);
+            needsUpdate = true;
+        }
+        
+        // إصلاح الدور
+        if (user.getRole() == null) {
+            user.setRole(UserRole.EMPLOYEE);
+            needsUpdate = true;
+        }
+        
+        // إصلاح التفعيل
+        if (!user.isActive()) {
+            user.setActive(true);
+            needsUpdate = true;
+        }
+        
+        // إصلاح التوقيت
+        if (user.getCreatedAt() == null) {
+            user.setCreatedAt(com.google.firebase.Timestamp.now());
+            needsUpdate = true;
+        }
+        
+        if (needsUpdate) {
+            Log.d(TAG, "Fixed required fields for user: " + email);
+        }
+    }
+    
+    /**
+     * تسجيل دخول المستخدم
+     */
+    private void performUserLogin(User user) {
+        try {
+            // تحديث آخر دخول
+            user.updateLastLogin();
+            
+            // حفظ التحديثات في قاعدة البيانات
+            updateUserInFirebase(user);
+            
+            // تسجيل دخول المستخدم في الجلسة
+            userSession.loginUser(user);
+            
+            // رسالة الترحيب
+            String welcome = "مرحباً " + user.getFullName();
+            if (user.getRole() != null) {
+                welcome += " (" + user.getRole().getDisplayName() + ")";
+            }
+            
+            Toast.makeText(this, welcome, Toast.LENGTH_LONG).show();
+            Log.d(TAG, "✓ User login successful: " + user.getEmail());
+            
+            // الانتقال للشاشة الرئيسية
+            startMainActivity();
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error during user login process", e);
+            Toast.makeText(this, "خطأ في عملية تسجيل الدخول: " + e.getMessage(), 
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    // مساعدات لاستخراج البيانات
+    private String extractString(java.util.Map<String, Object> data, String key, String defaultValue) {
+        Object value = data.get(key);
+        return (value != null && !value.toString().trim().isEmpty()) ? value.toString() : defaultValue;
+    }
+    
+    private boolean extractBoolean(java.util.Map<String, Object> data, String key, boolean defaultValue) {
+        Object value = data.get(key);
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        return defaultValue;
+    }
+    
+    private com.google.firebase.Timestamp extractTimestamp(java.util.Map<String, Object> data, String key, com.google.firebase.Timestamp defaultValue) {
+        Object value = data.get(key);
+        if (value instanceof com.google.firebase.Timestamp) {
+            return (com.google.firebase.Timestamp) value;
+        }
+        return defaultValue;
+    }
+    
+    private UserRole parseUserRole(String roleStr) {
+        if (roleStr == null) return UserRole.EMPLOYEE;
+        
+        try {
+            // محاولة التحويل المباشر
+            return UserRole.valueOf(roleStr.toUpperCase());
+        } catch (Exception e) {
+            // التحويل من القيم القديمة
+            switch (roleStr.toLowerCase()) {
+                case "admin":
+                case "مدير":
+                    return UserRole.ADMIN;
+                case "manager":
+                case "مدير فرع":
+                    return UserRole.MANAGER;
+                case "employee":
+                case "موظف":
+                default:
+                    return UserRole.EMPLOYEE;
+            }
+        }
+    }
+    
+    /**
+     * عرض خطأ معالجة المستخدم
+     */
+    private void showUserProcessingError(String email, int userCount) {
+        String message = "تم العثور على " + userCount + " مستخدم بالبريد الإلكتروني " + email + 
+                        " ولكن فشل في معالجة بياناتهم.\n\nماذا تريد أن تفعل؟";
+        
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("خطأ في معالجة المستخدم")
+                .setMessage(message)
+                .setPositiveButton("إصلاح تلقائي", (dialog, which) -> {
+                    forceFixUser(email);
+                })
+                .setNegativeButton("تشخيص النظام", (dialog, which) -> {
+                    runDiagnostic();
+                })
+                .setNeutralButton("إنشاء جديد", (dialog, which) -> {
+                    createNewUserAccount(email);
+                })
+                .setCancelable(false)
+                .show();
+    }
+    
+    /**
+     * عرض خطأ قاعدة البيانات
+     */
+    private void showDatabaseError(String email, Exception error) {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("خطأ في قاعدة البيانات")
+                .setMessage("فشل في الاتصال بقاعدة البيانات:\n" + error.getMessage() + 
+                           "\n\nتحقق من اتصال الإنترنت وإعدادات Firebase.")
+                .setPositiveButton("إعادة المحاولة", (dialog, which) -> {
+                    loadUserData(email);
+                })
+                .setNegativeButton("تشخيص", (dialog, which) -> {
+                    runDiagnostic();
+                })
+                .show();
+    }
+    
+    /**
+     * إصلاح قسري للمستخدم
+     */
+    private void forceFixUser(String email) {
+        Toast.makeText(this, "جاري الإصلاح القسري...", Toast.LENGTH_SHORT).show();
+        
+        // إنشاء مستخدم جديد بالحد الأدنى من البيانات
+        User newUser = new User();
+        newUser.setId("fixed_" + System.currentTimeMillis());
+        newUser.setEmail(email);
+        newUser.setFullName(email.split("@")[0]);
+        newUser.setUsername(email.split("@")[0]);
+        newUser.setRole(UserRole.EMPLOYEE);
+        newUser.setActive(true);
+        newUser.setCreatedAt(com.google.firebase.Timestamp.now());
+        
+        // حفظ في قاعدة البيانات
+        db.collection("users")
+                .add(newUser)
+                .addOnSuccessListener(documentReference -> {
+                    newUser.setId(documentReference.getId());
+                    performUserLogin(newUser);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "فشل في الإصلاح: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+    
+    /**
+     * معالجة المستخدمين الموجودين
+     */
+    private void processFoundUsers(com.google.firebase.firestore.QuerySnapshot queryDocumentSnapshots, String email) {
+        Log.d(TAG, "Processing " + queryDocumentSnapshots.size() + " found users");
+        
+        // البحث عن أول مستخدم صالح
+        for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+            try {
+                User user = document.toObject(User.class);
+                user.setId(document.getId());
+                
+                Log.d(TAG, "Processing user: " + user.getFullName());
+                Log.d(TAG, "- Active: " + user.isActive());
+                Log.d(TAG, "- Role: " + (user.getRole() != null ? user.getRole().name() : "null"));
+                
+                // إصلاح المستخدم إذا لزم الأمر
+                boolean wasFixed = fixUserIfNeeded(user);
+                
+                if (wasFixed) {
+                    Log.d(TAG, "User was fixed, updating in database...");
+                    updateUserInFirebase(user);
+                }
+                
+                // تسجيل دخول المستخدم
+                loginUserSuccessfully(user, wasFixed);
+                return;
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error processing user document: " + document.getId(), e);
+                
+                // محاولة إصلاح البيانات التالفة
+                try {
+                    User fixedUser = fixCorruptedUserData(document, email);
+                    if (fixedUser != null) {
+                        loginUserSuccessfully(fixedUser, true);
+                        return;
+                    }
+                } catch (Exception fixError) {
+                    Log.e(TAG, "Failed to fix corrupted user: " + document.getId(), fixError);
+                }
+            }
+        }
+        
+        // إذا وصلنا هنا، فلم نتمكن من معالجة أي مستخدم
+        Log.e(TAG, "Failed to process any of the found users");
+        Toast.makeText(this, "تم العثور على المستخدم ولكن فشل في معالجة البيانات", Toast.LENGTH_LONG).show();
+        showUserNotFoundDialog(email);
+    }
+    
+    /**
+     * إصلاح المستخدم إذا لزم الأمر
+     */
+    private boolean fixUserIfNeeded(User user) {
+        boolean needsUpdate = false;
+        StringBuilder fixLog = new StringBuilder();
+        
+        // إصلاح حالة التفعيل
+        if (!user.isActive()) {
+            user.setActive(true);
+            needsUpdate = true;
+            fixLog.append("تفعيل الحساب، ");
+        }
+        
+        // إصلاح الدور
+        if (user.getRole() == null) {
+            user.setRole(UserRole.EMPLOYEE);
+            needsUpdate = true;
+            fixLog.append("إضافة دور افتراضي، ");
+        }
+        
+        // إصلاح الاسم
+        if (user.getFullName() == null || user.getFullName().trim().isEmpty()) {
+            String emailName = user.getEmail() != null ? user.getEmail().split("@")[0] : "مستخدم";
+            user.setFullName(emailName);
+            needsUpdate = true;
+            fixLog.append("إضافة اسم افتراضي، ");
+        }
+        
+        // إصلاح اسم المستخدم
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            String emailName = user.getEmail() != null ? user.getEmail().split("@")[0] : "user";
+            user.setUsername(emailName);
+            needsUpdate = true;
+            fixLog.append("إضافة اسم مستخدم، ");
+        }
+        
+        // إصلاح التوقيتات
+        if (user.getCreatedAt() == null) {
+            user.setCreatedAt(com.google.firebase.Timestamp.now());
+            needsUpdate = true;
+            fixLog.append("إضافة تاريخ الإنشاء، ");
+        }
+        
+        if (needsUpdate) {
+            Log.d(TAG, "Fixed user " + user.getEmail() + ": " + fixLog.toString());
+        }
+        
+        return needsUpdate;
+    }
+    
+    /**
+     * إصلاح البيانات التالفة
+     */
+    private User fixCorruptedUserData(com.google.firebase.firestore.QueryDocumentSnapshot document, String email) throws Exception {
+        Log.d(TAG, "Attempting to fix corrupted user data for: " + email);
+        
+        java.util.Map<String, Object> data = document.getData();
+        
+        User user = new User();
+        user.setId(document.getId());
+        user.setEmail(email);
+        
+        // استخراج البيانات بأمان
+        user.setFullName(getStringValue(data, "fullName", email.split("@")[0]));
+        user.setUsername(getStringValue(data, "username", email.split("@")[0]));
+        user.setPhone(getStringValue(data, "phone", ""));
+        user.setActive(true); // تفعيل تلقائي
+        
+        // تحويل الدور
+        String roleString = getStringValue(data, "role", "EMPLOYEE");
+        try {
+            if (roleString.equals("admin") || roleString.equals("ADMIN")) {
+                user.setRole(UserRole.ADMIN);
+            } else if (roleString.equals("manager") || roleString.equals("MANAGER")) {
+                user.setRole(UserRole.MANAGER);
+            } else {
+                user.setRole(UserRole.EMPLOYEE);
+            }
+        } catch (Exception e) {
+            user.setRole(UserRole.EMPLOYEE);
+        }
+        
+        // التوقيتات
+        user.setCreatedAt(com.google.firebase.Timestamp.now());
+        user.updateLastLogin();
+        
+        // حفظ البيانات المُصلحة
+        updateUserInFirebase(user);
+        
+        Log.d(TAG, "Successfully fixed corrupted user: " + email);
+        return user;
+    }
+    
+    /**
+     * تسجيل دخول المستخدم بنجاح
+     */
+    private void loginUserSuccessfully(User user, boolean wasFixed) {
+        // تحديث آخر دخول
+        user.updateLastLogin();
+        if (!wasFixed) {
+            updateUserInFirebase(user);
+        }
+        
+        // تسجيل دخول المستخدم في الجلسة
+        userSession.loginUser(user);
+        
+        String welcomeMessage = "مرحباً " + user.getFullName();
+        if (wasFixed) {
+            welcomeMessage += " (تم إصلاح الحساب)";
+        }
+        
+        Toast.makeText(this, welcomeMessage, Toast.LENGTH_LONG).show();
+        Log.d(TAG, "User logged in successfully: " + user.getEmail());
+        
+        startMainActivity();
+    }
+    
+    /**
+     * البحث الاحتياطي عن المستخدم بدون شرط isActive
+     */
+    private void fallbackUserSearch(String email) {
+        Log.d(TAG, "Performing fallback search for email: " + email);
+        
+        db.collection("users")
+                .whereEqualTo("email", email)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        Log.d(TAG, "Found user in fallback search, count: " + queryDocumentSnapshots.size());
+                        
+                        // فحص جميع المستخدمين الموجودين
+                        for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            try {
+                                User user = document.toObject(User.class);
+                                user.setId(document.getId());
+                                
+                                Log.d(TAG, "User found - Name: " + user.getFullName() + 
+                                     ", Active: " + user.isActive() + 
+                                     ", Role: " + (user.getRole() != null ? user.getRole().name() : "null"));
+                                
+                                // إصلاح المستخدم إذا لزم الأمر
+                                boolean needsUpdate = false;
+                                
+                                // إصلاح حالة التفعيل
+                                if (!user.isActive()) {
+                                    user.setActive(true);
+                                    needsUpdate = true;
+                                    Log.d(TAG, "Fixed isActive field for user: " + email);
+                                }
+                                
+                                // إصلاح الدور
+                                if (user.getRole() == null) {
+                                    user.setRole(UserRole.EMPLOYEE);
+                                    needsUpdate = true;
+                                    Log.d(TAG, "Fixed role field for user: " + email);
+                                }
+                                
+                                // تحديث المستخدم في قاعدة البيانات إذا لزم الأمر
+                                if (needsUpdate) {
+                                    updateUserInFirebase(user);
+                                }
+                                
+                                // تسجيل دخول المستخدم
+                                userSession.loginUser(user);
+                                Toast.makeText(this, "مرحباً " + user.getFullName() + " (تم إصلاح الحساب)", Toast.LENGTH_LONG).show();
+                                startMainActivity();
+                                return;
+                                
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error processing user in fallback search", e);
+                                // محاولة إصلاح البيانات التالفة
+                                handleCorruptedUserData(document, email);
+                                return;
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "No user found in fallback search either");
+                        // المستخدم غير موجود نهائياً
+                        showUserNotFoundDialog(email);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error in fallback user search", e);
+                    Toast.makeText(this, "خطأ في البحث عن المستخدم: " + e.getMessage(), 
+                            Toast.LENGTH_LONG).show();
+                    
+                    // عرض خيارات المساعدة
+                    showSearchFailureDialog(email, e.getMessage());
+                });
+    }
+    
+    /**
+     * معالجة المستخدم الموجود
+     */
+    private void handleFoundUser(com.google.firebase.firestore.QuerySnapshot queryDocumentSnapshots, String email) {
+        try {
+            // المستخدم موجود في قاعدة البيانات
+            QueryDocumentSnapshot document = (QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
+            User user = document.toObject(User.class);
+            user.setId(document.getId());
+            
+            Log.d(TAG, "User loaded - Name: " + user.getFullName() + ", Role: " + 
+                 (user.getRole() != null ? user.getRole().name() : "null"));
+            
+            // التحقق من صحة دور المستخدم وإصلاحه إذا لزم الأمر
+            if (user.getRole() == null) {
+                user.setRole(UserRole.EMPLOYEE); // دور افتراضي
+                updateUserInFirebase(user);
+                Log.d(TAG, "Fixed null role for user: " + email);
+            }
+            
+            // تحديث آخر دخول
+            user.updateLastLogin();
+            updateUserInFirebase(user);
+            
+            // تسجيل دخول المستخدم في الجلسة
+            userSession.loginUser(user);
+            
+            Toast.makeText(this, "مرحباً " + user.getFullName(), Toast.LENGTH_SHORT).show();
+            startMainActivity();
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error deserializing user data", e);
+            // محاولة إصلاح البيانات التالفة
+            com.google.firebase.firestore.DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+            handleCorruptedUserData(documentSnapshot, email);
+        }
+    }
+    
+    /**
+     * عرض حوار فشل البحث مع خيارات المساعدة
+     */
+    private void showSearchFailureDialog(String email, String error) {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("خطأ في البحث")
+                .setMessage("فشل في البحث عن المستخدم:\n" + error + "\n\nماذا تريد أن تفعل؟")
+                .setPositiveButton("إعادة المحاولة", (dialog, which) -> {
+                    loadUserData(email);
+                })
+                .setNegativeButton("تشخيص النظام", (dialog, which) -> {
+                    runDiagnostic();
+                })
+                .setNeutralButton("إنشاء حساب", (dialog, which) -> {
+                    createNewUserAccount(email);
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
     
     /**

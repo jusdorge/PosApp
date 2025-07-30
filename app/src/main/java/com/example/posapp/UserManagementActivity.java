@@ -77,6 +77,16 @@ public class UserManagementActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("إدارة المستخدمين");
         
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        
+        // إضافة قائمة الأدوات
+        toolbar.inflateMenu(R.menu.menu_user_management);
+        toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_fix_users) {
+                showFixUsersDialog();
+                return true;
+            }
+            return false;
+        });
     }
     
     private void loadUsers() {
@@ -313,5 +323,463 @@ public class UserManagementActivity extends AppCompatActivity {
                     Toast.makeText(this, "خطأ في حذف المستخدم: " + e.getMessage(), 
                             Toast.LENGTH_LONG).show();
                 });
+    }
+    
+    /**
+     * عرض حوار إصلاح المستخدمين
+     */
+    private void showFixUsersDialog() {
+        String[] options = {
+            "إصلاح جميع المستخدمين", 
+            "تشخيص سريع", 
+            "اختبار تسجيل الدخول"
+        };
+        
+        new AlertDialog.Builder(this)
+                .setTitle("أدوات المستخدمين")
+                .setItems(options, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            showFullFixDialog();
+                            break;
+                        case 1:
+                            performQuickDiagnosis();
+                            break;
+                        case 2:
+                            showLoginTestDialog();
+                            break;
+                    }
+                })
+                .show();
+    }
+    
+    private void showFullFixDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("إصلاح المستخدمين")
+                .setMessage("هذه الوظيفة ستقوم بإصلاح جميع المستخدمين في النظام:\n\n" +
+                           "• تفعيل الحسابات غير المفعلة\n" +
+                           "• إضافة الأدوار المفقودة\n" +
+                           "• إصلاح البيانات التالفة\n\n" +
+                           "هل تريد المتابعة؟")
+                .setPositiveButton("إصلاح الآن", (dialog, which) -> {
+                    fixAllUsers();
+                })
+                .setNegativeButton("إلغاء", null)
+                .setIcon(android.R.drawable.ic_menu_preferences)
+                .show();
+    }
+    
+    /**
+     * تشخيص سريع للمستخدمين
+     */
+    private void performQuickDiagnosis() {
+        Toast.makeText(this, "جاري التشخيص السريع...", Toast.LENGTH_SHORT).show();
+        
+        db.collection("users")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int totalUsers = queryDocumentSnapshots.size();
+                    int activeUsers = 0;
+                    int inactiveUsers = 0;
+                    int usersWithoutRole = 0;
+                    int corruptedUsers = 0;
+                    
+                    StringBuilder report = new StringBuilder();
+                    report.append("📊 تقرير التشخيص السريع:\n\n");
+                    
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        try {
+                            User user = document.toObject(User.class);
+                            
+                            if (user.isActive()) {
+                                activeUsers++;
+                            } else {
+                                inactiveUsers++;
+                            }
+                            
+                            if (user.getRole() == null) {
+                                usersWithoutRole++;
+                            }
+                            
+                        } catch (Exception e) {
+                            corruptedUsers++;
+                        }
+                    }
+                    
+                    report.append("👥 إجمالي المستخدمين: ").append(totalUsers).append("\n");
+                    report.append("✅ نشطين: ").append(activeUsers).append("\n");
+                    report.append("❌ غير نشطين: ").append(inactiveUsers).append("\n");
+                    report.append("⚠️ بدون دور: ").append(usersWithoutRole).append("\n");
+                    report.append("🚫 تالفين: ").append(corruptedUsers).append("\n\n");
+                    
+                    if (inactiveUsers > 0 || usersWithoutRole > 0 || corruptedUsers > 0) {
+                        report.append("💡 يُنصح بتشغيل إصلاح المستخدمين.");
+                    } else {
+                        report.append("✨ جميع المستخدمين في حالة جيدة!");
+                    }
+                    
+                    new AlertDialog.Builder(this)
+                            .setTitle("نتيجة التشخيص")
+                            .setMessage(report.toString())
+                            .setPositiveButton("حسناً", null)
+                            .setNeutralButton("إصلاح الآن", (dialog, which) -> fixAllUsers())
+                            .show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "فشل التشخيص: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+    
+    /**
+     * اختبار تسجيل الدخول
+     */
+    private void showLoginTestDialog() {
+        android.widget.EditText emailInput = new android.widget.EditText(this);
+        emailInput.setHint("أدخل البريد الإلكتروني للاختبار");
+        emailInput.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        
+        new AlertDialog.Builder(this)
+                .setTitle("اختبار تسجيل الدخول")
+                .setMessage("أدخل البريد الإلكتروني لاختبار إمكانية تسجيل الدخول:")
+                .setView(emailInput)
+                .setPositiveButton("اختبار", (dialog, which) -> {
+                    String email = emailInput.getText().toString().trim();
+                    if (!email.isEmpty()) {
+                        testUserLogin(email);
+                    }
+                })
+                .setNegativeButton("إلغاء", null)
+                .show();
+    }
+    
+    /**
+     * اختبار تسجيل دخول مستخدم
+     */
+    private void testUserLogin(String email) {
+        Toast.makeText(this, "جاري اختبار: " + email, Toast.LENGTH_SHORT).show();
+        
+        db.collection("users")
+                .whereEqualTo("email", email)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        showTestResult(email, "❌ فشل", "لم يتم العثور على المستخدم في قاعدة البيانات", null);
+                        return;
+                    }
+                    
+                    try {
+                        com.google.firebase.firestore.QueryDocumentSnapshot document = 
+                            (com.google.firebase.firestore.QueryDocumentSnapshot) queryDocumentSnapshots.getDocuments().get(0);
+                        
+                        User user = document.toObject(User.class);
+                        user.setId(document.getId());
+                        
+                        // فحص حالة المستخدم
+                        StringBuilder status = new StringBuilder();
+                        boolean canLogin = true;
+                        
+                        status.append("✅ المستخدم موجود\n");
+                        status.append("📧 البريد: ").append(user.getEmail()).append("\n");  
+                        status.append("👤 الاسم: ").append(user.getFullName() != null ? user.getFullName() : "غير محدد").append("\n");
+                        
+                        if (user.isActive()) {
+                            status.append("✅ الحساب نشط\n");
+                        } else {
+                            status.append("❌ الحساب غير نشط\n");
+                            canLogin = false;
+                        }
+                        
+                        if (user.getRole() != null) {
+                            status.append("✅ الدور: ").append(user.getRole().getDisplayName()).append("\n");
+                        } else {
+                            status.append("⚠️ الدور: غير محدد\n");
+                            canLogin = false;
+                        }
+                        
+                        String result = canLogin ? "✅ نجح" : "⚠️ يحتاج إصلاح";
+                        showTestResult(email, result, status.toString(), canLogin ? null : user);
+                        
+                    } catch (Exception e) {
+                        showTestResult(email, "❌ فشل", "خطأ في قراءة بيانات المستخدم: " + e.getMessage(), null);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    showTestResult(email, "❌ فشل", "خطأ في البحث: " + e.getMessage(), null);
+                });
+    }
+    
+    /**
+     * عرض نتيجة الاختبار
+     */
+    private void showTestResult(String email, String result, String details, User userToFix) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("نتيجة اختبار " + email)
+                .setMessage("النتيجة: " + result + "\n\n" + details)
+                .setPositiveButton("حسناً", null);
+        
+        if (userToFix != null) {
+            builder.setNeutralButton("إصلاح هذا المستخدم", (dialog, which) -> {
+                fixSingleUser(userToFix);
+            });
+        }
+        
+        builder.show();
+    }
+    
+    /**
+     * إصلاح مستخدم واحد
+     */
+    private void fixSingleUser(User user) {
+        boolean needsUpdate = false;
+        
+        // إصلاح التفعيل
+        if (!user.isActive()) {
+            user.setActive(true);
+            needsUpdate = true;
+        }
+        
+        // إصلاح الدور
+        if (user.getRole() == null) {
+            user.setRole(UserRole.EMPLOYEE);
+            needsUpdate = true;
+        }
+        
+        // إصلاح الاسم
+        if (user.getFullName() == null || user.getFullName().trim().isEmpty()) {
+            user.setFullName(user.getEmail().split("@")[0]);
+            needsUpdate = true;
+        }
+        
+        if (needsUpdate) {
+            updateUser(user);
+            Toast.makeText(this, "تم إصلاح المستخدم: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "المستخدم لا يحتاج إصلاح", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    /**
+     * إصلاح جميع المستخدمين في النظام
+     */
+    private void fixAllUsers() {
+        // إظهار progress dialog
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage("جاري إصلاح المستخدمين...");
+        progressDialog.setProgressStyle(android.app.ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        
+                 db.collection("users")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int totalUsers = queryDocumentSnapshots.size();
+                    final int[] fixedUsers = {0};
+                    final int[] processedUsers = {0};
+                    
+                    progressDialog.setMax(totalUsers);
+                    
+                    Log.d(TAG, "Starting to fix " + totalUsers + " users");
+                    
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        try {
+                            // محاولة قراءة المستخدم
+                            User user = document.toObject(User.class);
+                            user.setId(document.getId());
+                            
+                            boolean needsUpdate = false;
+                            StringBuilder fixLog = new StringBuilder();
+                            
+                            // فحص وإصلاح البيانات
+                            
+                            // 1. إصلاح حالة التفعيل
+                            if (!user.isActive()) {
+                                user.setActive(true);
+                                needsUpdate = true;
+                                fixLog.append("تم تفعيل الحساب، ");
+                            }
+                            
+                            // 2. إصلاح الدور المفقود
+                            if (user.getRole() == null) {
+                                user.setRole(UserRole.EMPLOYEE); // دور افتراضي
+                                needsUpdate = true;
+                                fixLog.append("تم إضافة دور افتراضي، ");
+                            }
+                            
+                            // 3. إصلاح التوقيتات المفقودة
+                            if (user.getCreatedAt() == null) {
+                                user.setCreatedAt(com.google.firebase.Timestamp.now());
+                                needsUpdate = true;
+                                fixLog.append("تم إضافة تاريخ الإنشاء، ");
+                            }
+                            
+                            // 4. إصلاح الاسم المفقود
+                            if (user.getFullName() == null || user.getFullName().trim().isEmpty()) {
+                                String emailName = user.getEmail() != null ? user.getEmail().split("@")[0] : "مستخدم";
+                                user.setFullName(emailName);
+                                needsUpdate = true;
+                                fixLog.append("تم إضافة اسم افتراضي، ");
+                            }
+                            
+                            // 5. إصلاح اسم المستخدم المفقود
+                            if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+                                String emailName = user.getEmail() != null ? user.getEmail().split("@")[0] : "user";
+                                user.setUsername(emailName);
+                                needsUpdate = true;
+                                fixLog.append("تم إضافة اسم مستخدم افتراضي، ");
+                            }
+                            
+                            if (needsUpdate) {
+                                fixedUsers[0]++;
+                                Log.d(TAG, "Fixing user: " + user.getEmail() + " - " + fixLog.toString());
+                                
+                                // تحديث المستخدم في قاعدة البيانات
+                                db.collection("users").document(user.getId())
+                                        .set(user)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d(TAG, "Successfully fixed user: " + user.getEmail());
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "Failed to fix user: " + user.getEmail(), e);
+                                        });
+                                
+                                // تحديث المستخدم في القائمة المحلية
+                                for (int i = 0; i < usersList.size(); i++) {
+                                    if (usersList.get(i).getId().equals(user.getId())) {
+                                        usersList.set(i, user);
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            processedUsers[0]++;
+                            progressDialog.setProgress(processedUsers[0]);
+                            
+                            // إذا انتهينا من معالجة جميع المستخدمين
+                            if (processedUsers[0] == totalUsers) {
+                                progressDialog.dismiss();
+                                
+                                // تحديث واجهة المستخدم
+                                runOnUiThread(() -> {
+                                    adapter.notifyDataSetChanged();
+                                    
+                                    String message = "تم إصلاح " + fixedUsers[0] + " من أصل " + totalUsers + " مستخدم";
+                                    Toast.makeText(UserManagementActivity.this, message, Toast.LENGTH_LONG).show();
+                                    
+                                    // عرض تقرير مفصل
+                                    showFixReport(totalUsers, fixedUsers[0]);
+                                });
+                            }
+                            
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error processing user document: " + document.getId(), e);
+                            
+                            // محاولة إصلاح البيانات التالفة
+                            try {
+                                fixCorruptedUser(document);
+                                fixedUsers[0]++;
+                            } catch (Exception fixError) {
+                                Log.e(TAG, "Failed to fix corrupted user: " + document.getId(), fixError);
+                            }
+                            
+                            processedUsers[0]++;
+                            progressDialog.setProgress(processedUsers[0]);
+                            
+                            if (processedUsers[0] == totalUsers) {
+                                progressDialog.dismiss();
+                                runOnUiThread(() -> {
+                                    adapter.notifyDataSetChanged();
+                                    String message = "تم إصلاح " + fixedUsers[0] + " من أصل " + totalUsers + " مستخدم";
+                                    Toast.makeText(UserManagementActivity.this, message, Toast.LENGTH_LONG).show();
+                                    showFixReport(totalUsers, fixedUsers[0]);
+                                });
+                            }
+                        }
+                    }
+                    
+                    if (totalUsers == 0) {
+                        progressDialog.dismiss();
+                        Toast.makeText(this, "لا يوجد مستخدمين للإصلاح", Toast.LENGTH_SHORT).show();
+                    }
+                    
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Log.e(TAG, "Error loading users for fix", e);
+                    Toast.makeText(this, "خطأ في تحميل المستخدمين: " + e.getMessage(), 
+                            Toast.LENGTH_LONG).show();
+                });
+    }
+    
+    /**
+     * إصلاح مستخدم تالف
+     */
+    private void fixCorruptedUser(com.google.firebase.firestore.QueryDocumentSnapshot document) throws Exception {
+        java.util.Map<String, Object> data = document.getData();
+        
+        // إنشاء مستخدم جديد بالبيانات الصحيحة
+        User user = new User();
+        user.setId(document.getId());
+        
+        // استخراج البيانات الأساسية بأمان
+        user.setEmail(getStringValue(data, "email", "unknown@example.com"));
+        user.setFullName(getStringValue(data, "fullName", "مستخدم"));
+        user.setUsername(getStringValue(data, "username", user.getEmail().split("@")[0]));
+        user.setPhone(getStringValue(data, "phone", ""));
+        user.setActive(getBooleanValue(data, "isActive", true));
+        
+        // تحويل الدور
+        String roleString = getStringValue(data, "role", "EMPLOYEE");
+        try {
+            user.setRole(UserRole.valueOf(roleString.toUpperCase()));
+        } catch (Exception e) {
+            user.setRole(UserRole.EMPLOYEE); // دور افتراضي
+        }
+        
+        // التوقيتات
+        if (data.containsKey("createdAt") && data.get("createdAt") instanceof com.google.firebase.Timestamp) {
+            user.setCreatedAt((com.google.firebase.Timestamp) data.get("createdAt"));
+        } else {
+            user.setCreatedAt(com.google.firebase.Timestamp.now());
+        }
+        
+        if (data.containsKey("lastLogin") && data.get("lastLogin") instanceof com.google.firebase.Timestamp) {
+            user.setLastLogin((com.google.firebase.Timestamp) data.get("lastLogin"));
+        }
+        
+        // حفظ البيانات المُصلحة
+        db.collection("users").document(user.getId()).set(user);
+        
+        Log.d(TAG, "Fixed corrupted user: " + user.getEmail());
+    }
+    
+    private String getStringValue(java.util.Map<String, Object> data, String key, String defaultValue) {
+        Object value = data.get(key);
+        return value != null ? value.toString() : defaultValue;
+    }
+    
+    private boolean getBooleanValue(java.util.Map<String, Object> data, String key, boolean defaultValue) {
+        Object value = data.get(key);
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        return defaultValue;
+    }
+    
+    /**
+     * عرض تقرير الإصلاح
+     */
+    private void showFixReport(int totalUsers, int fixedUsers) {
+        String report = "تقرير إصلاح المستخدمين:\n\n" +
+                       "• إجمالي المستخدمين: " + totalUsers + "\n" +
+                       "• تم إصلاحهم: " + fixedUsers + "\n" +
+                       "• سليمين: " + (totalUsers - fixedUsers) + "\n\n" +
+                       "يمكن للمستخدمين الآن تسجيل الدخول بنجاح.";
+        
+        new AlertDialog.Builder(this)
+                .setTitle("تم الإصلاح!")
+                .setMessage(report)
+                .setPositiveButton("حسناً", null)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
     }
 } 

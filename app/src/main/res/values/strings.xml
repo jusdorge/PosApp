@@ -38,6 +38,18 @@
     <string name="changes_saved">تم حفظ التغييرات بنجاح</string>
     <string name="save_failed">فشل في حفظ التغييرات</string>
     <string name="no_items_to_edit">لا توجد بنود في الفاتورة للتعديل</string>
+    
+    <!-- User Management Fix Strings -->
+    <string name="fix_users">إصلاح المستخدمين</string>
+    <string name="fix_users_message">هذه الوظيفة ستقوم بإصلاح جميع المستخدمين في النظام</string>
+    <string name="fix_users_progress">جاري إصلاح المستخدمين...</string>
+    <string name="users_fixed_successfully">تم إصلاح المستخدمين بنجاح</string>
+    <string name="fix_users_report_title">تقرير الإصلاح</string>
+    
+    <!-- Login Fix Strings -->
+    <string name="user_search_failed">فشل البحث عن المستخدم</string>
+    <string name="account_fixed_login">تم إصلاح الحساب</string>
+    <string name="fallback_search_activated">تم تفعيل البحث الاحتياطي</string>
     <string name="default_web_client_id">584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com</string>
     <string name="title_activity_all_invoices">جميع الفواتير</string>
     <string name="title_activity_qr_code">QR code طباعة</string>
