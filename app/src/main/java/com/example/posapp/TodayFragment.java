@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     private TextView creditSalesTextView;
     private TextView invoiceCountTextView;
     private TextView todayDateTextView;
+    private Button addNewInvoiceButton;
     
     private InvoiceListAdapter adapter;
     private List<Invoice> invoiceList;
@@ -53,6 +55,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         creditSalesTextView = view.findViewById(R.id.creditSalesTextView);
         invoiceCountTextView = view.findViewById(R.id.invoiceCountTextView);
         todayDateTextView = view.findViewById(R.id.todayDateTextView);
+        addNewInvoiceButton = view.findViewById(R.id.addNewInvoiceButton);
         
         // إعداد قائمة الفواتير
         invoiceList = new ArrayList<>();
@@ -68,6 +71,9 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         // عرض تاريخ اليوم بأرقام عربية
         String todayDate = ArabicNumberUtils.formatLongDateWithArabicNumbers(new Date());
         todayDateTextView.setText("فواتير " + todayDate);
+        
+        // إعداد زر إنشاء فاتورة جديدة
+        addNewInvoiceButton.setOnClickListener(v -> openNewInvoice());
         
         // تحميل فواتير اليوم
         loadTodayInvoices();
@@ -201,13 +207,150 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     
     @Override
     public void onInvoiceClick(Invoice invoice, int position) {
-        // فتح صفحة طباعة الفاتورة
-        Intent intent = InvoicePrintActivity.createIntent(getContext(), invoice.getId());
-        startActivity(intent);
+        // عرض خيارات التعامل مع الفاتورة
+        showInvoiceOptionsDialog(invoice, position);
+    }
+    
+    /**
+     * عرض خيارات الفاتورة (طباعة، تعديل، إضافة منتجات)
+     */
+    private void showInvoiceOptionsDialog(Invoice invoice, int position) {
+        String invoiceNumber = invoice.getDisplayNumber();
+        String customerName = invoice.getCustomerName();
+        String totalAmount = CurrencyUtils.formatCurrency(invoice.getTotalAmount());
+        
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setTitle("فاتورة " + invoiceNumber)
+                .setMessage("العميل: " + customerName + "\nالمجموع: " + totalAmount + "\n\nماذا تريد أن تفعل؟")
+                .setIcon(android.R.drawable.ic_menu_edit)
+                .setPositiveButton("طباعة", (dialog, which) -> {
+                    // فتح صفحة طباعة الفاتورة (الوظيفة الأصلية)
+                    Intent intent = InvoicePrintActivity.createIntent(getContext(), invoice.getId());
+                    startActivity(intent);
+                })
+                .setNeutralButton("إضافة منتجات", (dialog, which) -> {
+                    // فتح حوار إضافة منتجات للفاتورة
+                    openAddProductsDialog(invoice, position);
+                })
+                .setNegativeButton("تحميل في الكاونتر", (dialog, which) -> {
+                    // تحميل الفاتورة في الكاونتر للتعديل الشامل
+                    loadInvoiceInCounter(invoice);
+                })
+                .show();
     }
     
     private void showInvoiceDetails(Invoice invoice) {
         // هنا يمكن إضافة كود لعرض تفاصيل الفاتورة في نافذة منبثقة
         // سنقوم بتنفيذها لاحقاً إذا طلب المستخدم
+    }
+    
+    /**
+     * فتح شاشة إنشاء فاتورة جديدة
+     */
+    private void openNewInvoice() {
+        // إظهار خيارات للمستخدم: إنشاء فاتورة جديدة أو إضافة منتج سريع
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setTitle("إنشاء فاتورة جديدة")
+                .setMessage("كيف تريد إضافة منتج جديد؟")
+                .setIcon(android.R.drawable.ic_input_add)
+                .setPositiveButton("الذهاب للكاونتر", (dialog, which) -> {
+                    // مسح الفاتورة الحالية في الكاونتر وبدء فاتورة جديدة
+                    CounterFragment.clearInvoice();
+                    CounterFragment.clearCustomer();
+                    
+                    // الانتقال إلى شاشة الكاونتر
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).switchToCounterFragment();
+                        Toast.makeText(getContext(), "🆕 تم إنشاء فاتورة جديدة في الكاونتر", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNeutralButton("إضافة منتج سريع", (dialog, which) -> {
+                    // فتح حوار اختيار المنتجات مباشرة
+                    openQuickProductSelection();
+                })
+                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+    
+    /**
+     * فتح حوار اختيار المنتجات السريع
+     */
+    private void openQuickProductSelection() {
+        QuickInvoiceDialog dialog = new QuickInvoiceDialog();
+        dialog.setOnInvoiceCreatedListener(() -> {
+            // إعادة تحميل فواتير اليوم عند إنشاء فاتورة جديدة
+            loadTodayInvoices();
+            Toast.makeText(getContext(), "✅ تم إنشاء الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
+        });
+        dialog.show(getChildFragmentManager(), "QuickInvoiceDialog");
+    }
+    
+    /**
+     * فتح حوار إضافة منتجات للفاتورة الموجودة
+     */
+    private void openAddProductsDialog(Invoice invoice, int position) {
+        AddProductsToInvoiceDialog dialog = AddProductsToInvoiceDialog.newInstance(invoice);
+        dialog.setOnProductsAddedListener((updatedInvoice) -> {
+            // تحديث الفاتورة في القائمة
+            invoiceList.set(position, updatedInvoice);
+            adapter.notifyItemChanged(position);
+            
+            // إعادة تحميل فواتير اليوم لتحديث الملخص
+            loadTodayInvoices();
+            
+            Toast.makeText(getContext(), "✅ تم إضافة المنتجات للفاتورة بنجاح", Toast.LENGTH_SHORT).show();
+        });
+        dialog.show(getChildFragmentManager(), "AddProductsToInvoiceDialog");
+    }
+    
+    /**
+     * تحميل الفاتورة في الكاونتر للتعديل الشامل
+     */
+    private void loadInvoiceInCounter(Invoice invoice) {
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setTitle("تحميل في الكاونتر")
+                .setMessage("سيتم تحميل هذه الفاتورة في الكاونتر للتعديل.\n\nملاحظة: أي فاتورة حالية في الكاونتر ستُمسح.")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("تحميل", (dialog, which) -> {
+                    // مسح الفاتورة الحالية في الكاونتر
+                    CounterFragment.clearInvoice();
+                    CounterFragment.clearCustomer();
+                    
+                    // تحميل منتجات الفاتورة
+                    if (invoice.getItems() != null && !invoice.getItems().isEmpty()) {
+                        for (com.example.posapp.model.InvoiceItem item : invoice.getItems()) {
+                            CounterFragment.addToInvoice(item);
+                        }
+                    }
+                    
+                    // تحميل معلومات العميل إذا كانت متوفرة
+                    if (!invoice.getCustomerName().equals("مجهول") && 
+                        !invoice.getCustomerPhone().isEmpty()) {
+                        
+                        // البحث عن العميل وتحميله
+                        db.collection("customers")
+                            .whereEqualTo("phone", invoice.getCustomerPhone())
+                            .get()
+                            .addOnSuccessListener(queryDocumentSnapshots -> {
+                                if (!queryDocumentSnapshots.isEmpty()) {
+                                    com.example.posapp.model.Customer customer = 
+                                        queryDocumentSnapshots.getDocuments().get(0)
+                                            .toObject(com.example.posapp.model.Customer.class);
+                                    if (customer != null) {
+                                        customer.setId(queryDocumentSnapshots.getDocuments().get(0).getId());
+                                        CounterFragment.setCustomer(customer);
+                                    }
+                                }
+                            });
+                    }
+                    
+                    // الانتقال إلى شاشة الكاونتر
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).switchToCounterFragment();
+                        Toast.makeText(getContext(), "✅ تم تحميل الفاتورة في الكاونتر", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }

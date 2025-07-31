@@ -54,4 +54,5 @@
     <color name="reportBackgroundLight">#FAFAFA</color>
     <color name="reportBackgroundDark">#EEEEEE</color>
     <color name="colorSecondary">#1E49CB</color>
+    <color name="colorGray">#757575</color>
 </resources>

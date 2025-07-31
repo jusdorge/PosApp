@@ -30,6 +30,7 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
     private TextView totalPriceTextView;
     private Button checkoutButton;
     private Button scanQRButton;
+    private static Button clearCustomerButton;
     private InvoiceAdapter invoiceAdapter;
     private static List<InvoiceItem> invoiceItems = new ArrayList<>();
     private double totalPrice = 0.0;
@@ -52,9 +53,13 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         totalPriceTextView = view.findViewById(R.id.totalPriceTextView);
         checkoutButton = view.findViewById(R.id.checkoutButton);
         scanQRButton = view.findViewById(R.id.scanQRButton);
+        clearCustomerButton = view.findViewById(R.id.clearCustomerButton);
         invoiceCustomerTextView = view.findViewById(R.id.invoiceCustomerTextView);
         if (currentCustomer != null) {
             invoiceCustomerTextView.setText("الزبون: " + currentCustomer.getName());
+            clearCustomerButton.setVisibility(View.VISIBLE);
+        } else {
+            clearCustomerButton.setVisibility(View.GONE);
         }
 
         // إعداد محول الفاتورة
@@ -100,6 +105,11 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
             startActivityForResult(intent, QR_SCANNER_REQUEST_CODE);
         });
 
+        // إعداد مستمع زر حذف العميل
+        clearCustomerButton.setOnClickListener(v -> {
+            showClearCustomerConfirmDialog();
+        });
+
         // تحديث إجمالي السعر
         updateTotalPrice();
 
@@ -125,12 +135,18 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
             updateTotalPrice();
         }
         
-        // تحديث عرض العميل
+        // تحديث عرض العميل وزر الحذف
         if (invoiceCustomerTextView != null) {
             if (currentCustomer != null) {
                 invoiceCustomerTextView.setText("الزبون: " + currentCustomer.getName());
+                if (clearCustomerButton != null) {
+                    clearCustomerButton.setVisibility(View.VISIBLE);
+                }
             } else {
                 invoiceCustomerTextView.setText("الزبون: مجهول");
+                if (clearCustomerButton != null) {
+                    clearCustomerButton.setVisibility(View.GONE);
+                }
             }
         }
     }
@@ -203,12 +219,18 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
     public static void setCustomer(Customer customer) {
         currentCustomer = customer;
         
-        // تحديث TextView إذا كان Fragment نشطًا
+        // تحديث TextView وزر الحذف إذا كان Fragment نشطًا
         if (activeInstance != null && invoiceCustomerTextView != null) {
             if (customer != null) {
                 invoiceCustomerTextView.setText("الزبون: " + customer.getName());
+                if (clearCustomerButton != null) {
+                    clearCustomerButton.setVisibility(View.VISIBLE);
+                }
             } else {
                 invoiceCustomerTextView.setText("الزبون: مجهول");
+                if (clearCustomerButton != null) {
+                    clearCustomerButton.setVisibility(View.GONE);
+                }
             }
         }
     }
@@ -229,6 +251,9 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         currentCustomer = null;
         if (activeInstance != null && invoiceCustomerTextView != null) {
             invoiceCustomerTextView.setText("الزبون: مجهول");
+            if (clearCustomerButton != null) {
+                clearCustomerButton.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -263,5 +288,28 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
             totalPrice += item.getQuantity()*item.getPrice();
         }
         totalPriceTextView.setText(CurrencyUtils.formatCurrency(totalPrice));
+    }
+    
+    /**
+     * عرض حوار تأكيد حذف العميل
+     */
+    private void showClearCustomerConfirmDialog() {
+        if (currentCustomer == null) {
+            return;
+        }
+        
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setTitle("حذف العميل")
+                .setMessage("هل أنت متأكد من حذف العميل \"" + currentCustomer.getName() + "\" من الفاتورة الحالية؟\n\nسيعود إلى الوضع الافتراضي: مجهول")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("حذف", (dialog, which) -> {
+                    String customerName = currentCustomer.getName();
+                    clearCustomer();
+                    Toast.makeText(getContext(), "✅ تم حذف العميل: " + customerName, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("إلغاء", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
     }
 } 

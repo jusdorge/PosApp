@@ -535,63 +535,127 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         // تحديث المخزون لكل منتج في الفاتورة
         updateInventoryForInvoice(batch, invoice.getId(), invoiceItems);
 
-        // إذا كانت الفاتورة غير مدفوعة (دين)، أضف إلى العميل
-        if (selectedPaymentMethod.isDebt()) {
-            // البحث عن العميل أولاً
-            db.collection("customers")
-                    .whereEqualTo("phone", phoneNumber)
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        // تحديث عملية الكتابة المجمعة
-                        WriteBatch newBatch = db.batch();
-                        DocumentReference invoiceRef = db.collection("invoices").document(invoice.getId());
-                        newBatch.set(invoiceRef, invoice);
+        // التحقق من وجود العميل وإضافته تلقائياً إذا لم يكن موجوداً (في جميع الحالات)
+        if (isValidCustomerInfo(customerName, phoneNumber)) {
+            // تطهير البيانات قبل البحث
+            String cleanName = customerName.trim();
+            String cleanPhone = cleanPhoneNumber(phoneNumber.trim());
+            
+            checkAndAddCustomer(batch, invoice, selectedPaymentMethod, cleanPhone, cleanName);
+        } else {
+            // إذا لم يتم توفير معلومات العميل صحيحة، احفظ الفاتورة فقط
+            android.util.Log.d("CheckoutDialog", "معلومات العميل غير مكتملة، سيتم حفظ الفاتورة فقط");
+            commitBatchAndFinish(batch);
+        }
+    }
+    
+    /**
+     * التحقق من وجود العميل وإضافته تلقائياً إذا لم يكن موجوداً
+     */
+    private void checkAndAddCustomer(WriteBatch batch, Invoice invoice, PaymentMethod selectedPaymentMethod,
+                                   String phoneNumber, String customerName) {
+        // البحث عن العميل بناءً على رقم الهاتف
+        android.util.Log.d("CheckoutDialog", "البحث عن العميل: " + customerName + " - " + phoneNumber);
+        
+        db.collection("customers")
+                .whereEqualTo("phone", phoneNumber)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // تحديث عملية الكتابة المجمعة
+                    WriteBatch newBatch = db.batch();
+                    DocumentReference invoiceRef = db.collection("invoices").document(invoice.getId());
+                    newBatch.set(invoiceRef, invoice);
 
-                        if (queryDocumentSnapshots.isEmpty()) {
-                            // إنشاء عميل جديد
-                            Customer customer = new Customer(customerName, phoneNumber);
-                            customer.addDebt(invoice.getId(), invoice.getTotalAmount(), invoice.getDate());
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        // العميل غير موجود - إنشاء عميل جديد
+                        android.util.Log.d("CheckoutDialog", "إنشاء عميل جديد: " + customerName);
+                        Customer newCustomer = new Customer(customerName, phoneNumber);
+                        
+                        // إضافة الدين فقط إذا كانت الفاتورة دين
+                        if (selectedPaymentMethod.isDebt()) {
+                            newCustomer.addDebt(invoice.getId(), invoice.getTotalAmount(), invoice.getDate());
+                            android.util.Log.d("CheckoutDialog", "تم إضافة دين بقيمة: " + invoice.getTotalAmount());
+                        }
 
-                            DocumentReference customerRef = db.collection("customers").document();
-                            customer.setId(customerRef.getId());
-                            newBatch.set(customerRef, customer);
-                        } else {
-                            // تحديث العميل الموجود
+                        DocumentReference customerRef = db.collection("customers").document();
+                        newCustomer.setId(customerRef.getId());
+                        newBatch.set(customerRef, newCustomer);
+                        
+                        Toast.makeText(getContext(), "✅ تم إضافة العميل الجديد: " + customerName, Toast.LENGTH_SHORT).show();
+                    } else {
+                        // العميل موجود - تحديث العميل إذا كان هناك دين
+                        android.util.Log.d("CheckoutDialog", "عميل موجود: " + customerName);
+                        
+                        if (selectedPaymentMethod.isDebt()) {
                             DocumentReference customerRef = queryDocumentSnapshots.getDocuments().get(0).getReference();
 
                             // إضافة الدين الجديد
                             CustomerDebt newDebt = new CustomerDebt(invoice.getId(), invoice.getTotalAmount(), invoice.getDate());
 
-                            // نحتاج لتحميل العميل بالكامل بدلاً من محاولة تحديث الديون مباشرة
-                            Customer customer = queryDocumentSnapshots.getDocuments().get(0).toObject(Customer.class);
-                            if (customer != null) {
+                            // تحميل العميل بالكامل وتحديث ديونه
+                            Customer existingCustomer = queryDocumentSnapshots.getDocuments().get(0).toObject(Customer.class);
+                            if (existingCustomer != null) {
                                 // إضافة الدين الجديد إلى قائمة الديون
-                                if (customer.getDebts() == null) {
-                                    customer.setDebts(new ArrayList<>());
+                                if (existingCustomer.getDebts() == null) {
+                                    existingCustomer.setDebts(new ArrayList<>());
                                 }
-                                customer.getDebts().add(newDebt);
-                                customer.setTotalDebt(customer.getTotalDebt() + totalAmount);
+                                existingCustomer.getDebts().add(newDebt);
+                                existingCustomer.setTotalDebt(existingCustomer.getTotalDebt() + invoice.getTotalAmount());
 
                                 // تحديث العميل بالكامل
-                                newBatch.set(customerRef, customer);
+                                newBatch.set(customerRef, existingCustomer);
+                                android.util.Log.d("CheckoutDialog", "تم تحديث دين العميل: " + existingCustomer.getTotalDebt());
                             } else {
-                                // في حالة حدوث خطأ في تحويل البيانات، نقوم بتحديث فقط المجموع الكلي للدين
-                                newBatch.update(customerRef, "totalDebt", queryDocumentSnapshots.getDocuments().get(0).getDouble("totalDebt") + totalAmount);
+                                // في حالة حدوث خطأ في تحويل البيانات
+                                Double currentDebt = queryDocumentSnapshots.getDocuments().get(0).getDouble("totalDebt");
+                                double newTotalDebt = (currentDebt != null ? currentDebt : 0.0) + invoice.getTotalAmount();
+                                newBatch.update(customerRef, "totalDebt", newTotalDebt);
                             }
+                            
+                            Toast.makeText(getContext(), "✅ تم تحديث دين العميل: " + customerName, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "ℹ️ العميل موجود مسبقاً: " + customerName, Toast.LENGTH_SHORT).show();
                         }
+                    }
 
-                        // تنفيذ عملية الكتابة المجمعة
-                        commitBatchAndFinish(newBatch);
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "حدث خطأ أثناء البحث عن العميل", Toast.LENGTH_SHORT).show();
-                        // محاولة حفظ الفاتورة على الأقل
-                        commitBatchAndFinish(batch);
-                    });
-        } else {
-            // إذا كان الدفع نقداً، فقط احفظ الفاتورة
-            commitBatchAndFinish(batch);
-        }
+                    // تحديث المخزون
+                    updateInventoryForInvoice(newBatch, invoice.getId(), invoiceItems);
+
+                    // حفظ جميع التغييرات
+                    commitBatchAndFinish(newBatch);
+                })
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("CheckoutDialog", "خطأ في البحث عن العميل", e);
+                    Toast.makeText(getContext(), "❌ خطأ في البحث عن العميل: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    // محاولة حفظ الفاتورة على الأقل
+                    commitBatchAndFinish(batch);
+                });
+    }
+    
+    /**
+     * التحقق من صحة معلومات العميل
+     */
+    private boolean isValidCustomerInfo(String customerName, String phoneNumber) {
+        return customerName != null && !customerName.trim().isEmpty() && 
+               phoneNumber != null && !phoneNumber.trim().isEmpty() && 
+               phoneNumber.trim().length() >= 8; // رقم هاتف لا يقل عن 8 أرقام
+    }
+    
+    /**
+     * تطهير رقم الهاتف من المسافات والرموز غير المرغوبة
+     */
+    private String cleanPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null) return "";
+        
+        // إزالة المسافات والرموز الخاصة وترك الأرقام والعلامة +
+        String cleaned = phoneNumber.replaceAll("[^\\d+]", "");
+        
+        // إذا كان الرقم يبدأ بـ 0 وليس فيه +، قم بإضافة رمز الدولة
+//        if (cleaned.startsWith("0") && !cleaned.startsWith("+")) {
+//            cleaned = "+213" + cleaned.substring(1); // رمز الجزائر
+//        }
+        
+        return cleaned;
     }
 
     private void commitBatchAndFinish(WriteBatch batch) {
