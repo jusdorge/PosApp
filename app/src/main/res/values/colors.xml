@@ -47,6 +47,7 @@
     <color name="performanceExcellent">#4CAF50</color>
     <color name="performanceGood">#8BC34A</color>
     <color name="performanceAverage">#FFC107</color>
+    <color name="performanceLow">#FF9800</color>
     <color name="performancePoor">#FF5722</color>
 
     <!-- Background variations -->

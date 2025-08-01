@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.example.posapp.model.Product;
 import com.example.posapp.model.Invoice;
 import com.example.posapp.model.InvoiceItem;
+import com.example.posapp.model.User;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -31,6 +32,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import android.content.Intent;
+import android.content.Context;
+import android.net.Uri;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+import androidx.cardview.widget.CardView;
 
 public class ReportsFragment extends Fragment {
     private static final int STORAGE_PERMISSION_CODE = 1001;
@@ -69,6 +79,17 @@ public class ReportsFragment extends Fragment {
     private TextView totalSalesTextView;
     private TextView totalProfitTextView;
     private TextView performanceIndicatorTextView;
+    
+    // Export buttons
+    private Button exportCSVButton;
+    private Button exportTextButton;
+    private Button shareReportButton;
+    
+    // Performance indicator card
+    private CardView performanceCard;
+    
+    // Cached data for reports
+    private Map<String, Object> reportData;
 
     @Nullable
     @Override
@@ -83,6 +104,7 @@ public class ReportsFragment extends Fragment {
         // Initialize all views
         initializeViews(view);
         setupDateControls();
+        setupExportButtons();
 
         // Load initial data for today
         loadReportsData();
@@ -121,6 +143,18 @@ public class ReportsFragment extends Fragment {
         totalSalesTextView = view.findViewById(R.id.totalSalesTextView);
         totalProfitTextView = view.findViewById(R.id.totalProfitTextView);
         performanceIndicatorTextView = view.findViewById(R.id.performanceIndicatorTextView);
+        
+        // Export buttons
+        exportCSVButton = view.findViewById(R.id.exportCSVButton);
+        exportTextButton = view.findViewById(R.id.exportTextButton);
+        shareReportButton = view.findViewById(R.id.shareReportButton);
+        
+        // Performance card
+        performanceCard = view.findViewById(R.id.performanceIndicatorTextView).getParent().getParent() instanceof CardView ?
+                (CardView) view.findViewById(R.id.performanceIndicatorTextView).getParent().getParent() : null;
+        
+        // Initialize report data cache
+        reportData = new HashMap<>();
     }
 
     private void setupDateControls() {
@@ -163,6 +197,9 @@ public class ReportsFragment extends Fragment {
     }
 
     private void loadReportsData() {
+        // إظهار مؤشرات التحميل
+        showLoadingIndicators();
+        
         // Set static titles
         categoryTitleTextView.setText("الفئة الأكثر مبيعاً");
         receiptsCountTitleTextView.setText("إجمالي عدد الفواتير");
@@ -172,6 +209,9 @@ public class ReportsFragment extends Fragment {
         bestCustomerTitleTextView.setText("أفضل عميل");
         paymentMethodTitleTextView.setText("طرق الدفع");
         sellerTitleTextView.setText("البائع");
+
+        // مسح البيانات السابقة
+        reportData.clear();
 
         // Load dynamic data
         loadTopCategory();
@@ -183,6 +223,38 @@ public class ReportsFragment extends Fragment {
         loadPaymentMethods();
         loadSellerInfo();
         loadTotalSalesAndProfit();
+        
+        // إخفاء مؤشرات التحميل بعد 3 ثواني
+        if (getView() != null) {
+            getView().postDelayed(this::hideLoadingIndicators, 3000);
+        }
+    }
+    
+    private void showLoadingIndicators() {
+        // تعطيل الأزرار أثناء التحميل
+        if (exportCSVButton != null) exportCSVButton.setEnabled(false);
+        if (exportTextButton != null) exportTextButton.setEnabled(false);
+        if (shareReportButton != null) shareReportButton.setEnabled(false);
+        
+        // إظهار رسائل التحميل
+        agrodivValueTextView.setText("جاري التحميل...");
+        receiptsCountValueTextView.setText("...");
+        avgSalesValueTextView.setText("جاري الحساب...");
+        bestCustomerValueTextView.setText("جاري البحث...");
+        cashValueTextView.setText("💵 جاري الحساب...");
+        if (creditValueTextView != null) {
+            creditValueTextView.setText("📝 جاري الحساب...");
+        }
+        totalSalesTextView.setText("إجمالي المبيعات: جاري الحساب...");
+        totalProfitTextView.setText("إجمالي الربح: جاري الحساب...");
+        performanceIndicatorTextView.setText("جاري تقييم الأداء...");
+    }
+    
+    private void hideLoadingIndicators() {
+        // إعادة تفعيل الأزرار
+        if (exportCSVButton != null) exportCSVButton.setEnabled(true);
+        if (exportTextButton != null) exportTextButton.setEnabled(true);
+        if (shareReportButton != null) shareReportButton.setEnabled(true);
     }
 
     private Timestamp[] getDateRange() {
@@ -247,9 +319,11 @@ public class ReportsFragment extends Fragment {
                     if (!topProductName.equals("غير محدد")) {
                         agrodivValueTextView.setText(topProductName + " : " + topCount);
                         agrodivDescTextView.setText((productCounts.size() - 1) + " منتجات أخرى");
+                        reportData.put("topProduct", topProductName + " : " + topCount);
                     } else {
                         agrodivValueTextView.setText("لا توجد مبيعات");
                         agrodivDescTextView.setText("0 منتجات");
+                        reportData.put("topProduct", "لا توجد مبيعات");
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -268,6 +342,7 @@ public class ReportsFragment extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int count = queryDocumentSnapshots.size();
                     receiptsCountValueTextView.setText(String.valueOf(count));
+                    reportData.put("receiptsCount", String.valueOf(count));
                 })
                 .addOnFailureListener(e -> {
                     receiptsCountValueTextView.setText("0");
@@ -309,6 +384,7 @@ public class ReportsFragment extends Fragment {
 
                     double average = count > 0 ? totalAmount / count : 0;
                     avgSalesValueTextView.setText(CurrencyUtils.formatCurrencyForReports(average));
+                    reportData.put("avgSales", CurrencyUtils.formatCurrencyForReports(average));
                 })
                 .addOnFailureListener(e -> {
                     avgSalesValueTextView.setText(CurrencyUtils.formatCurrencyForReports(0.0));
@@ -330,14 +406,19 @@ public class ReportsFragment extends Fragment {
                         String customerName = topInvoice.getString("customerName");
                         String customerPhone = topInvoice.getString("customerPhone");
 
+                        String bestCustomer;
                         if (customerName != null && !customerName.isEmpty()) {
+                            bestCustomer = customerName;
                             bestCustomerValueTextView.setText(customerName);
                         } else if (customerPhone != null) {
+                            bestCustomer = customerPhone;
                             bestCustomerValueTextView.setText(customerPhone);
                         } else {
+                            bestCustomer = "غير محدد";
                             bestCustomerValueTextView.setText("غير محدد");
                         }
                         bestCustomerDescTextView.setText("أفضل عميل اليوم");
+                        reportData.put("bestCustomer", bestCustomer);
                     } else {
                         bestCustomerValueTextView.setText("لا يوجد زبائن");
                         bestCustomerDescTextView.setText("0 زبون");
@@ -375,10 +456,16 @@ public class ReportsFragment extends Fragment {
                         }
                     }
 
-                    cashValueTextView.setText("💵 نقدي: " + CurrencyUtils.formatCurrencyForReports(totalCash));
+                    String cashText = "💵 نقدي: " + CurrencyUtils.formatCurrencyForReports(totalCash);
+                    String creditText = "📝 دين: " + CurrencyUtils.formatCurrencyForReports(totalCredit);
+                    
+                    cashValueTextView.setText(cashText);
                     if (creditValueTextView != null) {
-                        creditValueTextView.setText("📝 دين: " + CurrencyUtils.formatCurrencyForReports(totalCredit));
+                        creditValueTextView.setText(creditText);
                     }
+                    
+                    reportData.put("cashSales", CurrencyUtils.formatCurrencyForReports(totalCash));
+                    reportData.put("creditSales", CurrencyUtils.formatCurrencyForReports(totalCredit));
                 })
                 .addOnFailureListener(e -> {
                     cashValueTextView.setText("💵 نقدي: " + CurrencyUtils.formatCurrencyForReports(0.0));
@@ -408,8 +495,43 @@ public class ReportsFragment extends Fragment {
     }
 
     private void loadSellerInfo() {
-        sellerNameTextView.setText("akram taf");
-        sellerDescTextView.setText("1 بائع فقط!");
+        // الحصول على معلومات المستخدم الحالي
+        UserSession userSession = new UserSession(getContext());
+        User currentUser = userSession.getCurrentUser();
+        
+        if (currentUser != null) {
+            String displayName = currentUser.getFullName();
+            if (displayName == null || displayName.trim().isEmpty()) {
+                displayName = currentUser.getEmail();
+                if (displayName != null && displayName.contains("@")) {
+                    displayName = displayName.substring(0, displayName.indexOf("@"));
+                }
+            }
+            
+            sellerNameTextView.setText(displayName != null ? displayName : "مستخدم غير معروف");
+            
+            // حساب عدد البائعين النشطين
+            db.collection("users")
+                .whereEqualTo("isActive", true)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int activeUsersCount = queryDocumentSnapshots.size();
+                    String desc = activeUsersCount == 1 ? "بائع واحد فقط!" : 
+                                 activeUsersCount + " بائعين نشطين";
+                    sellerDescTextView.setText(desc);
+                    
+                    // حفظ في cache
+                    reportData.put("sellerName", displayName);
+                    reportData.put("activeUsers", activeUsersCount);
+                })
+                .addOnFailureListener(e -> {
+                    sellerDescTextView.setText("غير محدد");
+                    reportData.put("activeUsers", 1);
+                });
+        } else {
+            sellerNameTextView.setText("غير مسجل");
+            sellerDescTextView.setText("يرجى تسجيل الدخول");
+        }
     }
 
     private void loadTotalSalesAndProfit() {
@@ -453,6 +575,13 @@ public class ReportsFragment extends Fragment {
                                     if (processedInvoices[0] == totalInvoices) {
                                         totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(finalTotalSales[0]));
                                         totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(finalTotalProfit[0]));
+                                        
+                                        // حفظ البيانات في cache
+                                        reportData.put("totalSales", CurrencyUtils.formatCurrencyForReports(finalTotalSales[0]));
+                                        reportData.put("totalProfit", CurrencyUtils.formatCurrencyForReports(finalTotalProfit[0]));
+                                        
+                                        // تحديث مؤشر الأداء
+                                        updatePerformanceIndicator(finalTotalSales[0], finalTotalProfit[0], totalInvoices);
                                     }
                                 }
                             }
@@ -522,5 +651,232 @@ public class ReportsFragment extends Fragment {
      */
     private interface ProfitCalculationCallback {
         void onProfitCalculated(double profit);
+    }
+    
+    private void setupExportButtons() {
+        exportCSVButton.setOnClickListener(v -> {
+            // إضافة تأثير بصري للنقر
+            v.setEnabled(false);
+            exportToCSV();
+            v.postDelayed(() -> v.setEnabled(true), 2000);
+        });
+        
+        exportTextButton.setOnClickListener(v -> {
+            v.setEnabled(false);
+            exportToText();
+            v.postDelayed(() -> v.setEnabled(true), 2000);
+        });
+        
+        shareReportButton.setOnClickListener(v -> {
+            v.setEnabled(false);
+            shareReport();
+            v.postDelayed(() -> v.setEnabled(true), 2000);
+        });
+    }
+    
+    private void exportToCSV() {
+        // فحص الأذونات أولاً
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) 
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), 
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 
+                    STORAGE_PERMISSION_CODE);
+            return;
+        }
+        
+        try {
+            File exportDir = new File(getContext().getExternalFilesDir(null), "reports");
+            if (!exportDir.exists()) {
+                exportDir.mkdirs();
+            }
+            
+            String dateStr = ArabicNumberUtils.formatShortDateWithArabicNumbers(selectedDate.getTime());
+            File csvFile = new File(exportDir, "تقرير_" + dateStr.replace("/", "_") + ".csv");
+            
+            FileWriter writer = new FileWriter(csvFile);
+            
+            // كتابة رأس الملف
+            writer.append("البيان,القيمة\n");
+            writer.append("التاريخ," + dateStr + "\n");
+            writer.append("إجمالي المبيعات," + reportData.get("totalSales") + "\n");
+            writer.append("إجمالي الربح," + reportData.get("totalProfit") + "\n");
+            writer.append("عدد الفواتير," + reportData.get("receiptsCount") + "\n");
+            writer.append("متوسط المبيعات," + reportData.get("avgSales") + "\n");
+            writer.append("أفضل منتج," + reportData.get("topProduct") + "\n");
+            writer.append("أفضل عميل," + reportData.get("bestCustomer") + "\n");
+            writer.append("المبيعات النقدية," + reportData.get("cashSales") + "\n");
+            writer.append("مبيعات الدين," + reportData.get("creditSales") + "\n");
+            
+            writer.close();
+            
+            Toast.makeText(getContext(), "✅ تم تصدير التقرير إلى CSV بنجاح", Toast.LENGTH_SHORT).show();
+            
+            // فتح الملف
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Uri uri = Uri.fromFile(csvFile);
+            intent.setDataAndType(uri, "text/csv");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            
+            if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                startActivity(intent);
+            }
+            
+        } catch (IOException e) {
+            Toast.makeText(getContext(), "❌ خطأ في تصدير الملف: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    private void exportToText() {
+        // فحص الأذونات أولاً
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) 
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), 
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 
+                    STORAGE_PERMISSION_CODE);
+            return;
+        }
+        
+        try {
+            File exportDir = new File(getContext().getExternalFilesDir(null), "reports");
+            if (!exportDir.exists()) {
+                exportDir.mkdirs();
+            }
+            
+            String dateStr = ArabicNumberUtils.formatShortDateWithArabicNumbers(selectedDate.getTime());
+            File textFile = new File(exportDir, "تقرير_" + dateStr.replace("/", "_") + ".txt");
+            
+            FileWriter writer = new FileWriter(textFile);
+            
+            // كتابة التقرير النصي
+            writer.append("====== تقرير نقطة البيع ======\n");
+            writer.append("التاريخ: " + dateStr + "\n");
+            writer.append("================================\n\n");
+            
+            writer.append("📊 ملخص المبيعات:\n");
+            writer.append("• إجمالي المبيعات: " + reportData.get("totalSales") + "\n");
+            writer.append("• إجمالي الربح: " + reportData.get("totalProfit") + "\n");
+            writer.append("• عدد الفواتير: " + reportData.get("receiptsCount") + "\n");
+            writer.append("• متوسط قيمة الفاتورة: " + reportData.get("avgSales") + "\n\n");
+            
+            writer.append("🏆 أفضل الأداءات:\n");
+            writer.append("• أفضل منتج: " + reportData.get("topProduct") + "\n");
+            writer.append("• أفضل عميل: " + reportData.get("bestCustomer") + "\n\n");
+            
+            writer.append("💰 طرق الدفع:\n");
+            writer.append("• المبيعات النقدية: " + reportData.get("cashSales") + "\n");
+            writer.append("• مبيعات الدين: " + reportData.get("creditSales") + "\n\n");
+            
+            writer.append("================================\n");
+            writer.append("تم إنشاء هذا التقرير بواسطة تطبيق نقطة البيع\n");
+            writer.append("التوقيت: " + ArabicNumberUtils.formatDateTimeWithArabicNumbers(new Date()) + "\n");
+            
+            writer.close();
+            
+            Toast.makeText(getContext(), "✅ تم تصدير التقرير النصي بنجاح", Toast.LENGTH_SHORT).show();
+            
+            // فتح الملف
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Uri uri = Uri.fromFile(textFile);
+            intent.setDataAndType(uri, "text/plain");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            
+            if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+                startActivity(intent);
+            }
+            
+        } catch (IOException e) {
+            Toast.makeText(getContext(), "❌ خطأ في تصدير الملف: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    private void shareReport() {
+        String dateStr = ArabicNumberUtils.formatShortDateWithArabicNumbers(selectedDate.getTime());
+        
+        StringBuilder shareText = new StringBuilder();
+        shareText.append("📊 تقرير نقطة البيع - ").append(dateStr).append("\n");
+        shareText.append("═══════════════════════════════\n\n");
+        
+        shareText.append("💰 إجمالي المبيعات: ").append(reportData.get("totalSales")).append("\n");
+        shareText.append("📈 إجمالي الربح: ").append(reportData.get("totalProfit")).append("\n");
+        shareText.append("📄 عدد الفواتير: ").append(reportData.get("receiptsCount")).append("\n");
+        shareText.append("⭐ متوسط الفاتورة: ").append(reportData.get("avgSales")).append("\n\n");
+        
+        shareText.append("🏆 أفضل منتج: ").append(reportData.get("topProduct")).append("\n");
+        shareText.append("👤 أفضل عميل: ").append(reportData.get("bestCustomer")).append("\n\n");
+        
+        shareText.append("💵 المبيعات النقدية: ").append(reportData.get("cashSales")).append("\n");
+        shareText.append("📝 مبيعات الدين: ").append(reportData.get("creditSales")).append("\n\n");
+        
+        shareText.append("#نقطة_البيع #تقرير_يومي #مبيعات");
+        
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText.toString());
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "تقرير نقطة البيع - " + dateStr);
+        
+        startActivity(Intent.createChooser(shareIntent, "مشاركة التقرير"));
+    }
+    
+    private void updatePerformanceIndicator(double totalSales, double totalProfit, int receiptsCount) {
+        String performanceText;
+        int cardColor;
+        
+        // حساب مؤشر الأداء بناءً على عدة معايير
+        if (totalSales >= 10000 && receiptsCount >= 10 && totalProfit > 0) {
+            performanceText = "أداء ممتاز! 🎉";
+            cardColor = R.color.performanceExcellent;
+        } else if (totalSales >= 5000 && receiptsCount >= 5 && totalProfit > 0) {
+            performanceText = "أداء جيد جداً ✅";
+            cardColor = R.color.performanceGood;
+        } else if (totalSales >= 1000 && receiptsCount >= 2) {
+            performanceText = "أداء جيد 👍";
+            cardColor = R.color.performanceAverage;
+        } else if (totalSales > 0 || receiptsCount > 0) {
+            performanceText = "بداية النشاط 📈";
+            cardColor = R.color.performanceLow;
+        } else {
+            performanceText = "لا توجد مبيعات 😴";
+            cardColor = R.color.performancePoor;
+        }
+        
+        performanceIndicatorTextView.setText(performanceText);
+        
+        if (performanceCard != null) {
+            performanceCard.setCardBackgroundColor(ContextCompat.getColor(getContext(), cardColor));
+        }
+        
+        // حفظ في cache
+        reportData.put("performance", performanceText);
+    }
+    
+    /**
+     * إعادة تحديث البيانات يدوياً
+     */
+    public void refreshReportsData() {
+        if (getView() != null) {
+            loadReportsData();
+            Toast.makeText(getContext(), "🔄 تم تحديث التقرير", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        // تحديث البيانات عند العودة للشاشة
+        if (reportData.isEmpty()) {
+            loadReportsData();
+        }
+    }
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext(), "✅ تم منح إذن التخزين", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "❌ تم رفض إذن التخزين. لن تتمكن من تصدير التقارير.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
