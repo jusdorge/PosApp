@@ -136,7 +136,7 @@ public class AddProductsToInvoiceDialog extends DialogFragment implements Invoic
         Dialog dialog = getDialog();
         if (dialog != null) {
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
-            int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.8);
+            int height = (int) (getResources().getDisplayMetrics().heightPixels * 1.0);
             dialog.getWindow().setLayout(width, height);
         }
     }
