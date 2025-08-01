@@ -21,6 +21,7 @@ import com.example.posapp.model.Product;
 import com.example.posapp.model.Invoice;
 import com.example.posapp.model.InvoiceItem;
 import com.example.posapp.model.User;
+import com.example.posapp.UserSession;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -123,6 +124,26 @@ public class ReportsFragment extends Fragment {
         categoryTitleTextView = view.findViewById(R.id.categoryTitleTextView);
         agrodivValueTextView = view.findViewById(R.id.agrodivValueTextView);
         agrodivDescTextView = view.findViewById(R.id.agrodivDescTextView);
+        
+        // إضافة مستمع النقر لأفضل منتج
+        View topProductCard = agrodivValueTextView.getParent().getParent() instanceof View ?
+                (View) agrodivValueTextView.getParent().getParent() : null;
+        if (topProductCard != null) {
+            topProductCard.setOnClickListener(v -> {
+                // إضافة تأثير بصري عند النقر
+                v.setAlpha(0.7f);
+                v.animate().alpha(1.0f).setDuration(200);
+                
+                openProductsAnalyticsReport();
+            });
+            
+            // جعل الكارد يبدو قابل للنقر
+            topProductCard.setClickable(true);
+            topProductCard.setFocusable(true);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                topProductCard.setForeground(getResources().getDrawable(R.drawable.card_ripple_effect, null));
+            }
+        }
         receiptsCountTitleTextView = view.findViewById(R.id.receiptsCountTitleTextView);
         receiptsCountValueTextView = view.findViewById(R.id.receiptsCountValueTextView);
         taxTitleTextView = view.findViewById(R.id.taxTitleTextView);
@@ -318,11 +339,11 @@ public class ReportsFragment extends Fragment {
 
                     if (!topProductName.equals("غير محدد")) {
                         agrodivValueTextView.setText(topProductName + " : " + topCount);
-                        agrodivDescTextView.setText((productCounts.size() - 1) + " منتجات أخرى");
+                        agrodivDescTextView.setText((productCounts.size() - 1) + " منتجات أخرى • اضغط للتفاصيل 📊");
                         reportData.put("topProduct", topProductName + " : " + topCount);
                     } else {
                         agrodivValueTextView.setText("لا توجد مبيعات");
-                        agrodivDescTextView.setText("0 منتجات");
+                        agrodivDescTextView.setText("0 منتجات • اضغط للتفاصيل 📊");
                         reportData.put("topProduct", "لا توجد مبيعات");
                     }
                 })
@@ -496,7 +517,7 @@ public class ReportsFragment extends Fragment {
 
     private void loadSellerInfo() {
         // الحصول على معلومات المستخدم الحالي
-        UserSession userSession = new UserSession(getContext());
+        UserSession userSession = UserSession.getInstance(getContext());
         User currentUser = userSession.getCurrentUser();
         
         if (currentUser != null) {
@@ -508,7 +529,10 @@ public class ReportsFragment extends Fragment {
                 }
             }
             
-            sellerNameTextView.setText(displayName != null ? displayName : "مستخدم غير معروف");
+            // إنشاء متغير final للاستخدام في lambda
+            final String finalDisplayName = displayName != null ? displayName : "مستخدم غير معروف";
+            
+            sellerNameTextView.setText(finalDisplayName);
             
             // حساب عدد البائعين النشطين
             db.collection("users")
@@ -521,12 +545,13 @@ public class ReportsFragment extends Fragment {
                     sellerDescTextView.setText(desc);
                     
                     // حفظ في cache
-                    reportData.put("sellerName", displayName);
+                    reportData.put("sellerName", finalDisplayName);
                     reportData.put("activeUsers", activeUsersCount);
                 })
                 .addOnFailureListener(e -> {
                     sellerDescTextView.setText("غير محدد");
                     reportData.put("activeUsers", 1);
+                    reportData.put("sellerName", finalDisplayName);
                 });
         } else {
             sellerNameTextView.setText("غير مسجل");
@@ -877,6 +902,19 @@ public class ReportsFragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), "❌ تم رفض إذن التخزين. لن تتمكن من تصدير التقارير.", Toast.LENGTH_LONG).show();
             }
+        }
+    }
+    
+    /**
+     * فتح تقرير تحليل المنتجات مع المخطط الدائري
+     */
+    private void openProductsAnalyticsReport() {
+        Intent intent = new Intent(getContext(), ProductsAnalyticsActivity.class);
+        startActivity(intent);
+        
+        // إضافة تأثير بصري للانتقال
+        if (getActivity() != null) {
+            getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         }
     }
 }

@@ -98,6 +98,13 @@
             android:exported="false"
             android:screenOrientation="portrait" />
             
+        <!-- شاشة تحليل المنتجات -->
+        <activity 
+            android:name=".ProductsAnalyticsActivity"
+            android:exported="false"
+            android:label="تحليل المنتجات"
+            android:parentActivityName=".MainActivity" />
+            
         <!-- CaptureActivity من مكتبة ZXing -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
