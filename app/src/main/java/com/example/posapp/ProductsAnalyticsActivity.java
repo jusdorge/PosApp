@@ -303,41 +303,33 @@ public class ProductsAnalyticsActivity extends AppCompatActivity {
     }
     
     private void updateAnalyticsUI(List<ProductAnalyticsData> allProducts, int totalQuantitySold) {
-        // Sort by quantity (sold items first, then alphabetically)
+        // Filter to show only sold products and sort by quantity (descending)
         analyticsDataList.clear();
-        analyticsDataList.addAll(allProducts);
-        Collections.sort(analyticsDataList, (a, b) -> {
-            // First, sort by quantity sold (descending)
-            int quantityCompare = Integer.compare(b.getQuantitySold(), a.getQuantitySold());
-            if (quantityCompare != 0) {
-                return quantityCompare;
+        for (ProductAnalyticsData product : allProducts) {
+            if (product.getQuantitySold() > 0) {
+                analyticsDataList.add(product);
             }
-            // If same quantity (especially zero), sort alphabetically
-            return a.getProductName().compareTo(b.getProductName());
-        });
+        }
+        Collections.sort(analyticsDataList, (a, b) -> Integer.compare(b.getQuantitySold(), a.getQuantitySold()));
         
-        // Calculate comprehensive statistics
+        // Calculate statistics for sold products only
         double topRevenue = 0.0;
         double totalRevenue = 0.0;
-        int soldProductsCount = 0;
-        int notSoldProductsCount = 0;
+        int totalProductsInDB = allProducts.size();
+        int soldProductsCount = analyticsDataList.size(); // Only sold products are in the list now
+        int notSoldProductsCount = totalProductsInDB - soldProductsCount;
         
         for (ProductAnalyticsData data : analyticsDataList) {
             totalRevenue += data.getTotalRevenue();
-            if (data.getQuantitySold() > 0) {
-                soldProductsCount++;
-                if (topRevenue < data.getTotalRevenue()) {
-                    topRevenue = data.getTotalRevenue();
-                }
-            } else {
-                notSoldProductsCount++;
+            if (topRevenue < data.getTotalRevenue()) {
+                topRevenue = data.getTotalRevenue();
             }
         }
         
         double averageQuantity = soldProductsCount > 0 ? (double) totalQuantitySold / soldProductsCount : 0.0;
         
-        // Update summary TextViews with comprehensive information
-        totalProductsTextView.setText("📦 " + analyticsDataList.size() + " منتج إجمالي");
+        // Update summary TextViews - show both sold and total products info
+        totalProductsTextView.setText("📦 " + soldProductsCount + " من " + totalProductsInDB + " منتج");
         totalQuantityTextView.setText("📊 " + totalQuantitySold + " قطعة مباعة");
         topRevenueTextView.setText("💰 أعلى إيراد: " + CurrencyUtils.formatCurrency(topRevenue));
         averageQuantityTextView.setText("📈 متوسط الكمية: " + String.format("%.1f", averageQuantity));

@@ -37,63 +37,39 @@ public class ProductAnalyticsAdapter extends RecyclerView.Adapter<ProductAnalyti
             totalQuantity += item.getQuantitySold();
         }
         
-        // Set product data
+        // Set product data (all products in the list are sold products)
         holder.productNameTextView.setText(data.getProductName());
+        holder.quantityTextView.setText("الكمية: " + data.getQuantitySold());
+        holder.revenueTextView.setText("الإيرادات: " + CurrencyUtils.formatCurrency(data.getTotalRevenue()));
         
-        if (data.getQuantitySold() > 0) {
-            holder.quantityTextView.setText("الكمية: " + data.getQuantitySold());
-            holder.revenueTextView.setText("الإيرادات: " + CurrencyUtils.formatCurrency(data.getTotalRevenue()));
-            
-            // Calculate and set percentage
-            double percentage = data.getPercentage(totalQuantity);
-            holder.percentageTextView.setText(String.format("%.1f%%", percentage));
-            
-            // Set progress bar
-            holder.progressBar.setProgress((int) percentage);
-        } else {
-            // Product not sold today
-            holder.quantityTextView.setText("لم يُباع اليوم");
-            holder.revenueTextView.setText("الإيرادات: " + CurrencyUtils.formatCurrency(0.0));
-            holder.percentageTextView.setText("0.0%");
-            holder.progressBar.setProgress(0);
-            
-            // Gray out the text for unsold products
-            holder.quantityTextView.setTextColor(android.graphics.Color.GRAY);
-            holder.revenueTextView.setTextColor(android.graphics.Color.GRAY);
-        }
+        // Calculate and set percentage
+        double percentage = data.getPercentage(totalQuantity);
+        holder.percentageTextView.setText(String.format("%.1f%%", percentage));
+        
+        // Set progress bar
+        holder.progressBar.setProgress((int) percentage);
         
         // Set rank indicator
         holder.rankTextView.setText("#" + (position + 1));
         
-        // Set colors based on rank and sales status
+        // Set colors based on ranking (only sold products are shown)
         int color;
-        int rankColor = Color.WHITE;
-        
-        if (data.getQuantitySold() > 0) {
-            // Products with sales - use ranking colors
-            switch (position) {
-                case 0: // Gold - أول منتج مباع
-                    color = Color.rgb(255, 215, 0);
-                    break;
-                case 1: // Silver - ثاني منتج مباع
-                    color = Color.rgb(192, 192, 192);
-                    break;
-                case 2: // Bronze - ثالث منتج مباع
-                    color = Color.rgb(205, 127, 50);
-                    break;
-                default:
-                    color = Color.rgb(76, 175, 80); // Green for sold products
-                    break;
-            }
-            rankColor = Color.WHITE;
-        } else {
-            // Products not sold - use gray
-            color = Color.rgb(158, 158, 158);
-            rankColor = Color.DKGRAY;
-            holder.rankTextView.setText("⭕");
+        switch (position) {
+            case 0: // Gold - أول منتج مباع
+                color = Color.rgb(255, 215, 0);
+                break;
+            case 1: // Silver - ثاني منتج مباع
+                color = Color.rgb(192, 192, 192);
+                break;
+            case 2: // Bronze - ثالث منتج مباع
+                color = Color.rgb(205, 127, 50);
+                break;
+            default:
+                color = Color.rgb(76, 175, 80); // Green for other sold products
+                break;
         }
         
-        holder.rankTextView.setTextColor(rankColor);
+        holder.rankTextView.setTextColor(Color.WHITE);
         holder.progressBar.getProgressDrawable().setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
         
         // Set rank background color
