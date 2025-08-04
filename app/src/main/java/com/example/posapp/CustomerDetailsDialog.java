@@ -68,6 +68,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
     private Button btnSetLocation;
     private Button deleteCustomerButton;
     private Button generateQRButton;
+    private Button editCustomerButton;
     private Double latitude = null;
     private Double longitude = null;
 
@@ -116,6 +117,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         btnSetLocation = view.findViewById(R.id.btn_set_location);
         deleteCustomerButton = view.findViewById(R.id.deleteCustomerButton);
         generateQRButton = view.findViewById(R.id.generateQRButton);
+        editCustomerButton = view.findViewById(R.id.editCustomerButton);
 
         debtsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         invoicesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -127,6 +129,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         btnSetLocation.setOnClickListener(v -> setCustomerLocation());
         deleteCustomerButton.setOnClickListener(v -> showDeleteConfirmationDialog());
         generateQRButton.setOnClickListener(v -> showCustomerQRCode());
+        editCustomerButton.setOnClickListener(v -> showEditCustomerDialog());
 
         builder.setView(view);
 
@@ -603,5 +606,14 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         } catch (Exception e) {
             Toast.makeText(getContext(), "فشل في مشاركة معلومات العميل", Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    private void showEditCustomerDialog() {
+        EditCustomerDialog dialog = EditCustomerDialog.newInstance(customerId);
+        dialog.setOnCustomerUpdatedListener(() -> {
+            // إعادة تحميل بيانات العميل بعد التحديث
+            loadCustomerDetails();
+        });
+        dialog.show(getChildFragmentManager(), "EditCustomerDialog");
     }
 }

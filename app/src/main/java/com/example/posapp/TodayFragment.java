@@ -33,7 +33,7 @@ import android.app.DatePickerDialog;
 import com.example.posapp.utils.LocationUtils;
 import com.example.posapp.model.Customer;
 
-public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvoiceClickListener {
+public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvoiceClickListener, InvoiceListAdapter.OnInvoiceButtonClickListener {
     private RecyclerView invoicesRecyclerView;
     private TextView emptyInvoicesTextView;
     private TextView totalSalesTextView;
@@ -71,6 +71,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         invoiceList = new ArrayList<>();
         adapter = new InvoiceListAdapter(invoiceList);
         adapter.setOnInvoiceClickListener(this);
+        adapter.setOnInvoiceButtonClickListener(this);
         
         invoicesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         invoicesRecyclerView.setAdapter(adapter);
@@ -769,5 +770,37 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
             .addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "خطأ في البحث عن بيانات العميل: " + e.getMessage(), Toast.LENGTH_LONG).show();
             });
+    }
+    
+    // تنفيذ دوال OnInvoiceButtonClickListener
+    @Override
+    public void onPrintClick(Invoice invoice, int position) {
+        // فتح شاشة الطباعة
+        Intent intent = InvoicePrintActivity.createIntent(getContext(), invoice.getId());
+        startActivity(intent);
+    }
+    
+    @Override
+    public void onLoadInCounterClick(Invoice invoice, int position) {
+        // تحميل الفاتورة في الكاونتر
+        loadInvoiceInCounter(invoice);
+    }
+    
+    @Override
+    public void onAddProductsClick(Invoice invoice, int position) {
+        // إضافة منتجات للفاتورة
+        openAddProductsDialog(invoice, position);
+    }
+    
+    @Override
+    public void onCustomerLocationClick(Invoice invoice, int position) {
+        // فتح موقع العميل
+        openCustomerLocationOnMap(invoice);
+    }
+    
+    @Override
+    public void onDeleteClick(Invoice invoice, int position) {
+        // حذف الفاتورة
+        showDeleteInvoiceConfirmDialog(invoice, position);
     }
 }

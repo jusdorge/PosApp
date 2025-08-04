@@ -85,38 +85,12 @@ public class LocationUtils {
             return;
         }
         
+        // جرب الدالة المحسنة أولاً
         try {
-            // الحصول على الموقع الحالي
-            Location currentLocation = getCurrentLocation(context);
-            
-            String navigationUri;
-            if (currentLocation != null) {
-                // إنشاء رابط المسار من الموقع الحالي إلى العميل
-                navigationUri = String.format(Locale.US,
-                    "google.navigation:q=%f,%f&mode=d",
-                    customer.getLatitude(),
-                    customer.getLongitude()
-                );
-            } else {
-                // إذا لم نتمكن من الحصول على الموقع الحالي، افتح موقع العميل فقط
-                navigationUri = String.format(Locale.US,
-                    "geo:%f,%f?q=%f,%f(%s)",
-                    customer.getLatitude(),
-                    customer.getLongitude(),
-                    customer.getLatitude(),
-                    customer.getLongitude(),
-                    Uri.encode(customer.getName())
-                );
-                Toast.makeText(context, "لم يتم العثور على موقعك الحالي، سيتم عرض موقع العميل فقط", Toast.LENGTH_LONG).show();
-            }
-            
-            // فتح Google Maps
-            openGoogleMapsWithUri(context, navigationUri, customer.getName());
-            
+            openMapsWithMultipleFallbacks(context, customer);
         } catch (Exception e) {
-            Toast.makeText(context, "خطأ في فتح الخريطة: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            // محاولة بديلة باستخدام المتصفح
-            openGoogleMapsInBrowser(context, customer);
+            // إذا فشلت، جرب الطريقة المضمونة (Intent Chooser)
+            openLocationWithChooser(context, customer.getLatitude(), customer.getLongitude(), customer.getName());
         }
     }
     
@@ -124,116 +98,162 @@ public class LocationUtils {
      * فتح Google Maps مع إحداثيات محددة
      */
     public static void openGoogleMaps(Context context, double latitude, double longitude, String locationName) {
+        // إنشاء عميل مؤقت لاستخدام الدالة المحسنة
+        Customer tempCustomer = new Customer();
+        tempCustomer.setLatitude(latitude);
+        tempCustomer.setLongitude(longitude);
+        tempCustomer.setName(locationName != null ? locationName : "الموقع");
+        
+        openMapsWithMultipleFallbacks(context, tempCustomer);
+    }
+    
+    /**
+     * دالة محسنة لفتح Google Maps بطرق متعددة
+     */
+    public static void openMapsWithMultipleFallbacks(Context context, Customer customer) {
+        if (customer == null) {
+            Toast.makeText(context, "بيانات العميل غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        double lat = customer.getLatitude();
+        double lng = customer.getLongitude();
+        String name = customer.getName();
+        
+        if (lat == 0.0 && lng == 0.0) {
+            Toast.makeText(context, "موقع العميل غير محدد في النظام", Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        Toast.makeText(context, "جاري فتح الخرائط...", Toast.LENGTH_SHORT).show();
+        
+        // المحاولة الأولى: Google Maps Navigation
+        if (tryGoogleMapsNavigation(context, lat, lng, name)) return;
+        
+        // المحاولة الثانية: Google Maps عادي
+        if (tryGoogleMapsRegular(context, lat, lng, name)) return;
+        
+        // المحاولة الثالثة: أي تطبيق خرائط متوفر
+        if (tryAnyMapsApp(context, lat, lng, name)) return;
+        
+        // المحاولة الأخيرة: المتصفح
+        tryWebBrowser(context, lat, lng, name);
+    }
+    
+    /**
+     * التحقق من وجود Google Maps
+     */
+    private static boolean isGoogleMapsInstalled(Context context) {
+        try {
+            context.getPackageManager().getPackageInfo("com.google.android.apps.maps", 0);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * دالة مبسطة لفتح الموقع (تحاول كل الطرق)
+     */
+    public static void openLocation(Context context, double latitude, double longitude, String locationName) {
+        try {
+            // أولاً: جرب Google Maps مباشرة
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            String uri = String.format(Locale.US, "geo:%f,%f?q=%f,%f(%s)", 
+                latitude, longitude, latitude, longitude, locationName);
+            intent.setData(Uri.parse(uri));
+            
+            context.startActivity(intent);
+            Toast.makeText(context, "فتح " + locationName, Toast.LENGTH_SHORT).show();
+            
+        } catch (Exception e) {
+            // إذا فشل، جرب المتصفح
+            try {
+                String webUrl = String.format(Locale.US, 
+                    "https://www.google.com/maps/search/?api=1&query=%f,%f", latitude, longitude);
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
+                context.startActivity(webIntent);
+                Toast.makeText(context, "فتح " + locationName + " في المتصفح", Toast.LENGTH_SHORT).show();
+            } catch (Exception ex) {
+                Toast.makeText(context, "لا يمكن فتح الخرائط", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
+    private static boolean tryGoogleMapsNavigation(Context context, double lat, double lng, String name) {
+        try {
+            String uri = String.format(Locale.US, "google.navigation:q=%f,%f", lat, lng);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            intent.setPackage("com.google.android.apps.maps");
+            
+            context.startActivity(intent);
+            Toast.makeText(context, "فتح المسار إلى " + name, Toast.LENGTH_SHORT).show();
+            return true;
+        } catch (Exception e) {
+            // فشل في فتح Google Maps Navigation
+        }
+        return false;
+    }
+    
+    private static boolean tryGoogleMapsRegular(Context context, double lat, double lng, String name) {
         try {
             String uri = String.format(Locale.US, "geo:%f,%f?q=%f,%f(%s)", 
-                    latitude, longitude, latitude, longitude, 
-                    locationName != null ? Uri.encode(locationName) : Uri.encode("الموقع"));
+                lat, lng, lat, lng, Uri.encode(name));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            intent.setPackage("com.google.android.apps.maps");
             
+            context.startActivity(intent);
+            Toast.makeText(context, "فتح موقع " + name, Toast.LENGTH_SHORT).show();
+            return true;
+        } catch (Exception e) {
+            // فشل في فتح Google Maps العادي
+        }
+        return false;
+    }
+    
+    private static boolean tryAnyMapsApp(Context context, double lat, double lng, String name) {
+        try {
+            String uri = String.format(Locale.US, "geo:%f,%f?q=%f,%f(%s)", 
+                lat, lng, lat, lng, Uri.encode(name));
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
             
-            // محاولة فتح Google Maps أولاً
-            intent.setPackage("com.google.android.apps.maps");
-            if (intent.resolveActivity(context.getPackageManager()) != null) {
-                context.startActivity(intent);
-                return;
-            }
-            
-            // إذا لم تكن Google Maps مثبتة، جرب بدون تحديد package
-            intent.setPackage(null);
-            if (intent.resolveActivity(context.getPackageManager()) != null) {
-                context.startActivity(intent);
-                return;
-            }
-            
-            // كحل أخير، استخدم المتصفح
-            openGoogleMapsInBrowser(context, latitude, longitude, locationName);
-            
+            context.startActivity(intent);
+            Toast.makeText(context, "فتح موقع " + name + " في تطبيق الخرائط", Toast.LENGTH_SHORT).show();
+            return true;
         } catch (Exception e) {
-            Toast.makeText(context, "خطأ في فتح الخريطة: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            // فشل في فتح أي تطبيق خرائط
         }
+        return false;
     }
     
-    /**
-     * فتح Google Maps مع URI مخصص
-     */
-    private static void openGoogleMapsWithUri(Context context, String uri, String customerName) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-            
-            // محاولة فتح Google Maps أولاً
-            intent.setPackage("com.google.android.apps.maps");
-            if (intent.resolveActivity(context.getPackageManager()) != null) {
-                context.startActivity(intent);
-                Toast.makeText(context, "فتح المسار إلى " + customerName, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            
-            // إذا لم تكن Google Maps مثبتة، جرب بدون تحديد package
-            intent.setPackage(null);
-            if (intent.resolveActivity(context.getPackageManager()) != null) {
-                context.startActivity(intent);
-                Toast.makeText(context, "فتح المسار إلى " + customerName, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            
-            // كحل أخير، استخدم المتصفح
-            openGoogleMapsInBrowser(context, customerName);
-            
-        } catch (Exception e) {
-            Toast.makeText(context, "خطأ في فتح الخريطة: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-    
-    /**
-     * فتح Google Maps في المتصفح كحل بديل
-     */
-    private static void openGoogleMapsInBrowser(Context context, Customer customer) {
-        try {
-            String webUri = String.format(Locale.US, 
-                "https://www.google.com/maps/search/?api=1&query=%f,%f",
-                customer.getLatitude(), customer.getLongitude());
-            
-            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUri));
-            if (webIntent.resolveActivity(context.getPackageManager()) != null) {
+    private static void tryWebBrowser(Context context, double lat, double lng, String name) {
+        // جرب عدة روابط مختلفة للمتصفح
+        String[] browserUris = {
+            String.format(Locale.US, "https://www.google.com/maps/search/?api=1&query=%f,%f", lat, lng),
+            String.format(Locale.US, "https://maps.google.com/maps?q=%f,%f", lat, lng),
+            String.format(Locale.US, "https://www.google.com/maps?q=%f,%f", lat, lng)
+        };
+        
+        for (String webUri : browserUris) {
+            try {
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUri));
+                // إضافة FLAG_ACTIVITY_NEW_TASK للتأكد من فتح المتصفح
+                webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                
                 context.startActivity(webIntent);
-                Toast.makeText(context, "فتح المسار في المتصفح إلى " + customer.getName(), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(context, "لا يمكن فتح الخرائط. تأكد من تثبيت Google Maps أو متصفح", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "فتح موقع " + name + " في المتصفح", Toast.LENGTH_SHORT).show();
+                return; // نجح الفتح، اخرج من الدالة
+                
+            } catch (Exception e) {
+                // جرب الرابط التالي
+                continue;
             }
-        } catch (Exception e) {
-            Toast.makeText(context, "خطأ في فتح المتصفح: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+        
+        // إذا فشلت كل المحاولات
+        Toast.makeText(context, "لم نتمكن من فتح الخرائط. تحقق من اتصالك بالإنترنت", Toast.LENGTH_LONG).show();
     }
-    
-    /**
-     * فتح Google Maps في المتصفح مع إحداثيات
-     */
-    private static void openGoogleMapsInBrowser(Context context, double latitude, double longitude, String locationName) {
-        try {
-            String webUri = String.format(Locale.US, 
-                "https://www.google.com/maps/search/?api=1&query=%f,%f",
-                latitude, longitude);
-            
-            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUri));
-            if (webIntent.resolveActivity(context.getPackageManager()) != null) {
-                context.startActivity(webIntent);
-                Toast.makeText(context, "فتح الموقع في المتصفح", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(context, "لا يمكن فتح الخرائط. تأكد من تثبيت متصفح", Toast.LENGTH_LONG).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(context, "خطأ في فتح المتصفح: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-    
-    /**
-     * فتح Google Maps في المتصفح باستخدام اسم العميل (دالة مساعدة)
-     */
-    private static void openGoogleMapsInBrowser(Context context, String customerName) {
-        // هذه دالة مساعدة فقط لعرض رسالة
-        Toast.makeText(context, "فتح المسار في المتصفح إلى " + customerName, Toast.LENGTH_SHORT).show();
-    }
-    
+
     /**
      * حساب المسافة بين نقطتين بالكيلومتر
      */
@@ -261,5 +281,60 @@ public class LocationUtils {
         } else {
             return String.format("%.1f كم", distanceKm);
         }
+    }
+    
+    /**
+     * دالة مضمونة لفتح الموقع (Intent Chooser)
+     */
+    public static void openLocationWithChooser(Context context, double latitude, double longitude, String locationName) {
+        try {
+            String uri = String.format(Locale.US, "geo:%f,%f?q=%f,%f(%s)", 
+                latitude, longitude, latitude, longitude, locationName);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            
+            // إنشاء Intent Chooser ليظهر للمستخدم كل التطبيقات المتوفرة
+            Intent chooser = Intent.createChooser(mapIntent, "اختر تطبيق الخرائط");
+            
+            if (chooser.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(chooser);
+                Toast.makeText(context, "اختر التطبيق المناسب لفتح " + locationName, Toast.LENGTH_SHORT).show();
+            } else {
+                // إذا فشل حتى الـ Chooser، جرب المتصفح مباشرة
+                openDirectInBrowser(context, latitude, longitude, locationName);
+            }
+        } catch (Exception e) {
+            openDirectInBrowser(context, latitude, longitude, locationName);
+        }
+    }
+    
+    /**
+     * فتح مباشر في المتصفح (مضمون)
+     */
+    private static void openDirectInBrowser(Context context, double latitude, double longitude, String locationName) {
+        try {
+            String url = String.format(Locale.US, "https://www.google.com/maps/search/?api=1&query=%f,%f", latitude, longitude);
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(browserIntent);  
+            Toast.makeText(context, "فتح " + locationName + " في المتصفح", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context, "خطأ: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    /**
+     * دالة لاختبار فتح الخرائط (للتطوير)
+     */
+    public static void testMapsOpening(Context context) {
+        // إنشاء عميل تجريبي للاختبار
+        Customer testCustomer = new Customer();
+        testCustomer.setName("عميل تجريبي");
+        testCustomer.setLatitude(36.7538); // الجزائر العاصمة
+        testCustomer.setLongitude(3.0588);
+        
+        Toast.makeText(context, "اختبار فتح الخرائط...", Toast.LENGTH_SHORT).show();
+        
+        // جرب الطريقة الأكثر ضماناً
+        openLocationWithChooser(context, testCustomer.getLatitude(), testCustomer.getLongitude(), testCustomer.getName());
     }
 }

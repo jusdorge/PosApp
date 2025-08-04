@@ -37,6 +37,9 @@ public class AddCustomerDialog extends DialogFragment {
 
     private TextInputEditText customerNameEditText;
     private TextInputEditText phoneNumberEditText;
+    private TextInputEditText emailEditText;
+    private TextInputEditText addressEditText;
+    private TextInputEditText notesEditText;
     private ImageButton contactPickerButton;
     private Button btnSelectLocation;
     private TextView tvSelectedLocation;
@@ -94,6 +97,9 @@ public class AddCustomerDialog extends DialogFragment {
     private void initializeViews(View view) {
         customerNameEditText = view.findViewById(R.id.customerNameEditText);
         phoneNumberEditText = view.findViewById(R.id.phoneNumberEditText);
+        emailEditText = view.findViewById(R.id.emailEditText);
+        addressEditText = view.findViewById(R.id.addressEditText);
+        notesEditText = view.findViewById(R.id.notesEditText);
         contactPickerButton = view.findViewById(R.id.contactPickerButton);
         Button cancelButton = view.findViewById(R.id.cancelButton);
         Button saveButton = view.findViewById(R.id.saveButton);
@@ -131,6 +137,9 @@ public class AddCustomerDialog extends DialogFragment {
     private void saveCustomer() {
         String name = customerNameEditText.getText().toString().trim();
         String phone = phoneNumberEditText.getText().toString().trim();
+        String email = emailEditText.getText().toString().trim();
+        String address = addressEditText.getText().toString().trim();
+        String notes = notesEditText.getText().toString().trim();
 
         if (!validateInput(name, phone)) {
             return;
@@ -149,7 +158,7 @@ public class AddCustomerDialog extends DialogFragment {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         phoneNumberEditText.setError("هذا الرقم مسجل مسبقاً");
                     } else {
-                        addNewCustomer(name, phone);
+                        addNewCustomer(name, phone, email, address, notes);
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -178,11 +187,22 @@ public class AddCustomerDialog extends DialogFragment {
         return true;
     }
 
-    private void addNewCustomer(String name, String phone) {
+    private void addNewCustomer(String name, String phone, String email, String address, String notes) {
         Map<String, Object> customerData = new HashMap<>();
         customerData.put("name", name);
         customerData.put("phone", phone);
         customerData.put("totalDebt", 0.0);
+        
+        // إضافة الحقول الجديدة إذا لم تكن فارغة
+        if (!email.isEmpty()) {
+            customerData.put("email", email);
+        }
+        if (!address.isEmpty()) {
+            customerData.put("address", address);
+        }
+        if (!notes.isEmpty()) {
+            customerData.put("notes", notes);
+        }
 
         if (latitude != null && longitude != null) {
             customerData.put("latitude", latitude);

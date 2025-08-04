@@ -93,6 +93,33 @@ public class AllInvoicesActivity extends AppCompatActivity {
     private void setupRecyclerView() {
         invoicesAdapter = new AllInvoicesAdapter(invoicesList);
         invoicesAdapter.setOnInvoiceClickListener(this::onInvoiceClick);
+        invoicesAdapter.setOnInvoiceButtonClickListener(new AllInvoicesAdapter.OnInvoiceButtonClickListener() {
+            @Override
+            public void onPrintClick(Invoice invoice, int position) {
+                Intent intent = InvoicePrintActivity.createIntent(AllInvoicesActivity.this, invoice.getId());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onLoadInCounterClick(Invoice invoice, int position) {
+                loadInvoiceInCounter(invoice);
+            }
+
+            @Override
+            public void onAddProductsClick(Invoice invoice, int position) {
+                openAddProductsDialog(invoice, position);
+            }
+
+            @Override
+            public void onCustomerLocationClick(Invoice invoice, int position) {
+                openCustomerLocationOnMap(invoice);
+            }
+
+            @Override
+            public void onDeleteClick(Invoice invoice, int position) {
+                showDeleteInvoiceConfirmDialog(invoice, position);
+            }
+        });
         invoicesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         invoicesRecyclerView.setAdapter(invoicesAdapter);
     }

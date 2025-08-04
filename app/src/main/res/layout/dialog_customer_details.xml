@@ -154,10 +154,11 @@
         android:layout_height="150dp"
         android:layout_marginBottom="16dp" />
 
+    <!-- الصف الأول من الأزرار -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
         android:orientation="horizontal">
 
         <Button
@@ -168,7 +169,20 @@
             android:layout_marginEnd="4dp"
             android:backgroundTint="@color/colorAccent"
             android:text="اختيار للفاتورة"
-            android:textColor="@color/colorWhite" />
+            android:textColor="@color/colorWhite"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/editCustomerButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:text="✏️ تحرير"
+            android:textColor="@color/colorWhite"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/generateQRButton"
@@ -176,21 +190,30 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
             android:backgroundTint="@color/colorPrimary"
             android:text="QR Code"
-            android:textColor="@color/colorWhite" />
+            android:textColor="@color/colorWhite"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <!-- الصف الثاني من الأزرار -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/deleteCustomerButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
             android:backgroundTint="@android:color/holo_red_dark"
-            android:text="حذف العميل"
-            android:textColor="@color/colorWhite" />
+            android:text="🗑️ حذف العميل"
+            android:textColor="@color/colorWhite"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/closeButton"
@@ -200,6 +223,8 @@
             android:layout_marginStart="4dp"
             android:backgroundTint="@color/colorPrimary"
             android:text="إغلاق"
-            android:textColor="@color/colorWhite" />
+            android:textColor="@color/colorWhite"
+            android:textSize="12sp" />
+
     </LinearLayout>
 </LinearLayout> 

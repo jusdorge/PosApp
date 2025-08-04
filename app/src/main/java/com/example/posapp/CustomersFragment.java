@@ -40,7 +40,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomersFragment extends Fragment implements CustomerAdapter.OnCustomerClickListener, CustomerAdapter.OnQRCodeClickListener {
+public class CustomersFragment extends Fragment implements CustomerAdapter.OnCustomerClickListener, CustomerAdapter.OnQRCodeClickListener, CustomerAdapter.OnEditCustomerClickListener, CustomerAdapter.OnDeleteCustomerClickListener {
     private RecyclerView customersRecyclerView;
     private EditText searchCustomerEditText;
     private Button addCustomerButton;
@@ -65,6 +65,8 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
         customerAdapter = new CustomerAdapter(customerList);
         customerAdapter.setOnCustomerClickListener(this);
         customerAdapter.setOnQRCodeClickListener(this);
+        customerAdapter.setOnEditCustomerClickListener(this);
+        customerAdapter.setOnDeleteCustomerClickListener(this);
 
         customersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         customersRecyclerView.setAdapter(customerAdapter);
@@ -381,5 +383,64 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
         } catch (Exception e) {
             Toast.makeText(getContext(), "فشل في مشاركة معلومات العميل", Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    @Override
+    public void onEditCustomerClick(Customer customer, int position) {
+        // فتح حوار تحرير العميل
+        EditCustomerDialog dialog = EditCustomerDialog.newInstance(customer.getId());
+        dialog.setOnCustomerUpdatedListener(() -> {
+            // إعادة تحميل قائمة العملاء بعد التحديث
+            loadCustomers();
+        });
+        dialog.show(getChildFragmentManager(), "EditCustomerDialog");
+    }
+    
+    @Override
+    public void onDeleteCustomerClick(Customer customer, int position) {
+        // عرض تأكيد الحذف
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("تأكيد الحذف")
+            .setMessage("هل أنت متأكد من حذف العميل \"" + customer.getName() + "\"؟\n\n" +
+                       "سيتم حذف:\n" +
+                       "• جميع بيانات العميل\n" +
+                       "• جميع فواتير العميل\n" +
+                       "• سجل المعاملات\n\n" +
+                       "هذا الإجراء لا يمكن التراجع عنه!")
+            .setPositiveButton("حذف", (dialog, which) -> deleteCustomer(customer, position))
+            .setNegativeButton("إلغاء", null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
+    
+    private void deleteCustomer(Customer customer, int position) {
+        // حذف العميل من Firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        
+        // حذف جميع فواتير العميل أولاً
+        db.collection("invoices")
+            .whereEqualTo("customerPhone", customer.getPhone())
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                // حذف جميع الفواتير
+                for (com.google.firebase.firestore.QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    db.collection("invoices").document(document.getId()).delete();
+                }
+                
+                // بعد حذف الفواتير، احذف العميل
+                db.collection("customers").document(customer.getId())
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "تم حذف العميل \"" + customer.getName() + "\" بنجاح", Toast.LENGTH_SHORT).show();
+                        // إعادة تحميل القائمة
+                        loadCustomers();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "فشل في حذف العميل: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "فشل في حذف فواتير العميل: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
     }
 } 

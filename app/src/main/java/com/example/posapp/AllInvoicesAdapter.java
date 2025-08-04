@@ -3,6 +3,7 @@ package com.example.posapp;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,10 +19,19 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
     
     private List<Invoice> invoicesList;
     private OnInvoiceClickListener onInvoiceClickListener;
+    private OnInvoiceButtonClickListener buttonClickListener;
     private SimpleDateFormat dateFormat;
     
     public interface OnInvoiceClickListener {
         void onInvoiceClick(Invoice invoice, int position);
+    }
+    
+    public interface OnInvoiceButtonClickListener {
+        void onPrintClick(Invoice invoice, int position);
+        void onLoadInCounterClick(Invoice invoice, int position);
+        void onAddProductsClick(Invoice invoice, int position);
+        void onCustomerLocationClick(Invoice invoice, int position);
+        void onDeleteClick(Invoice invoice, int position);
     }
     
     public AllInvoicesAdapter(List<Invoice> invoicesList) {
@@ -31,6 +41,10 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
     
     public void setOnInvoiceClickListener(OnInvoiceClickListener listener) {
         this.onInvoiceClickListener = listener;
+    }
+    
+    public void setOnInvoiceButtonClickListener(OnInvoiceButtonClickListener listener) {
+        this.buttonClickListener = listener;
     }
     
     @NonNull
@@ -60,6 +74,12 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
         private TextView tvPaymentStatus;
         private TextView tvItemsCount;
         
+        private Button printInvoiceButton;
+        private Button loadInCounterButton;
+        private Button addProductsButton;
+        private Button customerLocationButton;
+        private Button deleteInvoiceButton;
+        
         public InvoiceViewHolder(@NonNull View itemView) {
             super(itemView);
             tvInvoiceNumber = itemView.findViewById(R.id.tvInvoiceNumber);
@@ -68,6 +88,12 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
             tvTotalAmount = itemView.findViewById(R.id.tvTotalAmount);
             tvPaymentStatus = itemView.findViewById(R.id.tvPaymentStatus);
             tvItemsCount = itemView.findViewById(R.id.tvItemsCount);
+            
+            printInvoiceButton = itemView.findViewById(R.id.printInvoiceButton);
+            loadInCounterButton = itemView.findViewById(R.id.loadInCounterButton);
+            addProductsButton = itemView.findViewById(R.id.addProductsButton);
+            customerLocationButton = itemView.findViewById(R.id.customerLocationButton);
+            deleteInvoiceButton = itemView.findViewById(R.id.deleteInvoiceButton);
         }
         
         public void bind(Invoice invoice) {
@@ -98,6 +124,24 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
                     onInvoiceClickListener.onInvoiceClick(invoice, getAdapterPosition());
                 }
             });
+            
+            // مستمعي النقر على الأزرار
+            if (buttonClickListener != null) {
+                printInvoiceButton.setOnClickListener(v -> 
+                    buttonClickListener.onPrintClick(invoice, getAdapterPosition()));
+                
+                loadInCounterButton.setOnClickListener(v -> 
+                    buttonClickListener.onLoadInCounterClick(invoice, getAdapterPosition()));
+                
+                addProductsButton.setOnClickListener(v -> 
+                    buttonClickListener.onAddProductsClick(invoice, getAdapterPosition()));
+                
+                customerLocationButton.setOnClickListener(v -> 
+                    buttonClickListener.onCustomerLocationClick(invoice, getAdapterPosition()));
+                
+                deleteInvoiceButton.setOnClickListener(v -> 
+                    buttonClickListener.onDeleteClick(invoice, getAdapterPosition()));
+            }
         }
     }
 } 
