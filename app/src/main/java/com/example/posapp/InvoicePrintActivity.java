@@ -31,7 +31,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.posapp.model.Invoice;
 import com.example.posapp.model.InvoiceItem;
+import com.example.posapp.model.OperationLog;
 import com.example.posapp.model.PaymentMethod;
+import com.example.posapp.service.OperationLogService;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
@@ -518,6 +520,23 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
                 itemsAdapter.updateData(invoiceItems);
             }
         }
+        
+        // تسجيل عملية عرض/طباعة الفاتورة
+        OperationLogService operationLogService = OperationLogService.getInstance(this);
+        String description = "عرض فاتورة رقم " + currentInvoice.getDisplayNumber() + 
+                           " للعميل " + currentInvoice.getCustomerName() + 
+                           " بقيمة " + CurrencyUtils.formatCurrency(currentInvoice.getTotalAmount());
+        
+        operationLogService.logView(
+            OperationLog.EntityType.INVOICE,
+            currentInvoice.getId(),
+            description
+        ).thenRun(() -> {
+            android.util.Log.d("InvoicePrintActivity", "Invoice view logged successfully");
+        }).exceptionally(throwable -> {
+            android.util.Log.e("InvoicePrintActivity", "Failed to log invoice view", throwable);
+            return null;
+        });
     }
 
     private void showPrinterSelectionDialog() {
@@ -962,6 +981,23 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             
             runOnUiThread(() -> {
                 Toast.makeText(this, "تم طباعة الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
+                
+                // تسجيل عملية الطباعة في الأرشيف
+                OperationLogService operationLogService = OperationLogService.getInstance(this);
+                String description = "طباعة فاتورة رقم " + currentInvoice.getDisplayNumber() + 
+                                   " للعميل " + currentInvoice.getCustomerName() + 
+                                   " بقيمة " + CurrencyUtils.formatCurrency(currentInvoice.getTotalAmount());
+                
+                operationLogService.logPrint(
+                    OperationLog.EntityType.INVOICE,
+                    currentInvoice.getId(),
+                    description
+                ).thenRun(() -> {
+                    android.util.Log.d("InvoicePrintActivity", "Invoice print logged successfully");
+                }).exceptionally(throwable -> {
+                    android.util.Log.e("InvoicePrintActivity", "Failed to log invoice print", throwable);
+                    return null;
+                });
             });
             
         } catch (IOException e) {
@@ -1093,6 +1129,8 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
     private void enableEditMode() {
         // إنشاء محول جديد مع إمكانية التعديل
         EditableInvoicePrintItemAdapter editableAdapter = new EditableInvoicePrintItemAdapter(invoiceItems);
+        
+        // إعداد مستمع التعديل
         editableAdapter.setOnItemEditListener((item, position) -> {
             EditInvoiceItemDialog dialog = EditInvoiceItemDialog.newInstance(item, position);
             dialog.setOnItemUpdatedListener((updatedItem, itemPosition) -> {
@@ -1108,6 +1146,34 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             });
             dialog.show(getSupportFragmentManager(), "EditInvoiceItemDialog");
         });
+        
+        // إعداد مستمع الحذف
+        editableAdapter.setOnItemDeleteListener(position -> {
+            if (position >= 0 && position < invoiceItems.size()) {
+                // إظهار حوار التأكيد قبل الحذف
+                InvoiceItem itemToDelete = invoiceItems.get(position);
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("حذف منتج")
+                    .setMessage("هل أنت متأكد من حذف \"" + itemToDelete.getProductName() + "\" من الفاتورة؟")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton("حذف", (dialog, which) -> {
+                        // حذف المنتج من القائمة
+                        invoiceItems.remove(position);
+                        editableAdapter.notifyItemRemoved(position);
+                        editableAdapter.notifyItemRangeChanged(position, invoiceItems.size());
+                        
+                        // إعادة حساب المجموع
+                        recalculateTotal();
+                        
+                        // إظهار خيارات الحفظ
+                        showSaveChangesDialog();
+                        
+                        Toast.makeText(this, "✅ تم حذف " + itemToDelete.getProductName(), Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
+                    .show();
+            }
+        });
 
         itemsRecyclerView.setAdapter(editableAdapter);
         
@@ -1115,7 +1181,7 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
         editButton.setText(getString(R.string.finish_editing));
         editButton.setOnClickListener(v -> disableEditMode());
         
-        Toast.makeText(this, getString(R.string.edit_mode_enabled), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.edit_mode_enabled) + "\n💡 يمكنك الآن تعديل أو حذف المنتجات", Toast.LENGTH_LONG).show();
     }
 
     private void disableEditMode() {

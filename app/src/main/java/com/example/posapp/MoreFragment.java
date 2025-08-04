@@ -36,6 +36,7 @@ public class MoreFragment extends Fragment {
     private CardView notificationsCard;
     private TextView notificationBadge;
     private CardView bmpGalleryCard;
+    private CardView operationLogsCard;
     private CardView logoutCard;
     
     private FirebaseFirestore db;
@@ -60,6 +61,7 @@ public class MoreFragment extends Fragment {
         notificationsCard = view.findViewById(R.id.notificationsCard);
         notificationBadge = view.findViewById(R.id.notificationBadge);
         bmpGalleryCard = view.findViewById(R.id.bmpGalleryCard);
+        operationLogsCard = view.findViewById(R.id.operationLogsCard);
         logoutCard = view.findViewById(R.id.logoutCard);
         
         // إخفاء جميع الكارتات افتراضياً حتى يتم فحص الصلاحيات
@@ -125,6 +127,11 @@ public class MoreFragment extends Fragment {
         // معرض الفواتير BMP
         if (bmpGalleryCard != null) {
             bmpGalleryCard.setOnClickListener(v -> openBMPGallery());
+        }
+        
+        // أرشيف العمليات
+        if (operationLogsCard != null) {
+            operationLogsCard.setOnClickListener(v -> openOperationLogs());
         }
         
         // إدارة المستخدمين
@@ -197,6 +204,13 @@ public class MoreFragment extends Fragment {
             bmpGalleryCard.setVisibility(View.VISIBLE);
         }
         
+        // أرشيف العمليات - متاح لجميع المستخدمين المسجلين
+        if (operationLogsCard != null && userSession != null && userSession.isLoggedIn()) {
+            operationLogsCard.setVisibility(View.VISIBLE);
+        } else if (operationLogsCard != null) {
+            operationLogsCard.setVisibility(View.GONE);
+        }
+        
         // إدارة المستخدمين - للمديرين فقط
         if (userManagementCard != null) {
         }
@@ -258,6 +272,7 @@ public class MoreFragment extends Fragment {
         if (userManagementCard != null) userManagementCard.setVisibility(View.GONE);
         if (notificationsCard != null) notificationsCard.setVisibility(View.GONE);
         if (bmpGalleryCard != null) bmpGalleryCard.setVisibility(View.GONE);
+        if (operationLogsCard != null) operationLogsCard.setVisibility(View.GONE);
         if (logoutCard != null) logoutCard.setVisibility(View.GONE);
     }
     
@@ -886,6 +901,14 @@ public class MoreFragment extends Fragment {
      */
     private void openBMPGallery() {
         Intent intent = new Intent(getContext(), BMPGalleryActivity.class);
+        startActivity(intent);
+    }
+    
+    /**
+     * فتح أرشيف العمليات
+     */
+    private void openOperationLogs() {
+        Intent intent = new Intent(getContext(), OperationLogsActivity.class);
         startActivity(intent);
     }
 }

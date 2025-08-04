@@ -33,6 +33,8 @@ import com.example.posapp.model.Customer;
 import com.example.posapp.model.CustomerDebt;
 import com.example.posapp.model.Invoice;
 import com.example.posapp.model.InvoiceItem;
+import com.example.posapp.model.OperationLog;
+import com.example.posapp.service.OperationLogService;
 import com.example.posapp.model.Product;
 import com.example.posapp.model.PaymentMethod;
 import com.example.posapp.model.StockMovement;
@@ -502,6 +504,20 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
             return;
         }
 
+        // فحص ما إذا كان يتم تعديل فاتورة موجودة
+        String loadedInvoiceId = CounterFragment.getLoadedInvoiceId();
+        boolean isEditingExisting = CounterFragment.isEditingExistingInvoice();
+        
+        if (isEditingExisting && loadedInvoiceId != null) {
+            // تحديث الفاتورة الموجودة
+            updateExistingInvoice(loadedInvoiceId, customerName, phoneNumber, selectedPaymentMethod);
+        } else {
+            // إنشاء فاتورة جديدة
+            createNewInvoice(customerName, phoneNumber, selectedPaymentMethod, currentUser);
+        }
+    }
+    
+    private void createNewInvoice(String customerName, String phoneNumber, PaymentMethod selectedPaymentMethod, User currentUser) {
         // إنشاء رقم الفاتورة المخصص
         InvoiceNumberGenerator numberGenerator = new InvoiceNumberGenerator(getContext());
         numberGenerator.generateInvoiceNumber(currentUser)
@@ -526,6 +542,45 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
                 android.util.Log.e("CheckoutDialog", "Error generating invoice number", throwable);
                 Toast.makeText(getContext(), "خطأ في إنشاء رقم الفاتورة: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                 return null;
+            });
+    }
+    
+    private void updateExistingInvoice(String invoiceId, String customerName, String phoneNumber, PaymentMethod selectedPaymentMethod) {
+        // تحميل الفاتورة الموجودة أولاً
+        db.collection("invoices").document(invoiceId)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    Invoice existingInvoice = documentSnapshot.toObject(Invoice.class);
+                    if (existingInvoice != null) {
+                        // تحديث بيانات الفاتورة
+                        existingInvoice.setCustomerName(customerName);
+                        existingInvoice.setCustomerPhone(phoneNumber);
+                        existingInvoice.setPaymentMethod(selectedPaymentMethod);
+                        existingInvoice.setTotalAmount(totalAmount);
+                        existingInvoice.setItems(invoiceItems);
+                        existingInvoice.setDate(new Timestamp(new Date())); // تحديث تاريخ التعديل
+                        
+                        // بدء عملية التحديث
+                        WriteBatch batch = db.batch();
+                        DocumentReference invoiceRef = db.collection("invoices").document(invoiceId);
+                        batch.set(invoiceRef, existingInvoice);
+                        
+                        // متابعة عملية الحفظ
+                        continueInvoiceSaving(batch, existingInvoice, selectedPaymentMethod, phoneNumber, customerName);
+                        
+                        Toast.makeText(getContext(), "🔄 جاري تحديث الفاتورة الموجودة...", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "❌ الفاتورة غير موجودة، سيتم إنشاء فاتورة جديدة", Toast.LENGTH_SHORT).show();
+                    // إنشاء فاتورة جديدة إذا لم توجد الأصلية
+                    UserSession userSession = UserSession.getInstance(getContext());
+                    createNewInvoice(customerName, phoneNumber, selectedPaymentMethod, userSession.getCurrentUser());
+                }
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "❌ خطأ في تحميل الفاتورة: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                android.util.Log.e("CheckoutDialog", "Error loading existing invoice", e);
             });
     }
     
@@ -650,11 +705,6 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         // إزالة المسافات والرموز الخاصة وترك الأرقام والعلامة +
         String cleaned = phoneNumber.replaceAll("[^\\d+]", "");
         
-        // إذا كان الرقم يبدأ بـ 0 وليس فيه +، قم بإضافة رمز الدولة
-//        if (cleaned.startsWith("0") && !cleaned.startsWith("+")) {
-//            cleaned = "+213" + cleaned.substring(1); // رمز الجزائر
-//        }
-        
         return cleaned;
     }
 
@@ -662,6 +712,43 @@ public class CheckoutDialog extends DialogFragment implements CustomerSearchAdap
         batch.commit()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "تم حفظ الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
+                    
+                    // تسجيل عملية الفاتورة في الأرشيف
+                    OperationLogService operationLogService = OperationLogService.getInstance(getContext());
+                    
+                    // التحقق من نوع العملية (إنشاء أم تحديث)
+                    boolean isUpdate = CounterFragment.isEditingExistingInvoice();
+                    String loadedInvoiceId = CounterFragment.getLoadedInvoiceId();
+                    
+                    java.util.Map<String, Object> invoiceData = new java.util.HashMap<>();
+                    invoiceData.put("totalAmount", totalAmount);
+                    invoiceData.put("itemsCount", invoiceItems.size());
+                    
+                    if (isUpdate && loadedInvoiceId != null) {
+                        // تسجيل عملية تحديث
+                        String description = "تحديث فاتورة بقيمة " + CurrencyUtils.formatCurrency(totalAmount) + 
+                                           " تحتوي على " + invoiceItems.size() + " منتجات";
+                        
+                        operationLogService.logUpdate(
+                            OperationLog.EntityType.INVOICE,
+                            loadedInvoiceId,
+                            description,
+                            null, // البيانات القديمة
+                            invoiceData
+                        );
+                    } else {
+                        // تسجيل عملية إنشاء
+                        String description = "إنشاء فاتورة جديدة بقيمة " + CurrencyUtils.formatCurrency(totalAmount) + 
+                                           " تحتوي على " + invoiceItems.size() + " منتجات";
+                        
+                        operationLogService.logCreate(
+                            OperationLog.EntityType.INVOICE,
+                            "new_invoice", // سيتم تحديثه بالمعرف الحقيقي لاحقاً
+                            description,
+                            invoiceData
+                        );
+                    }
+                    
                     if (listener != null) {
                         listener.onInvoiceCompleted();
                     }

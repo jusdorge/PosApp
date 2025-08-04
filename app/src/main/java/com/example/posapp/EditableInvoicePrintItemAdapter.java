@@ -3,6 +3,7 @@ package com.example.posapp;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,9 +16,14 @@ import java.util.List;
 public class EditableInvoicePrintItemAdapter extends RecyclerView.Adapter<EditableInvoicePrintItemAdapter.EditableInvoiceItemViewHolder> {
     private List<InvoiceItem> invoiceItems;
     private OnItemEditListener onItemEditListener;
+    private OnItemDeleteListener onItemDeleteListener;
 
     public interface OnItemEditListener {
         void onItemEdit(InvoiceItem item, int position);
+    }
+    
+    public interface OnItemDeleteListener {
+        void onItemDelete(int position);
     }
 
     public EditableInvoicePrintItemAdapter(List<InvoiceItem> invoiceItems) {
@@ -26,6 +32,10 @@ public class EditableInvoicePrintItemAdapter extends RecyclerView.Adapter<Editab
 
     public void setOnItemEditListener(OnItemEditListener listener) {
         this.onItemEditListener = listener;
+    }
+    
+    public void setOnItemDeleteListener(OnItemDeleteListener listener) {
+        this.onItemDeleteListener = listener;
     }
 
     @NonNull
@@ -63,6 +73,7 @@ public class EditableInvoicePrintItemAdapter extends RecyclerView.Adapter<Editab
         private TextView priceTextView;
         private TextView totalTextView;
         private TextView editHintTextView;
+        private ImageButton deleteButton;
 
         public EditableInvoiceItemViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -71,6 +82,7 @@ public class EditableInvoicePrintItemAdapter extends RecyclerView.Adapter<Editab
             priceTextView = itemView.findViewById(R.id.tv_price);
             totalTextView = itemView.findViewById(R.id.tv_total);
             editHintTextView = itemView.findViewById(R.id.tv_edit_hint);
+            deleteButton = itemView.findViewById(R.id.btn_delete_item);
         }
 
         public void bind(InvoiceItem item, int position) {
@@ -89,10 +101,17 @@ public class EditableInvoicePrintItemAdapter extends RecyclerView.Adapter<Editab
             editHintTextView.setVisibility(View.VISIBLE);
             editHintTextView.setText(itemView.getContext().getString(R.string.click_to_edit));
 
-            // إضافة مستمع النقر
+            // إضافة مستمع النقر للتعديل
             itemView.setOnClickListener(v -> {
                 if (onItemEditListener != null) {
                     onItemEditListener.onItemEdit(item, position);
+                }
+            });
+            
+            // إضافة مستمع النقر لزر الحذف
+            deleteButton.setOnClickListener(v -> {
+                if (onItemDeleteListener != null) {
+                    onItemDeleteListener.onItemDelete(position);
                 }
             });
 

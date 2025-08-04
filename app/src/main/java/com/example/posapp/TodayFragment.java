@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.posapp.model.Invoice;
+import com.example.posapp.model.OperationLog;
+import com.example.posapp.service.OperationLogService;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -26,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import android.content.Intent;
+import android.app.ProgressDialog;
 
 public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvoiceClickListener {
     private RecyclerView invoicesRecyclerView;
@@ -212,30 +215,38 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     }
     
     /**
-     * عرض خيارات الفاتورة (طباعة، تعديل، إضافة منتجات)
+     * عرض خيارات الفاتورة (طباعة، تعديل، إضافة منتجات، حذف)
      */
     private void showInvoiceOptionsDialog(Invoice invoice, int position) {
         String invoiceNumber = invoice.getDisplayNumber();
         String customerName = invoice.getCustomerName();
         String totalAmount = CurrencyUtils.formatCurrency(invoice.getTotalAmount());
         
+        // إنشاء قائمة الخيارات
+        String[] options = {"طباعة", "إضافة منتجات", "تحميل في الكاونتر", "حذف الفاتورة"};
+        
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
                 .setTitle("فاتورة " + invoiceNumber)
-                .setMessage("العميل: " + customerName + "\nالمجموع: " + totalAmount + "\n\nماذا تريد أن تفعل؟")
+                .setMessage("العميل: " + customerName + "\nالمجموع: " + totalAmount + "\n\nاختر العملية:")
                 .setIcon(android.R.drawable.ic_menu_edit)
-                .setPositiveButton("طباعة", (dialog, which) -> {
-                    // فتح صفحة طباعة الفاتورة (الوظيفة الأصلية)
-                    Intent intent = InvoicePrintActivity.createIntent(getContext(), invoice.getId());
-                    startActivity(intent);
+                .setItems(options, (dialog, which) -> {
+                    switch (which) {
+                        case 0: // طباعة
+                            Intent intent = InvoicePrintActivity.createIntent(getContext(), invoice.getId());
+                            startActivity(intent);
+                            break;
+                        case 1: // إضافة منتجات
+                            openAddProductsDialog(invoice, position);
+                            break;
+                        case 2: // تحميل في الكاونتر
+                            loadInvoiceInCounter(invoice);
+                            break;
+                        case 3: // حذف الفاتورة
+                            showDeleteInvoiceConfirmDialog(invoice, position);
+                            break;
+                    }
                 })
-                .setNeutralButton("إضافة منتجات", (dialog, which) -> {
-                    // فتح حوار إضافة منتجات للفاتورة
-                    openAddProductsDialog(invoice, position);
-                })
-                .setNegativeButton("تحميل في الكاونتر", (dialog, which) -> {
-                    // تحميل الفاتورة في الكاونتر للتعديل الشامل
-                    loadInvoiceInCounter(invoice);
-                })
+                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
                 .show();
     }
     
@@ -309,22 +320,13 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     private void loadInvoiceInCounter(Invoice invoice) {
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
                 .setTitle("تحميل في الكاونتر")
-                .setMessage("سيتم تحميل هذه الفاتورة في الكاونتر للتعديل.\n\nملاحظة: أي فاتورة حالية في الكاونتر ستُمسح.")
+                .setMessage("سيتم تحميل هذه الفاتورة في الكاونتر للتعديل.\n\nملاحظة: أي فاتورة حالية في الكاونتر ستُمسح.\n⚠️ سيتم تحديث الفاتورة الأصلية وليس إنشاء فاتورة جديدة.")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton("تحميل", (dialog, which) -> {
-                    // مسح الفاتورة الحالية في الكاونتر
-                    CounterFragment.clearInvoice();
-                    CounterFragment.clearCustomer();
+                    // البحث عن معلومات العميل أولاً
+                    com.example.posapp.model.Customer customerToLoad = null;
                     
-                    // تحميل منتجات الفاتورة
-                    if (invoice.getItems() != null && !invoice.getItems().isEmpty()) {
-                        for (com.example.posapp.model.InvoiceItem item : invoice.getItems()) {
-                            CounterFragment.addToInvoice(item);
-                        }
-                    }
-                    
-                    // تحميل معلومات العميل إذا كانت متوفرة
-                    if (!invoice.getCustomerName().equals("مجهول") && 
+                    if (!invoice.getCustomerName().equals("مجهول") &&
                         !invoice.getCustomerPhone().isEmpty()) {
                         
                         // البحث عن العميل وتحميله
@@ -332,25 +334,175 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                             .whereEqualTo("phone", invoice.getCustomerPhone())
                             .get()
                             .addOnSuccessListener(queryDocumentSnapshots -> {
+                                com.example.posapp.model.Customer customer = null;
                                 if (!queryDocumentSnapshots.isEmpty()) {
-                                    com.example.posapp.model.Customer customer = 
-                                        queryDocumentSnapshots.getDocuments().get(0)
+                                    customer = queryDocumentSnapshots.getDocuments().get(0)
                                             .toObject(com.example.posapp.model.Customer.class);
                                     if (customer != null) {
                                         customer.setId(queryDocumentSnapshots.getDocuments().get(0).getId());
-                                        CounterFragment.setCustomer(customer);
                                     }
                                 }
+                                
+                                // تحميل الفاتورة مع معلومات العميل
+                                CounterFragment.loadExistingInvoice(invoice.getId(), invoice.getItems(), customer);
+                                
+                                // الانتقال إلى شاشة الكاونتر
+                                if (getActivity() instanceof MainActivity) {
+                                    ((MainActivity) getActivity()).switchToCounterFragment();
+                                    Toast.makeText(getContext(), "✅ تم تحميل الفاتورة للتعديل - رقم: " + invoice.getDisplayNumber(), Toast.LENGTH_LONG).show();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                // تحميل الفاتورة بدون معلومات العميل
+                                CounterFragment.loadExistingInvoice(invoice.getId(), invoice.getItems(), null);
+                                
+                                if (getActivity() instanceof MainActivity) {
+                                    ((MainActivity) getActivity()).switchToCounterFragment();
+                                    Toast.makeText(getContext(), "✅ تم تحميل الفاتورة للتعديل (بدون معلومات العميل)", Toast.LENGTH_LONG).show();
+                                }
                             });
-                    }
-                    
-                    // الانتقال إلى شاشة الكاونتر
-                    if (getActivity() instanceof MainActivity) {
-                        ((MainActivity) getActivity()).switchToCounterFragment();
-                        Toast.makeText(getContext(), "✅ تم تحميل الفاتورة في الكاونتر", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // تحميل الفاتورة مباشرة بدون عميل
+                        CounterFragment.loadExistingInvoice(invoice.getId(), invoice.getItems(), null);
+                        
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).switchToCounterFragment();
+                            Toast.makeText(getContext(), "✅ تم تحميل الفاتورة للتعديل - رقم: " + invoice.getDisplayNumber(), Toast.LENGTH_LONG).show();
+                        }
                     }
                 })
                 .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+    
+    /**
+     * عرض حوار تأكيد حذف الفاتورة
+     */
+    private void showDeleteInvoiceConfirmDialog(Invoice invoice, int position) {
+        String invoiceNumber = invoice.getDisplayNumber();
+        String customerName = invoice.getCustomerName();
+        String totalAmount = CurrencyUtils.formatCurrency(invoice.getTotalAmount());
+        
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setTitle("⚠️ حذف فاتورة")
+                .setMessage("هل أنت متأكد من حذف الفاتورة نهائياً؟\n\n" +
+                        "📄 رقم الفاتورة: " + invoiceNumber + "\n" +
+                        "👤 العميل: " + customerName + "\n" +
+                        "💰 المبلغ: " + totalAmount + "\n\n" +
+                        "⚠️ تحذير: هذه العملية لا يمكن التراجع عنها!\n" +
+                        "سيتم حذف الفاتورة ومحتوياتها نهائياً من النظام.")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("🗑️ حذف نهائي", (dialog, which) -> {
+                    deleteInvoice(invoice, position);
+                })
+                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+    
+    /**
+     * حذف الفاتورة من قاعدة البيانات
+     */
+    private void deleteInvoice(Invoice invoice, int position) {
+        // إظهار progress dialog
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(getContext());
+        progressDialog.setMessage("جاري حذف الفاتورة...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        
+        // الحصول على خدمة تسجيل العمليات
+        OperationLogService operationLogService = OperationLogService.getInstance(getContext());
+        
+        // تحضير بيانات الفاتورة للأرشيف
+        java.util.Map<String, Object> deletedData = new java.util.HashMap<>();
+        deletedData.put("invoiceNumber", invoice.getDisplayNumber());
+        deletedData.put("customerName", invoice.getCustomerName());
+        deletedData.put("customerPhone", invoice.getCustomerPhone());
+        deletedData.put("totalAmount", invoice.getTotalAmount());
+        deletedData.put("itemsCount", invoice.getItems() != null ? invoice.getItems().size() : 0);
+        deletedData.put("paymentMethod", invoice.getPaymentMethod() != null ? invoice.getPaymentMethod().name() : "UNKNOWN");
+        deletedData.put("createdDate", invoice.getDate());
+        
+        // حذف الفاتورة من قاعدة البيانات
+        db.collection("invoices").document(invoice.getId())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    // تسجيل عملية الحذف في الأرشيف
+                    String description = "حذف فاتورة رقم " + invoice.getDisplayNumber() + 
+                                       " للعميل " + invoice.getCustomerName() + 
+                                       " بقيمة " + CurrencyUtils.formatCurrency(invoice.getTotalAmount());
+                    
+                    operationLogService.logDelete(
+                        OperationLog.EntityType.INVOICE,
+                        invoice.getId(),
+                        description,
+                        deletedData
+                    ).thenRun(() -> {
+                        android.util.Log.d("TodayFragment", "Invoice deletion logged successfully");
+                    }).exceptionally(throwable -> {
+                        android.util.Log.e("TodayFragment", "Failed to log invoice deletion", throwable);
+                        return null;
+                    });
+                    
+                    // إزالة الفاتورة من القائمة
+                    if (position >= 0 && position < invoiceList.size()) {
+                        invoiceList.remove(position);
+                        if (adapter != null) {
+                            adapter.notifyItemRemoved(position);
+                            adapter.notifyItemRangeChanged(position, invoiceList.size());
+                        }
+                    }
+                    
+                    // إعادة حساب الإحصائيات
+                    updateSummary(invoiceList.size(), calculateTotalSales(), calculateCashSales(), calculateCreditSales());
+                    
+                    progressDialog.dismiss();
+                    Toast.makeText(getContext(), "✅ تم حذف الفاتورة " + invoice.getDisplayNumber() + " نهائياً", 
+                            Toast.LENGTH_LONG).show();
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(getContext(), "❌ فشل في حذف الفاتورة: " + e.getMessage(), 
+                            Toast.LENGTH_LONG).show();
+                    android.util.Log.e("TodayFragment", "Failed to delete invoice", e);
+                });
+    }
+    
+    /**
+     * حساب إجمالي المبيعات
+     */
+    private double calculateTotalSales() {
+        double total = 0.0;
+        for (Invoice invoice : invoiceList) {
+            total += invoice.getTotalAmount();
+        }
+        return total;
+    }
+    
+    /**
+     * حساب المبيعات النقدية
+     */
+    private double calculateCashSales() {
+        double total = 0.0;
+        for (Invoice invoice : invoiceList) {
+            if (invoice.getPaymentMethod() != null && 
+                invoice.getPaymentMethod().name().equals("CASH")) {
+                total += invoice.getTotalAmount();
+            }
+        }
+        return total;
+    }
+    
+    /**
+     * حساب المبيعات الآجلة
+     */
+    private double calculateCreditSales() {
+        double total = 0.0;
+        for (Invoice invoice : invoiceList) {
+            if (invoice.getPaymentMethod() != null && 
+                invoice.getPaymentMethod().name().equals("DEBT")) {
+                total += invoice.getTotalAmount();
+            }
+        }
+        return total;
     }
 }

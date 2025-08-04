@@ -17,6 +17,7 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
     private List<InvoiceItem> invoiceItems;
     private OnInvoiceItemDeleteListener deleteListener;
     private OnInvoiceItemClickListener editListener;
+    private boolean isDeletionEnabled;
 
     public interface OnInvoiceItemDeleteListener {
         void onInvoiceItemDelete(int position);
@@ -29,6 +30,13 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
     public InvoiceAdapter(List<InvoiceItem> invoiceItems, OnInvoiceItemDeleteListener deleteListener) {
         this.invoiceItems = invoiceItems;
         this.deleteListener = deleteListener;
+        this.isDeletionEnabled = true; // افتراضياً يكون الحذف مفعل
+    }
+    
+    public InvoiceAdapter(List<InvoiceItem> invoiceItems, OnInvoiceItemDeleteListener deleteListener, boolean isDeletionEnabled) {
+        this.invoiceItems = invoiceItems;
+        this.deleteListener = deleteListener;
+        this.isDeletionEnabled = isDeletionEnabled;
     }
 
     public void setOnInvoiceItemClickListener(OnInvoiceItemClickListener listener) {
@@ -74,11 +82,16 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
             itemQuantityText.setText(String.valueOf(item.getQuantity()));
             itemTotalText.setText(CurrencyUtils.formatCurrency(item.getTotal()));
 
-            deleteButton.setOnClickListener(v -> {
-                if (deleteListener != null) {
+            // إظهار أو إخفاء زر الحذف بناءً على الإعدادات
+            if (isDeletionEnabled && deleteListener != null) {
+                deleteButton.setVisibility(View.VISIBLE);
+                deleteButton.setOnClickListener(v -> {
                     deleteListener.onInvoiceItemDelete(position);
-                }
-            });
+                });
+            } else {
+                deleteButton.setVisibility(View.GONE);
+                deleteButton.setOnClickListener(null);
+            }
 
             itemView.setOnClickListener(v -> {
                 if (editListener != null) {

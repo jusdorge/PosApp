@@ -37,6 +37,10 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
     
     private FirebaseFirestore db;
     private static Customer currentCustomer;
+    
+    // متغيرات لتتبع الفاتورة المحملة لتجنب التكرار
+    private static String loadedInvoiceId = null;
+    private static boolean isEditingExistingInvoice = false;
 
     public static CounterFragment activeInstance;
 
@@ -241,10 +245,55 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
 
     public static void clearInvoice() {
         invoiceItems.clear();
+        
+        // مسح معلومات الفاتورة المحملة
+        loadedInvoiceId = null;
+        isEditingExistingInvoice = false;
+        
         if (activeInstance != null && activeInstance.invoiceAdapter != null) {
             activeInstance.invoiceAdapter.notifyDataSetChanged();
             activeInstance.updateTotalPrice();
         }
+    }
+    
+    /**
+     * تحميل فاتورة موجودة للتعديل
+     */
+    public static void loadExistingInvoice(String invoiceId, List<InvoiceItem> items, Customer customer) {
+        // مسح الفاتورة الحالية
+        clearInvoice();
+        
+        // تعيين معلومات الفاتورة المحملة
+        loadedInvoiceId = invoiceId;
+        isEditingExistingInvoice = true;
+        
+        // إضافة منتجات الفاتورة
+        if (items != null) {
+            invoiceItems.addAll(items);
+        }
+        
+        // تعيين العميل
+        setCustomer(customer);
+        
+        // تحديث الواجهة
+        if (activeInstance != null && activeInstance.invoiceAdapter != null) {
+            activeInstance.invoiceAdapter.notifyDataSetChanged();
+            activeInstance.updateTotalPrice();
+        }
+    }
+    
+    /**
+     * الحصول على معرف الفاتورة المحملة
+     */
+    public static String getLoadedInvoiceId() {
+        return loadedInvoiceId;
+    }
+    
+    /**
+     * فحص ما إذا كان يتم تعديل فاتورة موجودة
+     */
+    public static boolean isEditingExistingInvoice() {
+        return isEditingExistingInvoice;
     }
 
     public static void clearCustomer() {

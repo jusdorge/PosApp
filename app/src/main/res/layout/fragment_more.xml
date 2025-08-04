@@ -403,6 +403,47 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- أرشيف العمليات -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/operationLogsCard"
+                android:layout_width="0dp"
+                android:layout_height="120dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@android:drawable/ic_menu_recent_history"
+                        app:tint="@color/colorAccent" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="📋 أرشيف العمليات"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@android:drawable/ic_media_play"
+                        android:rotation="180" />
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
             <!-- معرض الفواتير BMP -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/bmpGalleryCard"

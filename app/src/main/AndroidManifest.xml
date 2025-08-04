@@ -105,6 +105,13 @@
             android:label="تحليل المنتجات"
             android:parentActivityName=".MainActivity" />
             
+        <!-- شاشة أرشيف العمليات -->
+        <activity 
+            android:name=".OperationLogsActivity"
+            android:exported="false"
+            android:label="أرشيف العمليات"
+            android:parentActivityName=".MainActivity" />
+            
         <!-- CaptureActivity من مكتبة ZXing -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"

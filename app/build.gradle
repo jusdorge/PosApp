@@ -87,6 +87,7 @@ dependencies {
     implementation libs.fragment
     implementation libs.firebase.auth
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     // Testing
     testImplementation libs.junit

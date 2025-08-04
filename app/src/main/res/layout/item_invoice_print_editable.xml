@@ -56,6 +56,17 @@
             android:textStyle="bold"
             android:gravity="end" />
 
+        <ImageButton
+            android:id="@+id/btn_delete_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="حذف العنصر"
+            android:src="@android:drawable/ic_delete"
+            android:tint="@android:color/holo_red_dark"
+            android:padding="4dp" />
+
     </LinearLayout>
 
     <!-- تلميح التعديل -->

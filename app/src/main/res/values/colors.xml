@@ -6,6 +6,7 @@
     <color name="colorBackground">#F0F2F5</color>
     <color name="colorText">#050505</color>
     <color name="colorSecondaryText">#65676B</color>
+    <color name="colorTextSecondary">#65676B</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorBottomNav">#FFFFFF</color>
     <color name="colorDivider">#CCD0D5</color>
