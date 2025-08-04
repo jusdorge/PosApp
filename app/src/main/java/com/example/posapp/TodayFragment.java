@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Locale;
 import android.content.Intent;
 import android.app.ProgressDialog;
+import android.app.DatePickerDialog;
+import com.example.posapp.utils.LocationUtils;
+import com.example.posapp.model.Customer;
 
 public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvoiceClickListener {
     private RecyclerView invoicesRecyclerView;
@@ -39,11 +42,14 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     private TextView invoiceCountTextView;
     private TextView todayDateTextView;
     private Button addNewInvoiceButton;
+    private Button loadOtherDateButton;
     
     private InvoiceListAdapter adapter;
     private List<Invoice> invoiceList;
     
     private FirebaseFirestore db;
+    private Date currentDisplayDate; // التاريخ المعروض حالياً
+    private SimpleDateFormat displayDateFormat;
     
     @Nullable
     @Override
@@ -59,6 +65,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         invoiceCountTextView = view.findViewById(R.id.invoiceCountTextView);
         todayDateTextView = view.findViewById(R.id.todayDateTextView);
         addNewInvoiceButton = view.findViewById(R.id.addNewInvoiceButton);
+        loadOtherDateButton = view.findViewById(R.id.loadOtherDateButton);
         
         // إعداد قائمة الفواتير
         invoiceList = new ArrayList<>();
@@ -71,15 +78,21 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         // إعداد Firestore
         db = FirebaseFirestore.getInstance();
         
+        // إعداد التاريخ المعروض (اليوم افتراضياً)
+        currentDisplayDate = new Date();
+        displayDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        
         // عرض تاريخ اليوم بأرقام عربية
-        String todayDate = ArabicNumberUtils.formatLongDateWithArabicNumbers(new Date());
-        todayDateTextView.setText("فواتير " + todayDate);
+        updateDateTitle();
         
         // إعداد زر إنشاء فاتورة جديدة
         addNewInvoiceButton.setOnClickListener(v -> openNewInvoice());
         
+        // إعداد زر تحميل فواتير تاريخ آخر
+        loadOtherDateButton.setOnClickListener(v -> showDatePickerDialog());
+        
         // تحميل فواتير اليوم
-        loadTodayInvoices();
+        loadInvoicesForDate(currentDisplayDate);
         
         return view;
     }
@@ -91,7 +104,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         // تسجيل مستمع إضافة الفواتير
         CheckoutDialog.setOnInvoiceAddedListener(() -> {
             // إعادة تحميل فواتير اليوم عند إضافة فاتورة جديدة
-            loadTodayInvoices();
+            loadInvoicesForDate(currentDisplayDate);
         });
     }
 
@@ -106,7 +119,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     public void onResume() {
         super.onResume();
         // إعادة تحميل البيانات عند العودة للواجهة
-        loadTodayInvoices();
+        loadInvoicesForDate(currentDisplayDate);
     }
     
     private void loadTodayInvoices() {
@@ -211,7 +224,66 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     @Override
     public void onInvoiceClick(Invoice invoice, int position) {
         // عرض خيارات التعامل مع الفاتورة
-        showInvoiceOptionsDialog(invoice, position);
+        showInvoiceOptionsDialogAlternative(invoice, position);
+    }
+    
+    /**
+     * طريقة بديلة لعرض خيارات الفاتورة
+     */
+    private void showInvoiceOptionsDialogAlternative(Invoice invoice, int position) {
+        String invoiceNumber = invoice.getDisplayNumber();
+        String customerName = invoice.getCustomerName();
+        String totalAmount = CurrencyUtils.formatCurrency(invoice.getTotalAmount());
+        
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+        builder.setTitle("فاتورة " + invoiceNumber);
+        builder.setMessage("العميل: " + customerName + "\nالمجموع: " + totalAmount + "\n\nاختر العملية:");
+        
+        // إضافة الأزرار الأساسية
+        builder.setPositiveButton("طباعة", (dialog, which) -> {
+            Intent intent = InvoicePrintActivity.createIntent(requireContext(), invoice.getId());
+            startActivity(intent);
+        });
+        
+        builder.setNeutralButton("تحميل في الكاونتر", (dialog, which) -> {
+            loadInvoiceInCounter(invoice);
+        });
+        
+        builder.setNegativeButton("المزيد من الخيارات", (dialog, which) -> {
+            showMoreOptionsDialog(invoice, position);
+        });
+        
+        builder.show();
+    }
+    
+    /**
+     * عرض خيارات إضافية للفاتورة
+     */
+    private void showMoreOptionsDialog(Invoice invoice, int position) {
+        String[] options = {"إضافة منتجات", "📍 موقع العميل", "حذف الفاتورة"};
+        
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+        builder.setTitle("خيارات إضافية");
+        
+        builder.setItems(options, (dialog, which) -> {
+            switch (which) {
+                case 0: // إضافة منتجات
+                    openAddProductsDialog(invoice, position);
+                    break;
+                case 1: // موقع العميل
+                    openCustomerLocationOnMap(invoice);
+                    break;
+                case 2: // حذف الفاتورة
+                    showDeleteInvoiceConfirmDialog(invoice, position);
+                    break;
+            }
+        });
+        
+        builder.setNegativeButton("رجوع", (dialog, which) -> {
+            showInvoiceOptionsDialogAlternative(invoice, position);
+        });
+        
+        builder.show();
     }
     
     /**
@@ -222,17 +294,20 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         String customerName = invoice.getCustomerName();
         String totalAmount = CurrencyUtils.formatCurrency(invoice.getTotalAmount());
         
-        // إنشاء قائمة الخيارات
-        String[] options = {"طباعة", "إضافة منتجات", "تحميل في الكاونتر", "حذف الفاتورة"};
-        
-        new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                .setTitle("فاتورة " + invoiceNumber)
-                .setMessage("العميل: " + customerName + "\nالمجموع: " + totalAmount + "\n\nاختر العملية:")
-                .setIcon(android.R.drawable.ic_menu_edit)
-                .setItems(options, (dialog, which) -> {
+        try {
+            // إنشاء قائمة الخيارات
+            String[] options = {"طباعة", "إضافة منتجات", "تحميل في الكاونتر", "حذف الفاتورة"};
+            
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+            builder.setTitle("فاتورة " + invoiceNumber);
+            builder.setMessage("العميل: " + customerName + "\nالمجموع: " + totalAmount + "\n\nاختر العملية:");
+            builder.setIcon(android.R.drawable.ic_menu_edit);
+            
+            builder.setItems(options, (dialog, which) -> {
+                try {
                     switch (which) {
                         case 0: // طباعة
-                            Intent intent = InvoicePrintActivity.createIntent(getContext(), invoice.getId());
+                            Intent intent = InvoicePrintActivity.createIntent(requireContext(), invoice.getId());
                             startActivity(intent);
                             break;
                         case 1: // إضافة منتجات
@@ -245,9 +320,19 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                             showDeleteInvoiceConfirmDialog(invoice, position);
                             break;
                     }
-                })
-                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
-                .show();
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            
+            builder.setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss());
+            
+            androidx.appcompat.app.AlertDialog dialog = builder.create();
+            dialog.show();
+            
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), "خطأ في عرض الخيارات: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
     
     private void showInvoiceDetails(Invoice invoice) {
@@ -290,7 +375,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         QuickInvoiceDialog dialog = new QuickInvoiceDialog();
         dialog.setOnInvoiceCreatedListener(() -> {
             // إعادة تحميل فواتير اليوم عند إنشاء فاتورة جديدة
-            loadTodayInvoices();
+            loadInvoicesForDate(currentDisplayDate);
             Toast.makeText(getContext(), "✅ تم إنشاء الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
         });
         dialog.show(getChildFragmentManager(), "QuickInvoiceDialog");
@@ -307,7 +392,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
             adapter.notifyItemChanged(position);
             
             // إعادة تحميل فواتير اليوم لتحديث الملخص
-            loadTodayInvoices();
+            loadInvoicesForDate(currentDisplayDate);
             
             Toast.makeText(getContext(), "✅ تم إضافة المنتجات للفاتورة بنجاح", Toast.LENGTH_SHORT).show();
         });
@@ -504,5 +589,185 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
             }
         }
         return total;
+    }
+    
+    /**
+     * تحديث عنوان التاريخ
+     */
+    private void updateDateTitle() {
+        // التحقق من كون التاريخ المعروض هو اليوم
+        Date today = new Date();
+        SimpleDateFormat dateCompareFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        
+        if (dateCompareFormat.format(currentDisplayDate).equals(dateCompareFormat.format(today))) {
+            // عرض "فواتير اليوم" مع التاريخ
+            String todayDate = ArabicNumberUtils.formatLongDateWithArabicNumbers(currentDisplayDate);
+            todayDateTextView.setText("فواتير " + todayDate);
+        } else {
+            // عرض "فواتير تاريخ" مع التاريخ المحدد
+            String selectedDate = ArabicNumberUtils.formatLongDateWithArabicNumbers(currentDisplayDate);
+            todayDateTextView.setText("فواتير " + selectedDate);
+        }
+    }
+    
+    /**
+     * عرض حوار اختيار التاريخ
+     */
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDisplayDate);
+        
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+            requireContext(),
+            (view, year, month, dayOfMonth) -> {
+                Calendar selectedCalendar = Calendar.getInstance();
+                selectedCalendar.set(year, month, dayOfMonth);
+                currentDisplayDate = selectedCalendar.getTime();
+                
+                // تحديث العنوان
+                updateDateTitle();
+                
+                // تحميل فواتير التاريخ المحدد
+                loadInvoicesForDate(currentDisplayDate);
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        );
+        
+        datePickerDialog.setTitle("اختر التاريخ لعرض فواتيره");
+        datePickerDialog.show();
+    }
+    
+    /**
+     * تحميل فواتير تاريخ محدد
+     */
+    private void loadInvoicesForDate(Date selectedDate) {
+        // الحصول على بداية ونهاية اليوم المحدد
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(selectedDate);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date startOfDay = calendar.getTime();
+        
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        Date endOfDay = calendar.getTime();
+        
+        Timestamp startTimestamp = new Timestamp(startOfDay);
+        Timestamp endTimestamp = new Timestamp(endOfDay);
+        
+        // استعلام لجلب فواتير التاريخ المحدد
+        db.collection("invoices")
+            .whereGreaterThanOrEqualTo("date", startTimestamp)
+            .whereLessThanOrEqualTo("date", endTimestamp)
+            .orderBy("date", Query.Direction.DESCENDING) // أحدث الفواتير أولاً
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                invoiceList.clear();
+                
+                if (queryDocumentSnapshots.isEmpty()) {
+                    // عرض رسالة إذا لم تكن هناك فواتير
+                    showEmptyView(true);
+                    updateSummary(0, 0.0, 0.0, 0.0);
+                    return;
+                }
+                
+                double totalSales = 0.0;
+                double cashSales = 0.0;
+                double creditSales = 0.0;
+                
+                for (int i = 0; i < queryDocumentSnapshots.size(); i++) {
+                    Invoice invoice = queryDocumentSnapshots.getDocuments().get(i).toObject(Invoice.class);
+                    if (invoice != null) {
+                        invoice.setId(queryDocumentSnapshots.getDocuments().get(i).getId());
+                        invoiceList.add(invoice);
+                        
+                        double amount = invoice.getTotalAmount();
+                        totalSales += amount;
+                        
+                        // تحديد نوع الدفع
+                        if (isInvoicePaid(invoice)) {
+                            cashSales += amount;
+                        } else {
+                            creditSales += amount;
+                        }
+                    }
+                }
+                
+                adapter.notifyDataSetChanged();
+                showEmptyView(false);
+                updateSummary(invoiceList.size(), totalSales, cashSales, creditSales);
+                
+                // عرض رسالة نجاح
+                String dateString = displayDateFormat.format(selectedDate);
+                Toast.makeText(getContext(), "✅ تم تحميل " + invoiceList.size() + " فاتورة لتاريخ " + dateString, Toast.LENGTH_SHORT).show();
+            })
+            .addOnFailureListener(e -> {
+                showEmptyView(true);
+                Toast.makeText(getContext(), "حدث خطأ أثناء تحميل الفواتير: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+    }
+    
+    /**
+     * فتح موقع العميل على الخريطة
+     */
+    private void openCustomerLocationOnMap(Invoice invoice) {
+        if (invoice == null) {
+            Toast.makeText(getContext(), "بيانات الفاتورة غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // التحقق من وجود بيانات العميل
+        String customerPhone = invoice.getCustomerPhone();
+        if (customerPhone == null || customerPhone.isEmpty() || customerPhone.equals("مجهول")) {
+            Toast.makeText(getContext(), "هذه الفاتورة لا تحتوي على بيانات عميل محددة", Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        // البحث عن العميل في قاعدة البيانات
+        db.collection("customers")
+            .whereEqualTo("phone", customerPhone)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                if (queryDocumentSnapshots.isEmpty()) {
+                    Toast.makeText(getContext(), "لم يتم العثور على بيانات العميل في النظام", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                
+                // الحصول على بيانات العميل
+                Customer customer = queryDocumentSnapshots.getDocuments().get(0).toObject(Customer.class);
+                if (customer != null) {
+                    customer.setId(queryDocumentSnapshots.getDocuments().get(0).getId());
+                    
+                    // التحقق من صلاحيات الموقع
+                    if (!LocationUtils.hasLocationPermission(getContext())) {
+                        // طلب الصلاحيات
+                        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                            .setTitle("صلاحيات الموقع")
+                            .setMessage("يحتاج التطبيق لصلاحية الوصول للموقع لإظهار المسار إلى العميل.\n\nهل تريد منح الصلاحية؟")
+                            .setPositiveButton("نعم", (dialog, which) -> {
+                                LocationUtils.requestLocationPermission(getActivity());
+                                Toast.makeText(getContext(), "بعد منح الصلاحية، جرب مرة أخرى", Toast.LENGTH_LONG).show();
+                            })
+                            .setNegativeButton("لا", (dialog, which) -> {
+                                // فتح موقع العميل فقط بدون المسار
+                                LocationUtils.openGoogleMaps(getContext(), customer.getLatitude(), customer.getLongitude(), customer.getName());
+                            })
+                            .show();
+                        return;
+                    }
+                    
+                    // فتح المسار إلى العميل
+                    LocationUtils.openNavigationToCustomer(getContext(), customer);
+                }
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "خطأ في البحث عن بيانات العميل: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            });
     }
 }

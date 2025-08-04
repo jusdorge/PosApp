@@ -206,6 +206,13 @@ public class MainActivity extends AppCompatActivity {
         // تحديث header النافذة الجانبية
         updateNavigationHeader();
         android.util.Log.d("MainActivity", "✓ Navigation header updated");
+        
+        // فحص ما إذا كان يجب التبديل إلى الكاونتر
+        Intent intent = getIntent();
+        if (intent != null && intent.getBooleanExtra("switch_to_counter", false)) {
+            android.util.Log.d("MainActivity", "Switching to counter fragment as requested");
+            bottomNavigationView.setSelectedItemId(R.id.nav_counter);
+        }
     }
 
     private void showSelectCustomersLocationPage() {

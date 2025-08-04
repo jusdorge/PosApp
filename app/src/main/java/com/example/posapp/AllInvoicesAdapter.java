@@ -21,7 +21,7 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
     private SimpleDateFormat dateFormat;
     
     public interface OnInvoiceClickListener {
-        void onInvoiceClick(Invoice invoice);
+        void onInvoiceClick(Invoice invoice, int position);
     }
     
     public AllInvoicesAdapter(List<Invoice> invoicesList) {
@@ -95,7 +95,7 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
             
             itemView.setOnClickListener(v -> {
                 if (onInvoiceClickListener != null) {
-                    onInvoiceClickListener.onInvoiceClick(invoice);
+                    onInvoiceClickListener.onInvoiceClick(invoice, getAdapterPosition());
                 }
             });
         }

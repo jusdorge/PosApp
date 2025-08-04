@@ -33,7 +33,9 @@ import com.example.posapp.model.Invoice;
 import com.example.posapp.model.InvoiceItem;
 import com.example.posapp.model.OperationLog;
 import com.example.posapp.model.PaymentMethod;
+import com.example.posapp.model.Customer;
 import com.example.posapp.service.OperationLogService;
+import com.example.posapp.utils.LocationUtils;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
@@ -67,6 +69,7 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
     private Button saveAsBMPButton;
     private Button closeButton;
     private Button editPaymentMethodButton;  // زر تعديل طريقة الدفع الجديد
+    private Button openMapButton;  // زر فتح الخريطة
     
     private FirebaseFirestore db;
     private String invoiceId;
@@ -127,6 +130,7 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
         saveAsBMPButton = findViewById(R.id.saveAsBMPButton);
         closeButton = findViewById(R.id.closeButton);
         editPaymentMethodButton = findViewById(R.id.editPaymentMethodButton); // ربط الزر
+        openMapButton = findViewById(R.id.openMapButton); // ربط زر الخريطة
         
         // إعداد RecyclerView
         itemsAdapter = new InvoicePrintItemAdapter(invoiceItems);
@@ -185,6 +189,15 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
         });
         
         closeButton.setOnClickListener(v -> finish());
+        
+        // زر فتح الخريطة
+        openMapButton.setOnClickListener(v -> {
+            try {
+                openCustomerLocationOnMap();
+            } catch (Exception e) {
+                Toast.makeText(this, "خطأ في فتح الخريطة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     
     /**
@@ -1090,7 +1103,7 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         
         if (requestCode == BLUETOOTH_PERMISSION_REQUEST_CODE) {
@@ -1106,6 +1119,12 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
                 showPrinterSelection();
             } else {
                 Toast.makeText(this, "يحتاج التطبيق لأذونات البلوتوث للطباعة", Toast.LENGTH_LONG).show();
+            }
+        } else if (requestCode == LocationUtils.LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "✅ تم منح صلاحية الموقع. يمكنك الآن فتح المسار إلى العميل", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "تم رفض صلاحية الموقع. سيتم عرض موقع العميل فقط", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -1354,6 +1373,66 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
                     // الرجوع للحالة السابقة
                     loadInvoiceData();
                 });
+    }
+    
+    /**
+     * فتح موقع العميل على الخريطة
+     */
+    private void openCustomerLocationOnMap() {
+        if (currentInvoice == null) {
+            Toast.makeText(this, "بيانات الفاتورة غير متوفرة", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // التحقق من وجود بيانات العميل
+        String customerPhone = currentInvoice.getCustomerPhone();
+        if (customerPhone == null || customerPhone.isEmpty() || customerPhone.equals("مجهول")) {
+            Toast.makeText(this, "هذه الفاتورة لا تحتوي على بيانات عميل محددة", Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        // البحث عن العميل في قاعدة البيانات
+        db.collection("customers")
+            .whereEqualTo("phone", customerPhone)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                if (queryDocumentSnapshots.isEmpty()) {
+                    Toast.makeText(this, "لم يتم العثور على بيانات العميل في النظام", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                
+                // الحصول على بيانات العميل
+                Customer customer = queryDocumentSnapshots.getDocuments().get(0).toObject(Customer.class);
+                if (customer != null) {
+                    customer.setId(queryDocumentSnapshots.getDocuments().get(0).getId());
+                    
+                    // التحقق من صلاحيات الموقع
+                    if (!LocationUtils.hasLocationPermission(this)) {
+                        // طلب الصلاحيات
+                        new androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("صلاحيات الموقع")
+                            .setMessage("يحتاج التطبيق لصلاحية الوصول للموقع لإظهار المسار إلى العميل.\n\nهل تريد منح الصلاحية؟")
+                            .setPositiveButton("نعم", (dialog, which) -> {
+                                LocationUtils.requestLocationPermission(this);
+                                // حفظ بيانات العميل للاستخدام بعد منح الصلاحية
+                                // يمكننا تطبيق حل مؤقت أو إعادة استدعاء الدالة
+                                Toast.makeText(this, "بعد منح الصلاحية، اضغط على الزر مرة أخرى", Toast.LENGTH_LONG).show();
+                            })
+                            .setNegativeButton("لا", (dialog, which) -> {
+                                // فتح موقع العميل فقط بدون المسار
+                                LocationUtils.openGoogleMaps(this, customer.getLatitude(), customer.getLongitude(), customer.getName());
+                            })
+                            .show();
+                        return;
+                    }
+                    
+                    // فتح المسار إلى العميل
+                    LocationUtils.openNavigationToCustomer(this, customer);
+                }
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(this, "خطأ في البحث عن بيانات العميل: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            });
     }
 
 } 

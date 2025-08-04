@@ -214,6 +214,18 @@
                     android:drawablePadding="8dp" />
 
                 <Button
+                    android:id="@+id/openMapButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="📍 موقع العميل"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@android:drawable/ic_dialog_map"
+                    android:drawablePadding="8dp" />
+
+                <Button
                     android:id="@+id/closeButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
