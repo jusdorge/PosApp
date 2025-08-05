@@ -47,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
     
     // Counter badge management
     private static MainActivity instance;
+    
+    // Network status management
+    private NetworkStatusManager networkStatusManager;
+    private TextView networkStatusTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
             setupUI();
             android.util.Log.d("MainActivity", "✓ UI setup completed");
             
+            // إعداد مراقب حالة الشبكة
+            setupNetworkStatusManager();
+            android.util.Log.d("MainActivity", "✓ Network status manager setup completed");
+            
         } catch (Exception e) {
             android.util.Log.e("MainActivity", "❌ Error in onCreate", e);
             Toast.makeText(this, "خطأ في تهيئة التطبيق: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -162,33 +170,50 @@ public class MainActivity extends AppCompatActivity {
 
         // إعداد BottomNavigationView
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            android.util.Log.d("MainActivity", "📱 Bottom navigation item selected: " + 
+                getResources().getResourceEntryName(item.getItemId()));
+                
             // إذا كنا في شاشة من القائمة الجانبية، نعود أولاً إلى الـ Fragments الأساسية
             if (isInDrawerFragment) {
+                android.util.Log.d("MainActivity", "🔄 Returning from drawer fragment to main fragments");
                 isInDrawerFragment = false;
             }
 
             Fragment selectedFragment = null;
+            String fragmentName = "";
 
             switch (item.getItemId()) {
                 case R.id.nav_reports:
                     selectedFragment = reportsFragment;
+                    fragmentName = "Reports";
                     break;
                 case R.id.nav_today:
                     selectedFragment = todayFragment;
+                    fragmentName = "Today";
                     break;
                 case R.id.nav_counter:
                     selectedFragment = counterFragment;
+                    fragmentName = "Counter";
                     break;
                 case R.id.nav_items:
                     selectedFragment = itemsFragment;
+                    fragmentName = "Items";
                     break;
                 case R.id.nav_more:
                     selectedFragment = moreFragment;
+                    fragmentName = "More";
+                    break;
+                default:
+                    android.util.Log.w("MainActivity", "⚠️ Unknown navigation item selected: " + item.getItemId());
                     break;
             }
 
             if (selectedFragment != null) {
+                android.util.Log.d("MainActivity", "🎯 Switching to " + fragmentName + " fragment");
                 switchToFragment(selectedFragment);
+            } else {
+                android.util.Log.e("MainActivity", "❌ Selected fragment is null for " + fragmentName);
+                return false;
             }
 
             return true;
@@ -196,17 +221,32 @@ public class MainActivity extends AppCompatActivity {
         android.util.Log.d("MainActivity", "✓ Navigation listeners setup");
 
         try {
-            // إضافة جميع الFragments الأساسية مع إخفائها (ما عدا CounterFragment)
+            // مسح الـ container أولاً لتجنب التداخل
             fragmentManager.beginTransaction()
-                    .add(R.id.fragment_container, moreFragment, "5").hide(moreFragment)
-                    .add(R.id.fragment_container, itemsFragment, "4").hide(itemsFragment)
-                    .add(R.id.fragment_container, todayFragment, "3").hide(todayFragment)
-                    .add(R.id.fragment_container, reportsFragment, "2").hide(reportsFragment)
-                    .add(R.id.fragment_container, counterFragment, "1")
+                    .disallowAddToBackStack()
                     .commit();
-            android.util.Log.d("MainActivity", "✓ Fragments added to container");
+            
+            // إضافة جميع الFragments الأساسية مع إخفائها (ما عدا CounterFragment)
+            FragmentTransaction initialTransaction = fragmentManager.beginTransaction();
+            
+            // إضافة الـ fragments مع tags واضحة
+            initialTransaction.add(R.id.fragment_container, counterFragment, "counter");
+            initialTransaction.add(R.id.fragment_container, reportsFragment, "reports").hide(reportsFragment);
+            initialTransaction.add(R.id.fragment_container, todayFragment, "today").hide(todayFragment);
+            initialTransaction.add(R.id.fragment_container, itemsFragment, "items").hide(itemsFragment);
+            initialTransaction.add(R.id.fragment_container, moreFragment, "more").hide(moreFragment);
+            
+            // تعيين انتقال سلس
+            initialTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            initialTransaction.commitNow();
+            
+            android.util.Log.d("MainActivity", "✓ All fragments added successfully");
+            android.util.Log.d("MainActivity", "✓ Active fragment: " + activeFragment.getClass().getSimpleName());
+            
         } catch (Exception e) {
             android.util.Log.e("MainActivity", "❌ Error adding fragments", e);
+            // إعادة المحاولة مع طريقة أبسط
+            resetFragments();
         }
         
         // تحديث header النافذة الجانبية
@@ -233,21 +273,50 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchToFragment(Fragment fragment) {
         if (activeFragment != fragment) {
+            android.util.Log.d("MainActivity", "Switching from " + 
+                activeFragment.getClass().getSimpleName() + " to " + 
+                fragment.getClass().getSimpleName());
+                
             FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-            // إخفاء الـ Fragment النشط الحالي
-            transaction.hide(activeFragment);
+            // إخفاء الـ Fragment النشط الحالي بشكل صريح
+            if (activeFragment != null && activeFragment.isAdded()) {
+                transaction.hide(activeFragment);
+                android.util.Log.d("MainActivity", "Hiding " + activeFragment.getClass().getSimpleName());
+            }
 
             // إذا كان الـ Fragment المطلوب غير مضاف بعد، أضفه
             if (!fragment.isAdded()) {
                 transaction.add(R.id.fragment_container, fragment);
+                android.util.Log.d("MainActivity", "Adding " + fragment.getClass().getSimpleName());
             }
 
             // إظهار الـ Fragment المطلوب
             transaction.show(fragment);
+            android.util.Log.d("MainActivity", "Showing " + fragment.getClass().getSimpleName());
 
-            transaction.commit();
-            activeFragment = fragment;
+            // استخدام setTransition لضمان انتقال سلس
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            
+            try {
+                transaction.commitNow(); // استخدام commitNow بدلاً من commit لضمان التنفيذ الفوري
+                activeFragment = fragment;
+                android.util.Log.d("MainActivity", "✅ Fragment switch completed successfully");
+                
+                // فحص وإصلاح أي تداخل محتمل بعد التنقل
+                checkAndFixFragmentOverlap();
+                
+            } catch (Exception e) {
+                android.util.Log.e("MainActivity", "❌ Error switching fragments", e);
+                // fallback إلى commit العادي
+                transaction.commit();
+                activeFragment = fragment;
+                
+                // فحص التداخل حتى في حالة الخطأ
+                checkAndFixFragmentOverlap();
+            }
+        } else {
+            android.util.Log.d("MainActivity", "Fragment " + fragment.getClass().getSimpleName() + " is already active");
         }
     }
 
@@ -528,6 +597,11 @@ public class MainActivity extends AppCompatActivity {
         
         // تحديث header النافذة الجانبية
         updateNavigationHeader();
+        
+        // فحص وإصلاح أي تداخل في الـ fragments عند العودة للتطبيق
+        if (fragmentManager != null && activeFragment != null) {
+            checkAndFixFragmentOverlap();
+        }
     }
 
     @Override
@@ -566,10 +640,11 @@ public class MainActivity extends AppCompatActivity {
     public void updateCounterBadge(int itemCount) {
         if (bottomNavigationView != null) {
             if (itemCount > 0) {
-                bottomNavigationView.getOrCreateBadge(R.id.nav_counter)
-                    .setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark))
-                    .setNumber(itemCount)
-                    .setVisible(true);
+                com.google.android.material.badge.BadgeDrawable badge = 
+                    bottomNavigationView.getOrCreateBadge(R.id.nav_counter);
+                badge.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
+                badge.setNumber(itemCount);
+                badge.setVisible(true);
             } else {
                 bottomNavigationView.removeBadge(R.id.nav_counter);
             }
@@ -587,5 +662,164 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         instance = null;
+        
+        // إيقاف مراقبة الشبكة
+        if (networkStatusManager != null) {
+            networkStatusManager.stopNetworkMonitoring();
+        }
+    }
+    
+    /**
+     * إعداد مراقب حالة الشبكة
+     */
+    private void setupNetworkStatusManager() {
+        try {
+            networkStatusManager = NetworkStatusManager.getInstance(this);
+            
+            // إضافة مستمع لتغييرات حالة الشبكة
+            networkStatusManager.addNetworkStatusListener(new NetworkStatusManager.NetworkStatusListener() {
+                @Override
+                public void onNetworkAvailable() {
+                    runOnUiThread(() -> {
+                        android.util.Log.d("MainActivity", "🌐 Network is now available - Data will sync");
+                        showNetworkStatusMessage("✅ عاد الاتصال - جاري مزامنة البيانات", false);
+                    });
+                }
+                
+                @Override
+                public void onNetworkLost() {
+                    runOnUiThread(() -> {
+                        android.util.Log.d("MainActivity", "🚫 Network lost - Working in offline mode");
+                        showNetworkStatusMessage("⚠️ لا يوجد اتصال - يعمل في الوضع المحلي", true);
+                    });
+                }
+            });
+            
+            // عرض الحالة الأولية
+            boolean isOnline = networkStatusManager.isOnline();
+            String message = isOnline ? 
+                "🌐 متصل بالإنترنت" : 
+                "📱 يعمل في الوضع المحلي";
+            showNetworkStatusMessage(message, !isOnline);
+            
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "❌ Error setting up network status manager", e);
+        }
+    }
+    
+    /**
+     * عرض رسالة حالة الشبكة
+     */
+    private void showNetworkStatusMessage(String message, boolean isOffline) {
+        Toast.makeText(this, message, isOffline ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+    }
+    
+    /**
+     * إعادة تعيين الـ fragments في حالة حدوث مشكلة في التداخل
+     */
+    private void resetFragments() {
+        android.util.Log.d("MainActivity", "🔄 Resetting fragments to fix overlap issue...");
+        
+        try {
+            // إزالة جميع الـ fragments الموجودة
+            FragmentTransaction clearTransaction = fragmentManager.beginTransaction();
+            
+            if (counterFragment.isAdded()) clearTransaction.remove(counterFragment);
+            if (todayFragment.isAdded()) clearTransaction.remove(todayFragment);
+            if (itemsFragment.isAdded()) clearTransaction.remove(itemsFragment);
+            if (reportsFragment.isAdded()) clearTransaction.remove(reportsFragment);
+            if (moreFragment.isAdded()) clearTransaction.remove(moreFragment);
+            
+            clearTransaction.commitNow();
+            
+            // إعادة إنشاء الـ fragments
+            counterFragment = new CounterFragment();
+            todayFragment = new TodayFragment();
+            itemsFragment = new ItemsFragment();
+            reportsFragment = new ReportsFragment();
+            moreFragment = new MoreFragment();
+            activeFragment = counterFragment;
+            
+            // إضافتهم مرة أخرى
+            FragmentTransaction addTransaction = fragmentManager.beginTransaction();
+            addTransaction.add(R.id.fragment_container, counterFragment, "counter");
+            addTransaction.add(R.id.fragment_container, todayFragment, "today").hide(todayFragment);
+            addTransaction.add(R.id.fragment_container, itemsFragment, "items").hide(itemsFragment);
+            addTransaction.add(R.id.fragment_container, reportsFragment, "reports").hide(reportsFragment);
+            addTransaction.add(R.id.fragment_container, moreFragment, "more").hide(moreFragment);
+            addTransaction.commitNow();
+            
+            android.util.Log.d("MainActivity", "✅ Fragments reset successfully");
+            
+        } catch (Exception e) {
+            android.util.Log.e("MainActivity", "❌ Error resetting fragments", e);
+            Toast.makeText(this, "خطأ في إعادة تحميل الشاشات - يرجى إعادة تشغيل التطبيق", Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    /**
+     * فحص حالة الـ fragments وإصلاح أي تداخل
+     */
+    private void checkAndFixFragmentOverlap() {
+        android.util.Log.d("MainActivity", "🔍 Checking for fragment overlap...");
+        
+        int visibleCount = 0;
+        String visibleFragments = "";
+        
+        if (counterFragment != null && counterFragment.isAdded() && counterFragment.isVisible()) {
+            visibleCount++;
+            visibleFragments += "Counter ";
+        }
+        if (todayFragment != null && todayFragment.isAdded() && todayFragment.isVisible()) {
+            visibleCount++;
+            visibleFragments += "Today ";
+        }
+        if (itemsFragment != null && itemsFragment.isAdded() && itemsFragment.isVisible()) {
+            visibleCount++;
+            visibleFragments += "Items ";
+        }
+        if (reportsFragment != null && reportsFragment.isAdded() && reportsFragment.isVisible()) {
+            visibleCount++;
+            visibleFragments += "Reports ";
+        }
+        if (moreFragment != null && moreFragment.isAdded() && moreFragment.isVisible()) {
+            visibleCount++;
+            visibleFragments += "More ";
+        }
+        
+        if (visibleCount > 1) {
+            android.util.Log.w("MainActivity", "⚠️ Fragment overlap detected! Visible: " + visibleFragments);
+            android.util.Log.w("MainActivity", "🔧 Attempting to fix overlap...");
+            
+            // إخفاء جميع الـ fragments ما عدا الـ active
+            FragmentTransaction fixTransaction = fragmentManager.beginTransaction();
+            
+            if (counterFragment != activeFragment && counterFragment.isVisible()) {
+                fixTransaction.hide(counterFragment);
+            }
+            if (todayFragment != activeFragment && todayFragment.isVisible()) {
+                fixTransaction.hide(todayFragment);
+            }
+            if (itemsFragment != activeFragment && itemsFragment.isVisible()) {
+                fixTransaction.hide(itemsFragment);
+            }
+            if (reportsFragment != activeFragment && reportsFragment.isVisible()) {
+                fixTransaction.hide(reportsFragment);
+            }
+            if (moreFragment != activeFragment && moreFragment.isVisible()) {
+                fixTransaction.hide(moreFragment);
+            }
+            
+            // التأكد من أن الـ active fragment مرئي
+            if (activeFragment != null && !activeFragment.isVisible()) {
+                fixTransaction.show(activeFragment);
+            }
+            
+            fixTransaction.commitNow();
+            android.util.Log.d("MainActivity", "✅ Fragment overlap fixed");
+            
+        } else {
+            android.util.Log.d("MainActivity", "✅ No fragment overlap detected");
+        }
     }
 }

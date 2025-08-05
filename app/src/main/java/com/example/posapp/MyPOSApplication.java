@@ -5,6 +5,8 @@ import android.util.Log;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 public class MyPOSApplication extends MultiDexApplication {
     private static final String TAG = "MyPOSApplication";
@@ -24,6 +26,10 @@ public class MyPOSApplication extends MultiDexApplication {
             Log.d(TAG, "Initializing Firebase...");
             FirebaseApp.initializeApp(this);
             Log.d(TAG, "✅ Firebase initialized successfully");
+            
+            // تفعيل Offline Persistence لـ Firestore
+            setupFirestoreOfflineSupport();
+            
         } catch (Exception e) {
             Log.e(TAG, "❌ Firebase initialization failed", e);
         }
@@ -97,5 +103,31 @@ public class MyPOSApplication extends MultiDexApplication {
             className.contains("ClassNotFoundException") && 
             message != null && message.contains("mediatek")
         );
+    }
+    
+    /**
+     * إعداد دعم العمل بدون إنترنت لـ Firestore
+     */
+    private void setupFirestoreOfflineSupport() {
+        try {
+            Log.d(TAG, "Setting up Firestore offline support...");
+            
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            
+            // إعداد إعدادات Firestore للعمل بدون إنترنت
+            FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                    .setPersistenceEnabled(true)  // تفعيل التخزين المحلي
+                    .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)  // حجم التخزين غير محدود
+                    .build();
+            
+            db.setFirestoreSettings(settings);
+            
+            Log.d(TAG, "✅ Firestore Offline Persistence enabled!");
+            Log.d(TAG, "📱 App can now work offline and sync when back online");
+            Log.d(TAG, "🔄 Data will be cached locally and synchronized automatically");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Failed to setup Firestore offline support", e);
+        }
     }
 }

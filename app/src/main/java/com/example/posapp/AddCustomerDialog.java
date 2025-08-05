@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.posapp.model.Customer;
+import com.example.posapp.utils.DialogUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -163,7 +164,8 @@ public class AddCustomerDialog extends DialogFragment {
                 })
                 .addOnFailureListener(e -> {
                     dismissProgressDialog();
-                    Toast.makeText(getContext(), "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    android.util.Log.e("AddCustomerDialog", "خطأ في فحص رقم الهاتف", e);
+                    DialogUtils.showToastSafely(this, "خطأ: " + e.getMessage());
                 });
     }
 
@@ -219,18 +221,23 @@ public class AddCustomerDialog extends DialogFragment {
                         customer.setLongitude(longitude);
                     }
 
-                    Toast.makeText(getContext(), "تمت إضافة الزبون بنجاح", Toast.LENGTH_SHORT).show();
+                    // التأكد من أن الـ Dialog ما زال متاحاً قبل إظهار Toast
+                    DialogUtils.showToastSafely(this, "تمت إضافة الزبون بنجاح");
 
                     if (listener != null) {
                         listener.onCustomerAdded(customer);
                     }
 
-                    dismiss();
+                    // إغلاق الـ Dialog بأمان
+                    DialogUtils.dismissSafely(this);
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "فشل في إضافة الزبون: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    android.util.Log.e("AddCustomerDialog", "فشل في إضافة الزبون", e);
+                    DialogUtils.showToastSafely(this, "فشل في إضافة الزبون: " + e.getMessage());
                 });
     }
+
+
 
     private boolean hasContactPermission() {
         return ContextCompat.checkSelfPermission(requireContext(),
@@ -254,7 +261,7 @@ public class AddCustomerDialog extends DialogFragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openContactPicker();
             } else {
-                Toast.makeText(requireContext(), "تم رفض صلاحية الوصول إلى جهات الاتصال", Toast.LENGTH_SHORT).show();
+                DialogUtils.showToastSafely(this, "تم رفض صلاحية الوصول إلى جهات الاتصال");
             }
         }
     }
@@ -296,7 +303,8 @@ public class AddCustomerDialog extends DialogFragment {
                 phoneNumberEditText.setText(phoneNumber);
             }
         } catch (Exception e) {
-            Toast.makeText(getContext(), "خطأ في قراءة جهة الاتصال", Toast.LENGTH_SHORT).show();
+            android.util.Log.e("AddCustomerDialog", "خطأ في قراءة جهة الاتصال", e);
+            DialogUtils.showToastSafely(this, "خطأ في قراءة جهة الاتصال");
         }
     }
 

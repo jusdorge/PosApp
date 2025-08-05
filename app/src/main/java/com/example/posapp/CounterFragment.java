@@ -44,13 +44,6 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
 
     public static CounterFragment activeInstance;
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // تحديث البادج عند العودة للـ fragment
-        updateCounterBadge();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -148,6 +141,9 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
             invoiceAdapter.notifyDataSetChanged();
             updateTotalPrice();
         }
+        
+        // تحديث البادج عند العودة للـ fragment
+        updateCounterBadge();
         
         // تحديث عرض العميل وزر الحذف
         if (invoiceCustomerTextView != null) {

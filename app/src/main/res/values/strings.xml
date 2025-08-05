@@ -103,4 +103,16 @@
     <string name="counter_items_count">%1$d منتج</string>
     <string name="counter_items_count_singular">منتج واحد</string>
     
+    <!-- Offline Support -->
+    <string name="network_online">متصل بالإنترنت</string>
+    <string name="network_offline">غير متصل - يعمل محلياً</string>
+    <string name="network_reconnected">عاد الاتصال - جاري المزامنة</string>
+    <string name="network_lost">انقطع الاتصال - يعمل في الوضع المحلي</string>
+    <string name="offline_mode_active">الوضع المحلي مفعل</string>
+    <string name="syncing_data">جاري مزامنة البيانات...</string>
+    <string name="sync_completed">تمت المزامنة بنجاح</string>
+    <string name="working_offline">يعمل بدون إنترنت</string>
+    <string name="data_will_sync">البيانات ستتم مزامنتها عند عودة الاتصال</string>
+    <string name="offline_changes_saved">تم حفظ التغييرات محلياً</string>
+    
 </resources>

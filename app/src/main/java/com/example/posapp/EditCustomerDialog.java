@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.posapp.model.Customer;
+import com.example.posapp.utils.DialogUtils;
 import com.example.posapp.utils.LocationUtils;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -107,8 +108,8 @@ public class EditCustomerDialog extends DialogFragment {
     
     private void loadCustomerData() {
         if (customerId == null) {
-            Toast.makeText(getContext(), "خطأ: معرّف العميل غير متوفر", Toast.LENGTH_SHORT).show();
-            dismiss();
+            DialogUtils.showToastSafely(this, "خطأ: معرّف العميل غير متوفر");
+            DialogUtils.dismissSafely(this);
             return;
         }
         
@@ -122,13 +123,14 @@ public class EditCustomerDialog extends DialogFragment {
                         displayCustomerData();
                     }
                 } else {
-                    Toast.makeText(getContext(), "لم يتم العثور على العميل", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                    DialogUtils.showToastSafely(this, "لم يتم العثور على العميل");
+                    DialogUtils.dismissSafely(this);
                 }
             })
             .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "فشل في تحميل بيانات العميل: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                dismiss();
+                android.util.Log.e("EditCustomerDialog", "فشل في تحميل بيانات العميل", e);
+                DialogUtils.showToastSafely(this, "فشل في تحميل بيانات العميل: " + e.getMessage());
+                DialogUtils.dismissSafely(this);
             });
     }
     
@@ -195,17 +197,18 @@ public class EditCustomerDialog extends DialogFragment {
                 "longitude", longitude
             )
             .addOnSuccessListener(aVoid -> {
-                Toast.makeText(getContext(), "تم تحديث بيانات العميل بنجاح", Toast.LENGTH_SHORT).show();
+                DialogUtils.showToastSafely(this, "تم تحديث بيانات العميل بنجاح");
                 
                 // إشعار المستمع
                 if (listener != null) {
                     listener.onCustomerUpdated();
                 }
                 
-                dismiss();
+                DialogUtils.dismissSafely(this);
             })
             .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "فشل في تحديث بيانات العميل: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                android.util.Log.e("EditCustomerDialog", "فشل في تحديث بيانات العميل", e);
+                DialogUtils.showToastSafely(this, "فشل في تحديث بيانات العميل: " + e.getMessage(), Toast.LENGTH_LONG);
                 saveButton.setEnabled(true);
                 saveButton.setText("حفظ");
             });
