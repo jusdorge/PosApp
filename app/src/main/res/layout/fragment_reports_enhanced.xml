@@ -193,11 +193,11 @@
                         android:id="@+id/exportCSVButton"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/colorAccent"
                         android:text="CSV"
-                        android:textSize="12sp"
-                        android:backgroundTint="@color/chartGreen" />
+                        android:textSize="12sp" />
 
                     <Button
                         android:id="@+id/exportTextButton"
@@ -214,11 +214,11 @@
                         android:id="@+id/shareReportButton"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/colorAccent"
                         android:text="مشاركة"
-                        android:textSize="12sp"
-                        android:backgroundTint="@color/chartOrange" />
+                        android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>

@@ -55,6 +55,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:gravity="left"
                 android:text="إجمالي المبيعات: 0.00 دج"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
