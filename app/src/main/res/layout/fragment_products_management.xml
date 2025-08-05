@@ -49,20 +49,25 @@
             android:textColor="@color/colorWhite" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/productsRecyclerView"
+    <!-- Container للقوائم لتجنب التداخل -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="4dp" />
+        android:layout_weight="1">
 
-    <TextView
-        android:id="@+id/emptyProductsTextView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="لا توجد منتجات"
-        android:textSize="18sp"
-        android:visibility="gone" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/productsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="4dp" />
+
+        <TextView
+            android:id="@+id/emptyProductsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="لا توجد منتجات"
+            android:textSize="18sp"
+            android:visibility="gone" />
+    </FrameLayout>
 </LinearLayout> 

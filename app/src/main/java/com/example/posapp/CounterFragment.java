@@ -44,6 +44,13 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
 
     public static CounterFragment activeInstance;
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // تحديث البادج عند العودة للـ fragment
+        updateCounterBadge();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -78,6 +85,9 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         
         invoiceItemsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         invoiceItemsRecyclerView.setAdapter(invoiceAdapter);
+
+        // تحديث البادج في البداية
+        updateTotalPrice();
 
         // إعداد مستمع زر الدفع
         checkoutButton.setOnClickListener(v -> {
@@ -337,6 +347,19 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
             totalPrice += item.getQuantity()*item.getPrice();
         }
         totalPriceTextView.setText(CurrencyUtils.formatCurrency(totalPrice));
+        
+        // Update badge in MainActivity
+        updateCounterBadge();
+    }
+    
+    /**
+     * Update counter badge in MainActivity
+     */
+    private void updateCounterBadge() {
+        MainActivity mainActivity = MainActivity.getInstance();
+        if (mainActivity != null) {
+            mainActivity.updateCounterBadge(invoiceItems.size());
+        }
     }
     
     /**

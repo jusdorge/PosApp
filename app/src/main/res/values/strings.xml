@@ -86,4 +86,21 @@
     <string name="print_image_error">فشل في طباعة الصورة</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+    <!-- Cash Collection Strings -->
+    <string name="cash_collected">النقود المحصلة</string>
+    <string name="total_cash_collected">إجمالي النقود المحصلة</string>
+    <string name="cash_sales">المبيعات النقدية</string>
+    <string name="debt_payments">المدفوعات من الديون</string>
+    <string name="cash_collection_summary">ملخص النقود المحصلة</string>
+    <string name="cash_sales_format">💵 مبيعات نقدية: %1$s</string>
+    <string name="debt_payments_format">💰 مدفوعات الديون: %1$s</string>
+    <string name="total_cash_collected_format">💳 إجمالي النقود المحصلة: %1$s</string>
+    <string name="calculating_debt_payments">جاري حساب المدفوعات...</string>
+    <string name="calculating_cash_collected">جاري حساب النقود المحصلة...</string>
+    
+    <!-- Counter Badge -->
+    <string name="counter_items_count">%1$d منتج</string>
+    <string name="counter_items_count_singular">منتج واحد</string>
+    
 </resources>

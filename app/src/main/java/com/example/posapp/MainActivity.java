@@ -44,10 +44,16 @@ public class MainActivity extends AppCompatActivity {
 
     // متغير لتتبع ما إذا كنا في شاشة من القائمة الجانبية
     private boolean isInDrawerFragment = false;
+    
+    // Counter badge management
+    private static MainActivity instance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Set instance for static access
+        instance = this;
         
         // Debug log
         android.util.Log.d("MainActivity", "✓ onCreate called");
@@ -552,5 +558,34 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+    
+    /**
+     * Update counter badge with item count
+     */
+    public void updateCounterBadge(int itemCount) {
+        if (bottomNavigationView != null) {
+            if (itemCount > 0) {
+                bottomNavigationView.getOrCreateBadge(R.id.nav_counter)
+                    .setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark))
+                    .setNumber(itemCount)
+                    .setVisible(true);
+            } else {
+                bottomNavigationView.removeBadge(R.id.nav_counter);
+            }
+        }
+    }
+    
+    /**
+     * Get instance for static access
+     */
+    public static MainActivity getInstance() {
+        return instance;
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        instance = null;
     }
 }

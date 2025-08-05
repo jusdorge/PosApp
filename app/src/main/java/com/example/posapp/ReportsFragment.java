@@ -89,6 +89,11 @@ public class ReportsFragment extends Fragment {
     // Performance indicator card
     private CardView performanceCard;
     
+    // Cash collection views
+    private TextView cashSalesAmountTextView;
+    private TextView debtPaymentsAmountTextView;
+    private TextView totalCashCollectedTextView;
+    
     // Cached data for reports
     private Map<String, Object> reportData;
 
@@ -174,6 +179,11 @@ public class ReportsFragment extends Fragment {
         performanceCard = view.findViewById(R.id.performanceIndicatorTextView).getParent().getParent() instanceof CardView ?
                 (CardView) view.findViewById(R.id.performanceIndicatorTextView).getParent().getParent() : null;
         
+        // Cash collection views
+        cashSalesAmountTextView = view.findViewById(R.id.cashSalesAmountTextView);
+        debtPaymentsAmountTextView = view.findViewById(R.id.debtPaymentsAmountTextView);
+        totalCashCollectedTextView = view.findViewById(R.id.totalCashCollectedTextView);
+        
         // Initialize report data cache
         reportData = new HashMap<>();
     }
@@ -244,6 +254,7 @@ public class ReportsFragment extends Fragment {
         loadPaymentMethods();
         loadSellerInfo();
         loadTotalSalesAndProfit();
+        loadCashCollectionData();
         
         // إخفاء مؤشرات التحميل بعد 3 ثواني
         if (getView() != null) {
@@ -269,6 +280,17 @@ public class ReportsFragment extends Fragment {
         totalSalesTextView.setText("إجمالي المبيعات: جاري الحساب...");
         totalProfitTextView.setText("إجمالي الربح: جاري الحساب...");
         performanceIndicatorTextView.setText("جاري تقييم الأداء...");
+        
+        // إظهار رسائل تحميل النقود المحصلة
+        if (cashSalesAmountTextView != null) {
+            cashSalesAmountTextView.setText(getString(R.string.calculating_cash_collected));
+        }
+        if (debtPaymentsAmountTextView != null) {
+            debtPaymentsAmountTextView.setText(getString(R.string.calculating_debt_payments));
+        }
+        if (totalCashCollectedTextView != null) {
+            totalCashCollectedTextView.setText(getString(R.string.calculating_cash_collected));
+        }
     }
     
     private void hideLoadingIndicators() {
@@ -678,6 +700,119 @@ public class ReportsFragment extends Fragment {
         void onProfitCalculated(double profit);
     }
     
+    /**
+     * تحميل بيانات النقود المحصلة (المبيعات النقدية + المدفوعات من الديون)
+     */
+    private void loadCashCollectionData() {
+        Timestamp[] dateRange = getDateRange();
+        
+        // أولاً: حساب المبيعات النقدية من الفواتير
+        db.collection("invoices")
+                .whereGreaterThanOrEqualTo("date", dateRange[0])
+                .whereLessThanOrEqualTo("date", dateRange[1])
+                .get()
+                .addOnSuccessListener(invoicesSnapshot -> {
+                    double cashSales = 0;
+                    
+                    for (QueryDocumentSnapshot document : invoicesSnapshot) {
+                        Double amount = document.getDouble("totalAmount");
+                        if (amount != null) {
+                            String paymentMethodString = document.getString("paymentMethod");
+                            Boolean isPaid = document.getBoolean("isPaid");
+                            
+                            if (isInvoiceCash(paymentMethodString, isPaid)) {
+                                cashSales += amount;
+                            }
+                        }
+                    }
+                    
+                    final double finalCashSales = cashSales;
+                    
+                    // ثانياً: حساب المدفوعات من الديون
+                    loadDebtPayments(dateRange, finalCashSales);
+                })
+                .addOnFailureListener(e -> {
+                    // في حالة الفشل، عرض قيم افتراضية
+                    updateCashCollectionUI(0.0, 0.0);
+                });
+    }
+    
+    /**
+     * حساب المدفوعات من ديون العملاء في النطاق الزمني المحدد
+     */
+    private void loadDebtPayments(Timestamp[] dateRange, double cashSales) {
+        db.collection("customers")
+                .get()
+                .addOnSuccessListener(customersSnapshot -> {
+                    double totalDebtPayments = 0;
+                    
+                    for (QueryDocumentSnapshot customerDoc : customersSnapshot) {
+                        Object debtsObj = customerDoc.get("debts");
+                        if (debtsObj instanceof java.util.List) {
+                            java.util.List<Map<String, Object>> debts = (java.util.List<Map<String, Object>>) debtsObj;
+                            
+                            for (Map<String, Object> debtMap : debts) {
+                                Boolean isPayment = (Boolean) debtMap.get("isPayment");
+                                Object dateObj = debtMap.get("date");
+                                Object amountObj = debtMap.get("amount");
+                                
+                                if (isPayment != null && isPayment && dateObj instanceof com.google.firebase.Timestamp && amountObj != null) {
+                                    com.google.firebase.Timestamp paymentDate = (com.google.firebase.Timestamp) dateObj;
+                                    
+                                    // التحقق من أن المدفوعة في النطاق الزمني المحدد
+                                    if (paymentDate.compareTo(dateRange[0]) >= 0 && paymentDate.compareTo(dateRange[1]) <= 0) {
+                                        double amount = 0;
+                                        if (amountObj instanceof Double) {
+                                            amount = (Double) amountObj;
+                                        } else if (amountObj instanceof Long) {
+                                            amount = ((Long) amountObj).doubleValue();
+                                        }
+                                        totalDebtPayments += amount;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // تحديث واجهة المستخدم بالنتائج النهائية
+                    updateCashCollectionUI(cashSales, totalDebtPayments);
+                })
+                .addOnFailureListener(e -> {
+                    // في حالة فشل تحميل المدفوعات، عرض المبيعات النقدية فقط
+                    updateCashCollectionUI(cashSales, 0.0);
+                });
+    }
+    
+    /**
+     * تحديث واجهة المستخدم ببيانات النقود المحصلة
+     */
+    private void updateCashCollectionUI(double cashSales, double debtPayments) {
+        double totalCashCollected = cashSales + debtPayments;
+        
+        if (cashSalesAmountTextView != null) {
+            cashSalesAmountTextView.setText(
+                getString(R.string.cash_sales_format, CurrencyUtils.formatCurrencyForReports(cashSales))
+            );
+        }
+        
+        if (debtPaymentsAmountTextView != null) {
+            debtPaymentsAmountTextView.setText(
+                getString(R.string.debt_payments_format, CurrencyUtils.formatCurrencyForReports(debtPayments))
+            );
+        }
+        
+        if (totalCashCollectedTextView != null) {
+            totalCashCollectedTextView.setText(
+                getString(R.string.total_cash_collected_format, CurrencyUtils.formatCurrencyForReports(totalCashCollected))
+            );
+        }
+        
+        // حفظ البيانات في التقرير للتصدير
+        reportData.put("cashSalesAmount", CurrencyUtils.formatCurrencyForReports(cashSales));
+        reportData.put("debtPaymentsAmount", CurrencyUtils.formatCurrencyForReports(debtPayments));
+        reportData.put("totalCashCollected", CurrencyUtils.formatCurrencyForReports(totalCashCollected));
+    }
+    
     private void setupExportButtons() {
         exportCSVButton.setOnClickListener(v -> {
             // إضافة تأثير بصري للنقر
@@ -731,6 +866,8 @@ public class ReportsFragment extends Fragment {
             writer.append("أفضل عميل," + reportData.get("bestCustomer") + "\n");
             writer.append("المبيعات النقدية," + reportData.get("cashSales") + "\n");
             writer.append("مبيعات الدين," + reportData.get("creditSales") + "\n");
+            writer.append("المدفوعات من الديون," + reportData.get("debtPaymentsAmount") + "\n");
+            writer.append("إجمالي النقود المحصلة," + reportData.get("totalCashCollected") + "\n");
             
             writer.close();
             
@@ -791,6 +928,11 @@ public class ReportsFragment extends Fragment {
             writer.append("• المبيعات النقدية: " + reportData.get("cashSales") + "\n");
             writer.append("• مبيعات الدين: " + reportData.get("creditSales") + "\n\n");
             
+            writer.append("💳 النقود المحصلة:\n");
+            writer.append("• المبيعات النقدية: " + reportData.get("cashSalesAmount") + "\n");
+            writer.append("• المدفوعات من الديون: " + reportData.get("debtPaymentsAmount") + "\n");
+            writer.append("• إجمالي النقود المحصلة: " + reportData.get("totalCashCollected") + "\n\n");
+            
             writer.append("================================\n");
             writer.append("تم إنشاء هذا التقرير بواسطة تطبيق نقطة البيع\n");
             writer.append("التوقيت: " + ArabicNumberUtils.formatDateTimeWithArabicNumbers(new Date()) + "\n");
@@ -832,7 +974,12 @@ public class ReportsFragment extends Fragment {
         shareText.append("💵 المبيعات النقدية: ").append(reportData.get("cashSales")).append("\n");
         shareText.append("📝 مبيعات الدين: ").append(reportData.get("creditSales")).append("\n\n");
         
-        shareText.append("#نقطة_البيع #تقرير_يومي #مبيعات");
+        shareText.append("💳 النقود المحصلة:\n");
+        shareText.append("• مبيعات نقدية: ").append(reportData.get("cashSalesAmount")).append("\n");
+        shareText.append("• مدفوعات الديون: ").append(reportData.get("debtPaymentsAmount")).append("\n");
+        shareText.append("• الإجمالي: ").append(reportData.get("totalCashCollected")).append("\n\n");
+        
+        shareText.append("#نقطة_البيع #تقرير_يومي #مبيعات #النقود_المحصلة");
         
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
