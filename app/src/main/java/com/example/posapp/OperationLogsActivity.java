@@ -133,8 +133,25 @@ public class OperationLogsActivity extends AppCompatActivity implements Operatio
                 })
                 .exceptionally(throwable -> {
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "فشل في تحميل أرشيف العمليات: " + throwable.getMessage(), 
-                                Toast.LENGTH_LONG).show();
+                        android.util.Log.e("OperationLogsActivity", "فشل في تحميل أرشيف العمليات", throwable);
+                        
+                        // تحسين رسالة الخطأ للمستخدم
+                        String errorMessage;
+                        if (throwable.getMessage() != null) {
+                            if (throwable.getMessage().contains("PERMISSION_DENIED")) {
+                                errorMessage = "ليس لديك صلاحية لعرض أرشيف العمليات";
+                            } else if (throwable.getMessage().contains("network")) {
+                                errorMessage = "تحقق من اتصال الإنترنت وحاول مرة أخرى";
+                            } else if (throwable.getMessage().contains("index")) {
+                                errorMessage = "جارٍ إعداد قاعدة البيانات - يرجى المحاولة بعد قليل";
+                            } else {
+                                errorMessage = "فشل في تحميل أرشيف العمليات: " + throwable.getMessage();
+                            }
+                        } else {
+                            errorMessage = "فشل في تحميل أرشيف العمليات - يرجى المحاولة مرة أخرى";
+                        }
+                        
+                        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
                         swipeRefreshLayout.setRefreshing(false);
                         showEmptyState(true);
                     });

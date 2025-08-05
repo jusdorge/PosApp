@@ -14,6 +14,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -175,26 +176,110 @@ public class OperationLogService {
         User currentUser = userSession.getCurrentUser();
         
         if (currentUser == null) {
+            Log.w(TAG, "لا يوجد مستخدم مسجل دخول - إرجاع قائمة فارغة");
             future.complete(new ArrayList<>());
             return future;
         }
         
+        Log.d(TAG, "جارٍ تحميل سجل العمليات للمستخدم: " + currentUser.getFullName());
+        
+        // استخدام طريقة بديلة لتجنب الحاجة لـ composite index
+        // نحصل على العمليات للمستخدم أولاً، ثم نرتبها محلياً
         db.collection(COLLECTION_NAME)
             .whereEqualTo("userId", currentUser.getId())
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(limit)
-            .get()
+            .get(Source.DEFAULT) // محاولة من الخادم أولاً ثم من الكاش
             .addOnSuccessListener(queryDocumentSnapshots -> {
-                List<OperationLog> logs = new ArrayList<>();
-                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    OperationLog log = document.toObject(OperationLog.class);
-                    logs.add(log);
+                try {
+                    List<OperationLog> logs = new ArrayList<>();
+                    
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        try {
+                            OperationLog log = document.toObject(OperationLog.class);
+                            if (log != null) {
+                                log.setId(document.getId());
+                                logs.add(log);
+                            }
+                        } catch (Exception e) {
+                            Log.w(TAG, "خطأ في تحويل وثيقة العملية: " + document.getId(), e);
+                        }
+                    }
+                    
+                    // ترتيب العمليات حسب التاريخ (الأحدث أولاً)
+                    logs.sort((log1, log2) -> {
+                        if (log1.getTimestamp() == null) return 1;
+                        if (log2.getTimestamp() == null) return -1;
+                        return log2.getTimestamp().compareTo(log1.getTimestamp());
+                    });
+                    
+                    // تطبيق الحد الأقصى
+                    List<OperationLog> limitedLogs = logs.size() > limit ? 
+                        logs.subList(0, limit) : logs;
+                    
+                    Log.d(TAG, "تم تحميل " + limitedLogs.size() + " عملية بنجاح");
+                    future.complete(limitedLogs);
+                    
+                } catch (Exception e) {
+                    Log.e(TAG, "خطأ في معالجة سجل العمليات", e);
+                    future.completeExceptionally(e);
                 }
-                future.complete(logs);
             })
-            .addOnFailureListener(future::completeExceptionally);
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "فشل في تحميل سجل العمليات من Firestore", e);
+                
+                // محاولة من الكاش المحلي في حالة فشل الاتصال
+                tryLoadFromCache(currentUser.getId(), limit, future);
+            });
             
         return future;
+    }
+    
+    /**
+     * محاولة تحميل العمليات من الكاش المحلي
+     */
+    private void tryLoadFromCache(String userId, int limit, CompletableFuture<List<OperationLog>> future) {
+        Log.d(TAG, "محاولة تحميل العمليات من الكاش المحلي...");
+        
+        db.collection(COLLECTION_NAME)
+            .whereEqualTo("userId", userId)
+            .get(Source.CACHE)
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                try {
+                    List<OperationLog> logs = new ArrayList<>();
+                    
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        try {
+                            OperationLog log = document.toObject(OperationLog.class);
+                            if (log != null) {
+                                log.setId(document.getId());
+                                logs.add(log);
+                            }
+                        } catch (Exception e) {
+                            Log.w(TAG, "خطأ في تحويل وثيقة من الكاش: " + document.getId(), e);
+                        }
+                    }
+                    
+                    // ترتيب وتحديد العدد
+                    logs.sort((log1, log2) -> {
+                        if (log1.getTimestamp() == null) return 1;
+                        if (log2.getTimestamp() == null) return -1;
+                        return log2.getTimestamp().compareTo(log1.getTimestamp());
+                    });
+                    
+                    List<OperationLog> limitedLogs = logs.size() > limit ? 
+                        logs.subList(0, limit) : logs;
+                    
+                    Log.i(TAG, "تم تحميل " + limitedLogs.size() + " عملية من الكاش المحلي");
+                    future.complete(limitedLogs);
+                    
+                } catch (Exception e) {
+                    Log.e(TAG, "خطأ في معالجة الكاش", e);
+                    future.completeExceptionally(new Exception("فشل في تحميل البيانات من الخادم والكاش المحلي", e));
+                }
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "فشل في تحميل العمليات من الكاش أيضاً", e);
+                future.completeExceptionally(new Exception("لا يمكن الوصول لسجل العمليات - تحقق من الاتصال بالإنترنت", e));
+            });
     }
     
     /**
@@ -204,20 +289,48 @@ public class OperationLogService {
                                                                        String entityId) {
         CompletableFuture<List<OperationLog>> future = new CompletableFuture<>();
         
+        Log.d(TAG, "جارٍ تحميل سجل العمليات للكائن: " + entityType.name() + "/" + entityId);
+        
+        // استخدام فلترة بسيطة ثم ترتيب محلي لتجنب الحاجة لـ composite index
         db.collection(COLLECTION_NAME)
             .whereEqualTo("entityType", entityType.name())
             .whereEqualTo("entityId", entityId)
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .get()
+            .get(Source.DEFAULT)
             .addOnSuccessListener(queryDocumentSnapshots -> {
-                List<OperationLog> logs = new ArrayList<>();
-                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    OperationLog log = document.toObject(OperationLog.class);
-                    logs.add(log);
+                try {
+                    List<OperationLog> logs = new ArrayList<>();
+                    
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        try {
+                            OperationLog log = document.toObject(OperationLog.class);
+                            if (log != null) {
+                                log.setId(document.getId());
+                                logs.add(log);
+                            }
+                        } catch (Exception e) {
+                            Log.w(TAG, "خطأ في تحويل وثيقة العملية: " + document.getId(), e);
+                        }
+                    }
+                    
+                    // ترتيب العمليات حسب التاريخ (الأحدث أولاً)
+                    logs.sort((log1, log2) -> {
+                        if (log1.getTimestamp() == null) return 1;
+                        if (log2.getTimestamp() == null) return -1;
+                        return log2.getTimestamp().compareTo(log1.getTimestamp());
+                    });
+                    
+                    Log.d(TAG, "تم تحميل " + logs.size() + " عملية للكائن " + entityType.name());
+                    future.complete(logs);
+                    
+                } catch (Exception e) {
+                    Log.e(TAG, "خطأ في معالجة سجل العمليات للكائن", e);
+                    future.completeExceptionally(e);
                 }
-                future.complete(logs);
             })
-            .addOnFailureListener(future::completeExceptionally);
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "فشل في تحميل سجل العمليات للكائن: " + entityType.name() + "/" + entityId, e);
+                future.completeExceptionally(e);
+            });
             
         return future;
     }
@@ -228,26 +341,59 @@ public class OperationLogService {
     public CompletableFuture<List<OperationLog>> getCriticalOperations(int limit) {
         CompletableFuture<List<OperationLog>> future = new CompletableFuture<>();
         
+        Log.d(TAG, "جارٍ تحميل العمليات الحساسة (الحد: " + limit + ")");
+        
+        // قائمة أنواع العمليات الحساسة
+        java.util.Set<String> criticalTypes = new java.util.HashSet<>(java.util.Arrays.asList(
+            OperationLog.OperationType.DELETE.name(),
+            OperationLog.OperationType.UPDATE.name(),
+            OperationLog.OperationType.RESTORE.name()
+        ));
+        
+        // استخدام فلترة بسيطة ثم ترتيب محلي لتجنب الحاجة لـ composite index
         db.collection(COLLECTION_NAME)
-            .whereIn("operationType", 
-                java.util.Arrays.asList(
-                    OperationLog.OperationType.DELETE.name(),
-                    OperationLog.OperationType.UPDATE.name(),
-                    OperationLog.OperationType.RESTORE.name()
-                )
-            )
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(limit)
-            .get()
+            .whereIn("operationType", new ArrayList<>(criticalTypes))
+            .get(Source.DEFAULT)
             .addOnSuccessListener(queryDocumentSnapshots -> {
-                List<OperationLog> logs = new ArrayList<>();
-                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    OperationLog log = document.toObject(OperationLog.class);
-                    logs.add(log);
+                try {
+                    List<OperationLog> logs = new ArrayList<>();
+                    
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        try {
+                            OperationLog log = document.toObject(OperationLog.class);
+                            if (log != null && log.getOperationType() != null && 
+                                criticalTypes.contains(log.getOperationType().name())) {
+                                log.setId(document.getId());
+                                logs.add(log);
+                            }
+                        } catch (Exception e) {
+                            Log.w(TAG, "خطأ في تحويل وثيقة العملية الحساسة: " + document.getId(), e);
+                        }
+                    }
+                    
+                    // ترتيب العمليات حسب التاريخ (الأحدث أولاً)
+                    logs.sort((log1, log2) -> {
+                        if (log1.getTimestamp() == null) return 1;
+                        if (log2.getTimestamp() == null) return -1;
+                        return log2.getTimestamp().compareTo(log1.getTimestamp());
+                    });
+                    
+                    // تطبيق الحد الأقصى
+                    List<OperationLog> limitedLogs = logs.size() > limit ? 
+                        logs.subList(0, limit) : logs;
+                    
+                    Log.d(TAG, "تم تحميل " + limitedLogs.size() + " عملية حساسة بنجاح");
+                    future.complete(limitedLogs);
+                    
+                } catch (Exception e) {
+                    Log.e(TAG, "خطأ في معالجة العمليات الحساسة", e);
+                    future.completeExceptionally(e);
                 }
-                future.complete(logs);
             })
-            .addOnFailureListener(future::completeExceptionally);
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "فشل في تحميل العمليات الحساسة", e);
+                future.completeExceptionally(e);
+            });
             
         return future;
     }
