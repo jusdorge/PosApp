@@ -37,6 +37,7 @@ public class MoreFragment extends Fragment {
     private TextView notificationBadge;
     private CardView bmpGalleryCard;
     private CardView operationLogsCard;
+    private CardView languageSelectionCard;
     private CardView logoutCard;
     
     private FirebaseFirestore db;
@@ -62,6 +63,7 @@ public class MoreFragment extends Fragment {
         notificationBadge = view.findViewById(R.id.notificationBadge);
         bmpGalleryCard = view.findViewById(R.id.bmpGalleryCard);
         operationLogsCard = view.findViewById(R.id.operationLogsCard);
+        languageSelectionCard = view.findViewById(R.id.languageSelectionCard);
         logoutCard = view.findViewById(R.id.logoutCard);
         
         // إخفاء جميع الكارتات افتراضياً حتى يتم فحص الصلاحيات
@@ -132,6 +134,11 @@ public class MoreFragment extends Fragment {
         // أرشيف العمليات
         if (operationLogsCard != null) {
             operationLogsCard.setOnClickListener(v -> openOperationLogs());
+        }
+        
+        // اختيار اللغة
+        if (languageSelectionCard != null) {
+            languageSelectionCard.setOnClickListener(v -> openLanguageSelection());
         }
         
         // إدارة المستخدمين
@@ -211,6 +218,11 @@ public class MoreFragment extends Fragment {
             operationLogsCard.setVisibility(View.GONE);
         }
         
+        // اختيار اللغة - متاح للجميع
+        if (languageSelectionCard != null) {
+            languageSelectionCard.setVisibility(View.VISIBLE);
+        }
+        
         // إدارة المستخدمين - للمديرين فقط
         if (userManagementCard != null) {
         }
@@ -273,6 +285,7 @@ public class MoreFragment extends Fragment {
         if (notificationsCard != null) notificationsCard.setVisibility(View.GONE);
         if (bmpGalleryCard != null) bmpGalleryCard.setVisibility(View.GONE);
         if (operationLogsCard != null) operationLogsCard.setVisibility(View.GONE);
+        if (languageSelectionCard != null) languageSelectionCard.setVisibility(View.GONE);
         if (logoutCard != null) logoutCard.setVisibility(View.GONE);
     }
     
@@ -910,5 +923,41 @@ public class MoreFragment extends Fragment {
     private void openOperationLogs() {
         Intent intent = new Intent(getContext(), OperationLogsActivity.class);
         startActivity(intent);
+    }
+    
+    /**
+     * فتح حوار اختيار اللغة
+     */
+    private void openLanguageSelection() {
+        if (!isAdded() || getActivity() == null) {
+            return;
+        }
+        
+        android.util.Log.d("MoreFragment", "فتح حوار اختيار اللغة");
+        
+        LanguageSelectionDialog dialog = LanguageSelectionDialog.newInstance();
+        dialog.setOnLanguageSelectedListener(languageCode -> {
+            android.util.Log.d("MoreFragment", "تم اختيار اللغة: " + languageCode);
+            
+            // عرض رسالة تأكيد وإعادة تشغيل النشاط
+            new AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.language_applied))
+                .setMessage(getString(R.string.language_changed_restart_required))
+                .setPositiveButton(getString(R.string.restart_app), (d, which) -> {
+                    if (getActivity() != null) {
+                        getActivity().recreate();
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .setCancelable(false)
+                .show();
+        });
+        
+        try {
+            dialog.show(getParentFragmentManager(), "LanguageSelectionDialog");
+        } catch (Exception e) {
+            android.util.Log.e("MoreFragment", "خطأ في عرض حوار اللغة", e);
+            Toast.makeText(getContext(), "خطأ في عرض خيارات اللغة", Toast.LENGTH_SHORT).show();
+        }
     }
 }

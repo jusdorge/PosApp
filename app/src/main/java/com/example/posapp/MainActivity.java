@@ -22,6 +22,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import android.widget.TextView;
 import com.example.posapp.UserSession;
+import com.example.posapp.utils.LanguageManager;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -55,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // تطبيق اللغة المختارة قبل إعداد UI
+        LanguageManager languageManager = LanguageManager.getInstance(this);
+        languageManager.applyLanguage(this);
+        android.util.Log.d("MainActivity", "✓ Language applied: " + languageManager.getLanguage());
         
         // Set instance for static access
         instance = this;
