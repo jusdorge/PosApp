@@ -183,7 +183,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
             })
             .addOnFailureListener(e -> {
                 showEmptyView(true);
-                Toast.makeText(getContext(), "حدث خطأ أثناء تحميل الفواتير: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.error_loading_invoices, e.getMessage()), Toast.LENGTH_SHORT).show();
             });
     }
     
@@ -203,10 +203,10 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         
         // عرض تفصيل المبيعات النقدية والدين
         if (cashSalesTextView != null) {
-            cashSalesTextView.setText("💵 المبيعات النقدية: " + CurrencyUtils.formatCurrency(cashSales));
+            cashSalesTextView.setText(getString(R.string.cash_sales_format, CurrencyUtils.formatCurrency(cashSales)));
         }
         if (creditSalesTextView != null) {
-            creditSalesTextView.setText("📝 المبيعات بالدين: " + CurrencyUtils.formatCurrency(creditSales));
+            creditSalesTextView.setText(getString(R.string.debt_payments_format, CurrencyUtils.formatCurrency(creditSales)));
         }
     }
     
@@ -237,20 +237,20 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         String totalAmount = CurrencyUtils.formatCurrency(invoice.getTotalAmount());
         
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
-        builder.setTitle("فاتورة " + invoiceNumber);
-        builder.setMessage("العميل: " + customerName + "\nالمجموع: " + totalAmount + "\n\nاختر العملية:");
+        builder.setTitle(getString(R.string.invoice_hash, invoiceNumber));
+        builder.setMessage(getString(R.string.invoice_summary_message, customerName, totalAmount));
         
         // إضافة الأزرار الأساسية
-        builder.setPositiveButton("طباعة", (dialog, which) -> {
+        builder.setPositiveButton(getString(R.string.print_action), (dialog, which) -> {
             Intent intent = InvoicePrintActivity.createIntent(requireContext(), invoice.getId());
             startActivity(intent);
         });
         
-        builder.setNeutralButton("تحميل في الكاونتر", (dialog, which) -> {
+        builder.setNeutralButton(getString(R.string.load_in_counter), (dialog, which) -> {
             loadInvoiceInCounter(invoice);
         });
         
-        builder.setNegativeButton("المزيد من الخيارات", (dialog, which) -> {
+        builder.setNegativeButton(getString(R.string.more_options_action), (dialog, which) -> {
             showMoreOptionsDialog(invoice, position);
         });
         
@@ -261,10 +261,10 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
      * عرض خيارات إضافية للفاتورة
      */
     private void showMoreOptionsDialog(Invoice invoice, int position) {
-        String[] options = {"إضافة منتجات", "📍 موقع العميل", "حذف الفاتورة"};
+        String[] options = {getString(R.string.add_products_option), getString(R.string.customer_location_option), getString(R.string.delete_invoice_option)};
         
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
-        builder.setTitle("خيارات إضافية");
+        builder.setTitle(getString(R.string.more_options));
         
         builder.setItems(options, (dialog, which) -> {
             switch (which) {
@@ -280,7 +280,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
             }
         });
         
-        builder.setNegativeButton("رجوع", (dialog, which) -> {
+        builder.setNegativeButton(getString(R.string.back), (dialog, which) -> {
             showInvoiceOptionsDialogAlternative(invoice, position);
         });
         
@@ -297,11 +297,11 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         
         try {
             // إنشاء قائمة الخيارات
-            String[] options = {"طباعة", "إضافة منتجات", "تحميل في الكاونتر", "حذف الفاتورة"};
+            String[] options = {getString(R.string.print_action), getString(R.string.add_products_option), getString(R.string.load_in_counter), getString(R.string.delete_invoice_option)};
             
             androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
-            builder.setTitle("فاتورة " + invoiceNumber);
-            builder.setMessage("العميل: " + customerName + "\nالمجموع: " + totalAmount + "\n\nاختر العملية:");
+            builder.setTitle(getString(R.string.invoice_hash, invoiceNumber));
+            builder.setMessage(getString(R.string.invoice_summary_message, customerName, totalAmount));
             builder.setIcon(android.R.drawable.ic_menu_edit);
             
             builder.setItems(options, (dialog, which) -> {
@@ -322,17 +322,17 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                             break;
                     }
                 } catch (Exception e) {
-                    Toast.makeText(requireContext(), "خطأ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.generic_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                 }
             });
             
-            builder.setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss());
+            builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
             
             androidx.appcompat.app.AlertDialog dialog = builder.create();
             dialog.show();
             
         } catch (Exception e) {
-            Toast.makeText(requireContext(), "خطأ في عرض الخيارات: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), getString(R.string.error_showing_options, e.getMessage()), Toast.LENGTH_LONG).show();
         }
     }
     
@@ -347,10 +347,10 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     private void openNewInvoice() {
         // إظهار خيارات للمستخدم: إنشاء فاتورة جديدة أو إضافة منتج سريع
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                .setTitle("إنشاء فاتورة جديدة")
-                .setMessage("كيف تريد إضافة منتج جديد؟")
+                .setTitle(getString(R.string.create_new_invoice_title))
+                .setMessage(getString(R.string.how_to_add_product_message))
                 .setIcon(android.R.drawable.ic_input_add)
-                .setPositiveButton("الذهاب للكاونتر", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.go_to_counter), (dialog, which) -> {
                     // مسح الفاتورة الحالية في الكاونتر وبدء فاتورة جديدة
                     CounterFragment.clearInvoice();
                     CounterFragment.clearCustomer();
@@ -358,14 +358,14 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                     // الانتقال إلى شاشة الكاونتر
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).switchToCounterFragment();
-                        Toast.makeText(getContext(), "🆕 تم إنشاء فاتورة جديدة في الكاونتر", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.invoice_created_success), Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNeutralButton("إضافة منتج سريع", (dialog, which) -> {
+                .setNeutralButton(getString(R.string.add_quick_product), (dialog, which) -> {
                     // فتح حوار اختيار المنتجات مباشرة
                     openQuickProductSelection();
                 })
-                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
                 .show();
     }
     
@@ -377,7 +377,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         dialog.setOnInvoiceCreatedListener(() -> {
             // إعادة تحميل فواتير اليوم عند إنشاء فاتورة جديدة
             loadInvoicesForDate(currentDisplayDate);
-            Toast.makeText(getContext(), "✅ تم إنشاء الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.invoice_created_success), Toast.LENGTH_SHORT).show();
         });
         dialog.show(getChildFragmentManager(), "QuickInvoiceDialog");
     }
@@ -405,10 +405,10 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
      */
     private void loadInvoiceInCounter(Invoice invoice) {
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                .setTitle("تحميل في الكاونتر")
-                .setMessage("سيتم تحميل هذه الفاتورة في الكاونتر للتعديل.\n\nملاحظة: أي فاتورة حالية في الكاونتر ستُمسح.\n⚠️ سيتم تحديث الفاتورة الأصلية وليس إنشاء فاتورة جديدة.")
+                .setTitle(getString(R.string.load_in_counter_title))
+                .setMessage(getString(R.string.load_in_counter_warning))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton("تحميل", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.load_label), (dialog, which) -> {
                     // البحث عن معلومات العميل أولاً
                     com.example.posapp.model.Customer customerToLoad = null;
                     
@@ -435,7 +435,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                                 // الانتقال إلى شاشة الكاونتر
                                 if (getActivity() instanceof MainActivity) {
                                     ((MainActivity) getActivity()).switchToCounterFragment();
-                                    Toast.makeText(getContext(), "✅ تم تحميل الفاتورة للتعديل - رقم: " + invoice.getDisplayNumber(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getContext(), getString(R.string.invoice_loaded_for_edit, invoice.getDisplayNumber()), Toast.LENGTH_LONG).show();
                                 }
                             })
                             .addOnFailureListener(e -> {
@@ -444,7 +444,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                                 
                                 if (getActivity() instanceof MainActivity) {
                                     ((MainActivity) getActivity()).switchToCounterFragment();
-                                    Toast.makeText(getContext(), "✅ تم تحميل الفاتورة للتعديل (بدون معلومات العميل)", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getContext(), getString(R.string.invoice_loaded_without_customer), Toast.LENGTH_LONG).show();
                                 }
                             });
                     } else {
@@ -453,11 +453,11 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                         
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).switchToCounterFragment();
-                            Toast.makeText(getContext(), "✅ تم تحميل الفاتورة للتعديل - رقم: " + invoice.getDisplayNumber(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), getString(R.string.invoice_loaded_for_edit, invoice.getDisplayNumber()), Toast.LENGTH_LONG).show();
                         }
                     }
                 })
-                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
                 .show();
     }
     
@@ -470,18 +470,13 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         String totalAmount = CurrencyUtils.formatCurrency(invoice.getTotalAmount());
         
         new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                .setTitle("⚠️ حذف فاتورة")
-                .setMessage("هل أنت متأكد من حذف الفاتورة نهائياً؟\n\n" +
-                        "📄 رقم الفاتورة: " + invoiceNumber + "\n" +
-                        "👤 العميل: " + customerName + "\n" +
-                        "💰 المبلغ: " + totalAmount + "\n\n" +
-                        "⚠️ تحذير: هذه العملية لا يمكن التراجع عنها!\n" +
-                        "سيتم حذف الفاتورة ومحتوياتها نهائياً من النظام.")
+                .setTitle(getString(R.string.delete_invoice_warning_title))
+                .setMessage(getString(R.string.delete_invoice_confirm_message, invoiceNumber, customerName, totalAmount))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton("🗑️ حذف نهائي", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.delete_permanently), (dialog, which) -> {
                     deleteInvoice(invoice, position);
                 })
-                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
                 .show();
     }
     
@@ -491,7 +486,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     private void deleteInvoice(Invoice invoice, int position) {
         // إظهار progress dialog
         android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(getContext());
-        progressDialog.setMessage("جاري حذف الفاتورة...");
+        progressDialog.setMessage(getString(R.string.deleting_invoice));
         progressDialog.setCancelable(false);
         progressDialog.show();
         
@@ -542,12 +537,12 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                     updateSummary(invoiceList.size(), calculateTotalSales(), calculateCashSales(), calculateCreditSales());
                     
                     progressDialog.dismiss();
-                    Toast.makeText(getContext(), "✅ تم حذف الفاتورة " + invoice.getDisplayNumber() + " نهائياً", 
+                    Toast.makeText(getContext(), getString(R.string.invoice_deleted_success, invoice.getDisplayNumber()),
                             Toast.LENGTH_LONG).show();
                 })
                 .addOnFailureListener(e -> {
                     progressDialog.dismiss();
-                    Toast.makeText(getContext(), "❌ فشل في حذف الفاتورة: " + e.getMessage(), 
+                    Toast.makeText(getContext(), getString(R.string.failed_delete_invoice, e.getMessage()),
                             Toast.LENGTH_LONG).show();
                     android.util.Log.e("TodayFragment", "Failed to delete invoice", e);
                 });
@@ -636,7 +631,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
             calendar.get(Calendar.DAY_OF_MONTH)
         );
         
-        datePickerDialog.setTitle("اختر التاريخ لعرض فواتيره");
+        datePickerDialog.setTitle(getString(R.string.choose_date_to_load_invoices));
         datePickerDialog.show();
     }
     
@@ -706,11 +701,11 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                 
                 // عرض رسالة نجاح
                 String dateString = displayDateFormat.format(selectedDate);
-                Toast.makeText(getContext(), "✅ تم تحميل " + invoiceList.size() + " فاتورة لتاريخ " + dateString, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.loaded_invoices_for_date, invoiceList.size(), dateString), Toast.LENGTH_SHORT).show();
             })
             .addOnFailureListener(e -> {
                 showEmptyView(true);
-                Toast.makeText(getContext(), "حدث خطأ أثناء تحميل الفواتير: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.error_loading_invoices, e.getMessage()), Toast.LENGTH_SHORT).show();
             });
     }
     
@@ -719,14 +714,14 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
      */
     private void openCustomerLocationOnMap(Invoice invoice) {
         if (invoice == null) {
-            Toast.makeText(getContext(), "بيانات الفاتورة غير متوفرة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.invoice_data_unavailable), Toast.LENGTH_SHORT).show();
             return;
         }
         
         // التحقق من وجود بيانات العميل
         String customerPhone = invoice.getCustomerPhone();
         if (customerPhone == null || customerPhone.isEmpty() || customerPhone.equals("مجهول")) {
-            Toast.makeText(getContext(), "هذه الفاتورة لا تحتوي على بيانات عميل محددة", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.invoice_missing_customer_data), Toast.LENGTH_LONG).show();
             return;
         }
         
@@ -736,7 +731,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 if (queryDocumentSnapshots.isEmpty()) {
-                    Toast.makeText(getContext(), "لم يتم العثور على بيانات العميل في النظام", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.customer_not_found_system), Toast.LENGTH_LONG).show();
                     return;
                 }
                 
@@ -749,13 +744,13 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                     if (!LocationUtils.hasLocationPermission(getContext())) {
                         // طلب الصلاحيات
                         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                            .setTitle("صلاحيات الموقع")
-                            .setMessage("يحتاج التطبيق لصلاحية الوصول للموقع لإظهار المسار إلى العميل.\n\nهل تريد منح الصلاحية؟")
-                            .setPositiveButton("نعم", (dialog, which) -> {
+                            .setTitle(getString(R.string.location_permissions_title))
+                            .setMessage(getString(R.string.location_permission_request_message))
+                            .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
                                 LocationUtils.requestLocationPermission(getActivity());
-                                Toast.makeText(getContext(), "بعد منح الصلاحية، جرب مرة أخرى", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(), getString(R.string.try_again_after_permission), Toast.LENGTH_LONG).show();
                             })
-                            .setNegativeButton("لا", (dialog, which) -> {
+                            .setNegativeButton(getString(R.string.no), (dialog, which) -> {
                                 // فتح موقع العميل فقط بدون المسار
                                 LocationUtils.openGoogleMaps(getContext(), customer.getLatitude(), customer.getLongitude(), customer.getName());
                             })
@@ -768,7 +763,7 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
                 }
             })
             .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "خطأ في البحث عن بيانات العميل: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.error_searching_customer_data, e.getMessage()), Toast.LENGTH_LONG).show();
             });
     }
     

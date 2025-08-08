@@ -55,7 +55,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
         
         // إعداد شريط العنوان
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("طباعة QR Code");
+            getSupportActionBar().setTitle(getString(R.string.qr_print_title));
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         
@@ -105,9 +105,9 @@ public class QRCodePrintActivity extends AppCompatActivity {
             qrImageView.setImageBitmap(qrBitmap);
         }
         
-        customerNameTextView.setText("الاسم: " + (customerName != null ? customerName : "غير محدد"));
-        customerPhoneTextView.setText("الهاتف: " + (customerPhone != null ? customerPhone : "غير محدد"));
-        customerDebtTextView.setText(String.format("إجمالي الدين: %.2f دج", customerDebt));
+        customerNameTextView.setText(getString(R.string.name_colon_value, (customerName != null ? customerName : getString(R.string.not_specified))));
+        customerPhoneTextView.setText(getString(R.string.phone_colon_value, (customerPhone != null ? customerPhone : getString(R.string.not_specified))));
+        customerDebtTextView.setText(getString(R.string.total_debt_formatted, customerDebt));
     }
     
     private void setupButtons() {
@@ -115,7 +115,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
             try {
                 showPrinterSelectionDialog();
             } catch (Exception e) {
-                Toast.makeText(this, "خطأ في فتح قائمة الطابعات: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.error_opening_printers, e.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
         
@@ -123,7 +123,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
             try {
                 shareQRCode();
             } catch (Exception e) {
-                Toast.makeText(this, "خطأ في مشاركة QR Code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.error_sharing_qr, e.getMessage()), Toast.LENGTH_SHORT).show();
             }
         });
         
@@ -132,7 +132,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
     
     private void showPrinterSelectionDialog() {
         if (bluetoothAdapter == null) {
-            Toast.makeText(this, "البلوتوث غير مدعوم على هذا الجهاز", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.bluetooth_not_supported), Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -178,7 +178,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
     
     private void showPrinterSelection() {
         if (!bluetoothAdapter.isEnabled()) {
-            Toast.makeText(this, "يرجى تفعيل البلوتوث أولاً", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.enable_bluetooth_first), Toast.LENGTH_SHORT).show();
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 return;
@@ -191,12 +191,12 @@ public class QRCodePrintActivity extends AppCompatActivity {
         try {
             pairedDevices = bluetoothAdapter.getBondedDevices();
         } catch (SecurityException e) {
-            Toast.makeText(this, "ليس لديك صلاحية للوصول لأجهزة البلوتوث", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_permission_bluetooth_devices), Toast.LENGTH_SHORT).show();
             return;
         }
         
         if (pairedDevices.isEmpty()) {
-            Toast.makeText(this, "لا توجد أجهزة بلوتوث مقترنة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_paired_bluetooth_devices), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -210,17 +210,17 @@ public class QRCodePrintActivity extends AppCompatActivity {
                 devices[i] = device;
                 i++;
             } catch (SecurityException e) {
-                Toast.makeText(this, "ليس لديك صلاحية للوصول لمعلومات الجهاز", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.no_permission_device_info), Toast.LENGTH_SHORT).show();
                 return;
             }
         }
 
         new AlertDialog.Builder(this)
-                .setTitle("اختر الطابعة")
+                .setTitle(getString(R.string.select_printer))
                 .setItems(deviceNames, (dialog, which) -> {
                     connectAndPrint(devices[which]);
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
     
@@ -228,21 +228,21 @@ public class QRCodePrintActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "جاري الاتصال بالطابعة...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.connecting_to_printer), Toast.LENGTH_SHORT).show();
                 });
                 
                 bluetoothSocket = device.createRfcommSocketToServiceRecord(PRINTER_UUID);
                 bluetoothSocket.connect();
                 
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "تم الاتصال، جاري الطباعة...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.connected_printing), Toast.LENGTH_SHORT).show();
                 });
                 
                 printQRCode();
                 
             } catch (IOException e) {
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "فشل في الاتصال بالطابعة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.failed_connect_printer, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
                 
                 try {
@@ -254,7 +254,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
                 }
             } catch (SecurityException e) {
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "ليس لديك صلاحية للاتصال بالطابعة", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.no_permission_connect_printer), Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();
@@ -312,16 +312,16 @@ public class QRCodePrintActivity extends AppCompatActivity {
             }
             
             runOnUiThread(() -> {
-                Toast.makeText(this, "تم طباعة QR Code بنجاح", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.qr_printed_success), Toast.LENGTH_SHORT).show();
             });
             
         } catch (IOException e) {
             runOnUiThread(() -> {
-                Toast.makeText(this, "فشل في طباعة QR Code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.failed_print_qr, e.getMessage()), Toast.LENGTH_SHORT).show();
             });
         } catch (Exception e) {
             runOnUiThread(() -> {
-                Toast.makeText(this, "خطأ في الطباعة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.print_error_generic, e.getMessage()), Toast.LENGTH_SHORT).show();
             });
         }
     }
@@ -357,7 +357,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
     private void shareQRCode() {
         try {
             if (qrBitmap == null) {
-                Toast.makeText(this, "QR Code غير متوفر", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.qr_not_available), Toast.LENGTH_SHORT).show();
                 return;
             }
             
@@ -378,7 +378,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
             
             // التحقق من وجود الملف
             if (!file.exists()) {
-                Toast.makeText(this, "فشل في حفظ QR Code", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.failed_save_qr), Toast.LENGTH_SHORT).show();
                 return;
             }
             
@@ -393,18 +393,19 @@ public class QRCodePrintActivity extends AppCompatActivity {
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("image/png");
                 shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "QR Code للعميل: " + customerName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, 
-                    "QR Code للعميل: " + (customerName != null ? customerName : "غير محدد") + "\n" +
-                    "الهاتف: " + (customerPhone != null ? customerPhone : "غير محدد") + "\n" +
-                    "إجمالي الدين: " + String.format("%.2f دج", customerDebt));
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.customer_qr_subject, customerName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT,
+                    getString(R.string.customer_qr_share_text,
+                        (customerName != null ? customerName : getString(R.string.not_specified)),
+                        (customerPhone != null ? customerPhone : getString(R.string.not_specified)),
+                        String.format("%.2f دج", customerDebt)));
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 
                 // التحقق من وجود تطبيقات للمشاركة
                 if (shareIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(Intent.createChooser(shareIntent, "مشاركة QR Code"));
+                    startActivity(Intent.createChooser(shareIntent, getString(R.string.share_qr_code)));
                 } else {
-                    Toast.makeText(this, "لا توجد تطبيقات للمشاركة", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.no_apps_to_share), Toast.LENGTH_SHORT).show();
                 }
                 
             } catch (Exception fileProviderException) {
@@ -414,7 +415,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
             
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "فشل في مشاركة QR Code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.failed_share_qr, e.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
     
@@ -434,7 +435,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
             if (allPermissionsGranted) {
                 showPrinterSelection();
             } else {
-                Toast.makeText(this, "يحتاج التطبيق لأذونات البلوتوث للطباعة", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.bluetooth_permissions_required), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -457,13 +458,13 @@ public class QRCodePrintActivity extends AppCompatActivity {
                 "QR Code Data:\n" + qrData);
             
             if (shareIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(Intent.createChooser(shareIntent, "مشاركة معلومات العميل"));
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_customer_info)));
             } else {
-                Toast.makeText(this, "لا توجد تطبيقات للمشاركة", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.no_apps_to_share), Toast.LENGTH_SHORT).show();
             }
             
         } catch (Exception e) {
-            Toast.makeText(this, "فشل في مشاركة معلومات العميل", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.failed_share_customer_info), Toast.LENGTH_SHORT).show();
         }
     }
     

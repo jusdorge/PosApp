@@ -266,7 +266,7 @@ public class UserSession {
                     User defaultAdmin = new User(
                         "admin",
                         "admin@posapp.com",
-                        "مدير النظام",
+                        context.getString(R.string.system_admin),
                         UserRole.ADMIN
                     );
                     
@@ -331,11 +331,11 @@ public class UserSession {
      */
     public String getUserStatusMessage() {
         if (!isLoggedIn()) {
-            return "غير مسجل دخول";
+            return context.getString(R.string.not_logged_in);
         }
         
         if (isGuestUser()) {
-            return "حساب ضيف مؤقت (صلاحيات محدودة)";
+            return context.getString(R.string.guest_account_limited);
         }
         
         return currentUser.getRole().getDisplayName();

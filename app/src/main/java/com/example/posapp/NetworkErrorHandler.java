@@ -20,7 +20,7 @@ public class NetworkErrorHandler {
     public static void handleFirestoreError(Context context, Exception exception, String operation) {
         if (context == null) return;
         
-        String userMessage = "حدث خطأ غير متوقع";
+        String userMessage = context.getString(R.string.unexpected_error);
         boolean showRetryOption = true;
         
         if (exception instanceof FirebaseFirestoreException) {
@@ -28,40 +28,40 @@ public class NetworkErrorHandler {
             
             switch (firestoreException.getCode()) {
                 case PERMISSION_DENIED:
-                    userMessage = "ليس لديك صلاحية للوصول لهذه البيانات";
+                    userMessage = context.getString(R.string.no_permission_access_data);
                     showRetryOption = false;
                     break;
                 case UNAVAILABLE:
-                    userMessage = "الخدمة غير متاحة حالياً. يرجى المحاولة لاحقاً";
+                    userMessage = context.getString(R.string.service_unavailable_try_later);
                     break;
                 case DEADLINE_EXCEEDED:
-                    userMessage = "انتهت مهلة الاتصال. تحقق من سرعة الإنترنت";
+                    userMessage = context.getString(R.string.deadline_exceeded_check_internet);
                     break;
                 case UNAUTHENTICATED:
-                    userMessage = "انتهت صلاحية تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى";
+                    userMessage = context.getString(R.string.session_expired_login_again);
                     showRetryOption = false;
                     break;
                 case NOT_FOUND:
-                    userMessage = "البيانات المطلوبة غير موجودة";
+                    userMessage = context.getString(R.string.data_not_found);
                     showRetryOption = false;
                     break;
                 case ALREADY_EXISTS:
-                    userMessage = "البيانات موجودة مسبقاً";
+                    userMessage = context.getString(R.string.data_already_exists);
                     showRetryOption = false;
                     break;
                 case RESOURCE_EXHAUSTED:
-                    userMessage = "تم تجاوز الحد المسموح. يرجى المحاولة لاحقاً";
+                    userMessage = context.getString(R.string.resource_exhausted_try_later);
                     break;
                 default:
                     if (!isNetworkAvailable(context)) {
-                        userMessage = "لا يوجد اتصال بالإنترنت. تحقق من شبكة WiFi أو بيانات الهاتف";
+                        userMessage = context.getString(R.string.no_internet_check_connection);
                     } else {
-                        userMessage = "خطأ في الخدمة: " + operation;
+                        userMessage = context.getString(R.string.service_error_with_operation, operation);
                     }
                     break;
             }
         } else if (exception instanceof FirebaseNetworkException) {
-            userMessage = "خطأ في الشبكة. تحقق من اتصال الإنترنت";
+            userMessage = context.getString(R.string.network_error_check_connection);
         } else if (exception instanceof FirebaseAuthException) {
             FirebaseAuthException authException = (FirebaseAuthException) exception;
             userMessage = getAuthErrorMessage(authException.getErrorCode());
@@ -133,13 +133,13 @@ public class NetworkErrorHandler {
         if (activity == null || activity.isFinishing()) return;
         
         new android.app.AlertDialog.Builder(activity)
-            .setTitle("خطأ في " + operation)
-            .setMessage(message + "\n\nهل تريد إعادة المحاولة؟")
-            .setPositiveButton("إعادة المحاولة", (dialog, which) -> {
+            .setTitle(activity.getString(R.string.error_in_operation, operation))
+            .setMessage(activity.getString(R.string.retry_question_with_message, message))
+            .setPositiveButton(activity.getString(R.string.retry), (dialog, which) -> {
                 // يمكن للأنشطة تنفيذ منطق إعادة المحاولة الخاص بها
-                Toast.makeText(activity, "يرجى إعادة تنفيذ العملية", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.please_retry_operation), Toast.LENGTH_SHORT).show();
             })
-            .setNegativeButton("إلغاء", null)
+            .setNegativeButton(activity.getString(R.string.cancel), null)
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show();
     }
@@ -150,13 +150,13 @@ public class NetworkErrorHandler {
     public static void handleDataError(Context context, String dataType) {
         if (context == null) return;
         
-        String message = "خطأ في البيانات: " + dataType + " غير موجود أو تالف";
+        String message = context.getString(R.string.data_error_missing_or_corrupt, dataType);
         
         if (context instanceof android.app.Activity) {
             new android.app.AlertDialog.Builder((android.app.Activity) context)
-                .setTitle("خطأ في البيانات")
-                .setMessage(message + "\n\nيرجى الاتصال بالدعم الفني إذا استمرت المشكلة.")
-                .setPositiveButton("موافق", null)
+                .setTitle(context.getString(R.string.data_error_title))
+                .setMessage(context.getString(R.string.data_error_message_with_support, message))
+                .setPositiveButton(context.getString(R.string.ok), null)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .show();
         } else {
@@ -172,12 +172,12 @@ public class NetworkErrorHandler {
     public static void handleSyncError(Context context, String syncOperation, Exception exception) {
         if (context == null) return;
         
-        String message = "فشل في مزامنة " + syncOperation;
+        String message = context.getString(R.string.sync_failed_for_operation, syncOperation);
         
         if (!isNetworkAvailable(context)) {
-            message += " - لا يوجد اتصال بالإنترنت";
+            message += " - " + context.getString(R.string.no_internet_suffix);
         } else {
-            message += " - خطأ في الخادم";
+            message += " - " + context.getString(R.string.server_error_suffix);
         }
         
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();

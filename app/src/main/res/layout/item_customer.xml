@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/debt_background"
                 android:padding="6dp"
-                android:text="250.00 دج"
+                android:text="@string/customer_debt_label"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
                 android:textStyle="bold" />

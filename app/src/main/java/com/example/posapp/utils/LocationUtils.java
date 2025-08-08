@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import java.util.Locale;
 
 import com.example.posapp.model.Customer;
+import com.example.posapp.R;
 
 public class LocationUtils {
     
@@ -75,13 +76,13 @@ public class LocationUtils {
      */
     public static void openNavigationToCustomer(Context context, Customer customer) {
         if (customer == null) {
-            Toast.makeText(context, "بيانات العميل غير متوفرة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.customer_data_unavailable), Toast.LENGTH_SHORT).show();
             return;
         }
         
         // التحقق من وجود موقع للعميل
         if (customer.getLatitude() == 0.0 && customer.getLongitude() == 0.0) {
-            Toast.makeText(context, "موقع العميل غير محدد في النظام", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getString(R.string.customer_location_not_set_system), Toast.LENGTH_LONG).show();
             return;
         }
         
@@ -102,7 +103,7 @@ public class LocationUtils {
         Customer tempCustomer = new Customer();
         tempCustomer.setLatitude(latitude);
         tempCustomer.setLongitude(longitude);
-        tempCustomer.setName(locationName != null ? locationName : "الموقع");
+        tempCustomer.setName(locationName != null ? locationName : context.getString(R.string.location_label));
         
         openMapsWithMultipleFallbacks(context, tempCustomer);
     }
@@ -112,7 +113,7 @@ public class LocationUtils {
      */
     public static void openMapsWithMultipleFallbacks(Context context, Customer customer) {
         if (customer == null) {
-            Toast.makeText(context, "بيانات العميل غير متوفرة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.customer_data_unavailable), Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -121,11 +122,11 @@ public class LocationUtils {
         String name = customer.getName();
         
         if (lat == 0.0 && lng == 0.0) {
-            Toast.makeText(context, "موقع العميل غير محدد في النظام", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getString(R.string.customer_location_not_set_system), Toast.LENGTH_LONG).show();
             return;
         }
         
-        Toast.makeText(context, "جاري فتح الخرائط...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.opening_maps), Toast.LENGTH_SHORT).show();
         
         // المحاولة الأولى: Google Maps Navigation
         if (tryGoogleMapsNavigation(context, lat, lng, name)) return;
@@ -164,7 +165,7 @@ public class LocationUtils {
             intent.setData(Uri.parse(uri));
             
             context.startActivity(intent);
-            Toast.makeText(context, "فتح " + locationName, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.open_location, locationName), Toast.LENGTH_SHORT).show();
             
         } catch (Exception e) {
             // إذا فشل، جرب المتصفح
@@ -173,9 +174,9 @@ public class LocationUtils {
                     "https://www.google.com/maps/search/?api=1&query=%f,%f", latitude, longitude);
                 Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
                 context.startActivity(webIntent);
-                Toast.makeText(context, "فتح " + locationName + " في المتصفح", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.open_location_in_browser, locationName), Toast.LENGTH_SHORT).show();
             } catch (Exception ex) {
-                Toast.makeText(context, "لا يمكن فتح الخرائط", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.cannot_open_maps), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -187,7 +188,7 @@ public class LocationUtils {
             intent.setPackage("com.google.android.apps.maps");
             
             context.startActivity(intent);
-            Toast.makeText(context, "فتح المسار إلى " + name, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.open_route_to_name, name), Toast.LENGTH_SHORT).show();
             return true;
         } catch (Exception e) {
             // فشل في فتح Google Maps Navigation
@@ -203,7 +204,7 @@ public class LocationUtils {
             intent.setPackage("com.google.android.apps.maps");
             
             context.startActivity(intent);
-            Toast.makeText(context, "فتح موقع " + name, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.open_location, name), Toast.LENGTH_SHORT).show();
             return true;
         } catch (Exception e) {
             // فشل في فتح Google Maps العادي
@@ -218,7 +219,7 @@ public class LocationUtils {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
             
             context.startActivity(intent);
-            Toast.makeText(context, "فتح موقع " + name + " في تطبيق الخرائط", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.open_location_in_maps_app, name), Toast.LENGTH_SHORT).show();
             return true;
         } catch (Exception e) {
             // فشل في فتح أي تطبيق خرائط
@@ -241,7 +242,7 @@ public class LocationUtils {
                 webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 
                 context.startActivity(webIntent);
-                Toast.makeText(context, "فتح موقع " + name + " في المتصفح", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.open_location_in_browser, name), Toast.LENGTH_SHORT).show();
                 return; // نجح الفتح، اخرج من الدالة
                 
             } catch (Exception e) {
@@ -251,7 +252,7 @@ public class LocationUtils {
         }
         
         // إذا فشلت كل المحاولات
-        Toast.makeText(context, "لم نتمكن من فتح الخرائط. تحقق من اتصالك بالإنترنت", Toast.LENGTH_LONG).show();
+        Toast.makeText(context, context.getString(R.string.could_not_open_maps_check_internet), Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -293,11 +294,11 @@ public class LocationUtils {
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
             
             // إنشاء Intent Chooser ليظهر للمستخدم كل التطبيقات المتوفرة
-            Intent chooser = Intent.createChooser(mapIntent, "اختر تطبيق الخرائط");
+            Intent chooser = Intent.createChooser(mapIntent, context.getString(R.string.choose_maps_app));
             
             if (chooser.resolveActivity(context.getPackageManager()) != null) {
                 context.startActivity(chooser);
-                Toast.makeText(context, "اختر التطبيق المناسب لفتح " + locationName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.choose_app_to_open_location, locationName), Toast.LENGTH_SHORT).show();
             } else {
                 // إذا فشل حتى الـ Chooser، جرب المتصفح مباشرة
                 openDirectInBrowser(context, latitude, longitude, locationName);
@@ -316,9 +317,9 @@ public class LocationUtils {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(browserIntent);  
-            Toast.makeText(context, "فتح " + locationName + " في المتصفح", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.open_location_in_browser, locationName), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(context, "خطأ: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getString(R.string.error_with_message, e.getMessage()), Toast.LENGTH_LONG).show();
         }
     }
     
@@ -328,11 +329,11 @@ public class LocationUtils {
     public static void testMapsOpening(Context context) {
         // إنشاء عميل تجريبي للاختبار
         Customer testCustomer = new Customer();
-        testCustomer.setName("عميل تجريبي");
+        testCustomer.setName(context.getString(R.string.test_customer_name));
         testCustomer.setLatitude(36.7538); // الجزائر العاصمة
         testCustomer.setLongitude(3.0588);
         
-        Toast.makeText(context, "اختبار فتح الخرائط...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.test_opening_maps), Toast.LENGTH_SHORT).show();
         
         // جرب الطريقة الأكثر ضماناً
         openLocationWithChooser(context, testCustomer.getLatitude(), testCustomer.getLongitude(), testCustomer.getName());

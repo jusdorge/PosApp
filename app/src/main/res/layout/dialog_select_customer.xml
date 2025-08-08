@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="اختيار عميل للفاتورة"
+        android:text="@string/select_customer_for_invoice"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/colorPrimary"
@@ -24,7 +24,7 @@
             android:id="@+id/searchEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="البحث بالاسم أو رقم الهاتف"
+            android:hint="@string/search_customer_by_name_or_phone"
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="إضافة عميل جديد"
+            android:text="@string/add_new_customer"
             android:textColor="@color/colorWhite"
             android:backgroundTint="@color/colorAccent" />
 
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="إلغاء"
+            android:text="@string/cancel"
             android:textColor="@color/colorWhite"
             android:backgroundTint="@color/colorAccent" />
     </LinearLayout>

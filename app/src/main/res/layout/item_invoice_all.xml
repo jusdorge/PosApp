@@ -63,7 +63,7 @@
                 android:id="@+id/tvItemsCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="5 عناصر"
+                android:text="@string/counter_items_count"
                 android:textSize="12sp"
                 android:textColor="@color/colorSecondaryText"
                 android:background="@color/colorBackground"

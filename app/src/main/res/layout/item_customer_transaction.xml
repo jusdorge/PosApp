@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/debt_background"
             android:padding="8dp"
-            android:text="100.00 دج"
+            android:text="@string/revenue_label"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold" />

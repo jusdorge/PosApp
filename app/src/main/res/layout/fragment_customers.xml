@@ -35,7 +35,7 @@
             android:background="@drawable/search_background"
             android:drawableStart="@android:drawable/ic_menu_search"
             android:drawablePadding="8dp"
-            android:hint="بحث عن زبون..."
+            android:hint="@string/search_customer_hint"
             android:padding="8dp"
             android:textSize="16sp" />
 

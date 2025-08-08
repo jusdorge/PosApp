@@ -103,7 +103,7 @@
                 android:id="@+id/invoiceTotalTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="150.00 دج"
+                android:text="@string/total_label"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -123,7 +123,7 @@
                 android:id="@+id/invoiceItemsCountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="5 منتجات"
+                android:text="@string/counter_items_count"
                 android:textSize="14sp" />
         </LinearLayout>
 

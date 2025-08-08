@@ -45,7 +45,7 @@
             android:layout_gravity="center_vertical"
             android:background="@drawable/debt_background"
             android:padding="4dp"
-            android:text="250.00 دج"
+            android:text="@string/customer_debt_label"
             android:textColor="@android:color/white"
             android:textSize="14sp"
             android:visibility="gone" />

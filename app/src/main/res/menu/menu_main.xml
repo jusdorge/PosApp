@@ -8,48 +8,48 @@
     <item
         android:id="@+id/action_add_customer"
         android:icon="@drawable/ic_customers"
-        android:title="اختيار عميل"
+        android:title="@string/select_customer"
         app:showAsAction="always" />
     
     <item
         android:id="@+id/action_home"
         android:icon="@drawable/ic_counter"
-        android:title="الرئيسية"
+        android:title="@string/home"
         app:showAsAction="never" />
     
     <item
         android:id="@+id/action_manage_customers"
         android:icon="@drawable/ic_customers"
-        android:title="إدارة الزبائن"
+        android:title="@string/customers_management"
         app:showAsAction="never" />
     
     <item
         android:id="@+id/action_manage_products"
         android:icon="@drawable/ic_products"
-        android:title="إدارة المنتجات"
+        android:title="@string/products_management"
         app:showAsAction="never" />
     
     <item
         android:id="@+id/action_inventory_management"
         android:icon="@drawable/ic_items"
-        android:title="إدارة المخزون"
+        android:title="@string/inventory_management"
         app:showAsAction="never" />
     
     <item
         android:id="@+id/action_all_invoices"
         android:icon="@android:drawable/ic_menu_agenda"
-        android:title="جميع الفواتير"
+        android:title="@string/all_invoices"
         app:showAsAction="never" />
     
     <item
         android:id="@+id/action_select_customer_location"
         android:icon="@drawable/ic_menu_add"
-        android:title="مواقع العملاء"
+        android:title="@string/customer_locations"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_logout"
         android:icon="@drawable/ic_logout"
-        android:title="تسجيل الخروج"
+        android:title="@string/logout"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_settings"

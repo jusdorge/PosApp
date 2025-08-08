@@ -185,9 +185,9 @@ public class UserManagementActivity extends AppCompatActivity {
         roleSpinner.setAdapter(roleAdapter);
         
         new AlertDialog.Builder(this)
-                .setTitle("إضافة مستخدم جديد")
+                .setTitle(getString(R.string.add_new_user))
                 .setView(dialogView)
-                .setPositiveButton("إضافة", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.add), (dialog, which) -> {
                     String username = usernameEdit.getText().toString().trim();
                     String email = emailEdit.getText().toString().trim();
                     String fullName = fullNameEdit.getText().toString().trim();
@@ -198,7 +198,7 @@ public class UserManagementActivity extends AppCompatActivity {
                         createUser(username, email, fullName, phone, selectedRole);
                     }
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
     
@@ -308,9 +308,9 @@ public class UserManagementActivity extends AppCompatActivity {
         phoneEdit.setText(user.getPhone());
         
         new AlertDialog.Builder(this)
-                .setTitle("تعديل " + user.getFullName())
+                .setTitle(getString(R.string.edit_user_title, user.getFullName()))
                 .setView(dialogView)
-                .setPositiveButton("حفظ", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.save), (dialog, which) -> {
                     String newFullName = fullNameEdit.getText().toString().trim();
                     String newPhone = phoneEdit.getText().toString().trim();
                     
@@ -320,7 +320,7 @@ public class UserManagementActivity extends AppCompatActivity {
                         updateUser(user);
                     }
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
     
@@ -357,30 +357,30 @@ public class UserManagementActivity extends AppCompatActivity {
     private void showDeleteUserDialog(User user) {
         // منع حذف المدراء المصرح لهم
         if (user.getRole() == UserRole.ADMIN && isAuthorizedAdmin(user.getEmail())) {
-            Toast.makeText(this, "❌ غير مسموح: لا يمكن حذف المدير الأساسي", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.not_allowed_delete_primary_admin), Toast.LENGTH_LONG).show();
             Log.w("UserManagement", "⚠️ SECURITY: Attempted to delete authorized admin: " + user.getEmail());
             return;
         }
         
         new AlertDialog.Builder(this)
-                .setTitle("تأكيد الحذف")
-                .setMessage("هل أنت متأكد من حذف المستخدم: " + user.getFullName() + "؟")
-                .setPositiveButton("حذف", (dialog, which) -> {
+                .setTitle(getString(R.string.confirm_delete))
+                .setMessage(getString(R.string.confirm_delete_user, user.getFullName()))
+                .setPositiveButton(getString(R.string.delete), (dialog, which) -> {
                     db.collection("users").document(user.getId())
                             .delete()
                             .addOnSuccessListener(aVoid -> {
                                 usersList.remove(user);
                                 adapter.notifyDataSetChanged();
-                                Toast.makeText(this, "تم حذف المستخدم", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, getString(R.string.user_deleted), Toast.LENGTH_SHORT).show();
                                 Log.i("UserManagement", "User deleted: " + user.getEmail());
                             })
                             .addOnFailureListener(e -> {
                                 Log.e(TAG, "Error deleting user", e);
-                                Toast.makeText(this, "خطأ في حذف المستخدم: " + e.getMessage(), 
-                                        Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getString(R.string.error_deleting_user, e.getMessage()), 
+                                    Toast.LENGTH_LONG).show();
                             });
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
     
@@ -401,7 +401,7 @@ public class UserManagementActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error updating user", e);
-                    Toast.makeText(this, "خطأ في تحديث المستخدم: " + e.getMessage(), 
+                    Toast.makeText(this, getString(R.string.error_updating_user, e.getMessage()),
                             Toast.LENGTH_LONG).show();
                 });
     }
@@ -423,16 +423,16 @@ public class UserManagementActivity extends AppCompatActivity {
                             .addOnSuccessListener(aVoid -> {
                                 usersList.remove(user);
                                 adapter.notifyDataSetChanged();
-                                Toast.makeText(this, "تم حذف المستخدم", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, getString(R.string.user_deleted), Toast.LENGTH_SHORT).show();
                                 Log.i("UserManagement", "User deleted: " + user.getEmail());
                             })
                             .addOnFailureListener(e -> {
                                 Log.e(TAG, "Error deleting user", e);
-                                Toast.makeText(this, "خطأ في حذف المستخدم: " + e.getMessage(), 
+                                Toast.makeText(this, getString(R.string.error_deleting_user, e.getMessage()), 
                                         Toast.LENGTH_LONG).show();
                             });
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
     
@@ -546,20 +546,20 @@ public class UserManagementActivity extends AppCompatActivity {
      */
     private void showLoginTestDialog() {
         android.widget.EditText emailInput = new android.widget.EditText(this);
-        emailInput.setHint("أدخل البريد الإلكتروني للاختبار");
+        emailInput.setHint(getString(R.string.enter_email_for_test));
         emailInput.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         
         new AlertDialog.Builder(this)
-                .setTitle("اختبار تسجيل الدخول")
-                .setMessage("أدخل البريد الإلكتروني لاختبار إمكانية تسجيل الدخول:")
+                .setTitle(getString(R.string.login_test))
+                .setMessage(getString(R.string.enter_email_to_test_login))
                 .setView(emailInput)
-                .setPositiveButton("اختبار", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.test_action), (dialog, which) -> {
                     String email = emailInput.getText().toString().trim();
                     if (!email.isEmpty()) {
                         testUserLogin(email);
                     }
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
     
@@ -694,7 +694,7 @@ public class UserManagementActivity extends AppCompatActivity {
             
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(this, "المستخدم لا يحتاج إصلاح", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.user_no_fix_needed), Toast.LENGTH_SHORT).show();
         }
     }
     
@@ -754,7 +754,7 @@ public class UserManagementActivity extends AppCompatActivity {
                             
                             // 4. إصلاح الاسم المفقود
                             if (user.getFullName() == null || user.getFullName().trim().isEmpty()) {
-                                String emailName = user.getEmail() != null ? user.getEmail().split("@")[0] : "مستخدم";
+                                String emailName = user.getEmail() != null ? user.getEmail().split("@")[0] : getString(R.string.user);
                                 user.setFullName(emailName);
                                 needsUpdate = true;
                                 fixLog.append("تم إضافة اسم افتراضي، ");
@@ -862,7 +862,7 @@ public class UserManagementActivity extends AppCompatActivity {
         
         // استخراج البيانات الأساسية بأمان
         user.setEmail(getStringValue(data, "email", "unknown@example.com"));
-        user.setFullName(getStringValue(data, "fullName", "مستخدم"));
+        user.setFullName(getStringValue(data, "fullName", getString(R.string.user)));
         user.setUsername(getStringValue(data, "username", user.getEmail().split("@")[0]));
         user.setPhone(getStringValue(data, "phone", ""));
         user.setActive(getBooleanValue(data, "isActive", true));

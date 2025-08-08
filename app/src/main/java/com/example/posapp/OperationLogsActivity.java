@@ -59,7 +59,7 @@ public class OperationLogsActivity extends AppCompatActivity implements Operatio
         
         // إعداد شريط العنوان
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("أرشيف العمليات");
+            getSupportActionBar().setTitle(getString(R.string.operation_logs_title));
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         
@@ -133,22 +133,22 @@ public class OperationLogsActivity extends AppCompatActivity implements Operatio
                 })
                 .exceptionally(throwable -> {
                     runOnUiThread(() -> {
-                        android.util.Log.e("OperationLogsActivity", "فشل في تحميل أرشيف العمليات", throwable);
+                        android.util.Log.e("OperationLogsActivity", getString(R.string.failed_load_operation_logs), throwable);
                         
                         // تحسين رسالة الخطأ للمستخدم
                         String errorMessage;
                         if (throwable.getMessage() != null) {
                             if (throwable.getMessage().contains("PERMISSION_DENIED")) {
-                                errorMessage = "ليس لديك صلاحية لعرض أرشيف العمليات";
+                                errorMessage = getString(R.string.no_permission_view_operation_logs);
                             } else if (throwable.getMessage().contains("network")) {
-                                errorMessage = "تحقق من اتصال الإنترنت وحاول مرة أخرى";
+                                errorMessage = getString(R.string.check_internet_try_again);
                             } else if (throwable.getMessage().contains("index")) {
-                                errorMessage = "جارٍ إعداد قاعدة البيانات - يرجى المحاولة بعد قليل";
+                                errorMessage = getString(R.string.database_being_prepared_try_later);
                             } else {
-                                errorMessage = "فشل في تحميل أرشيف العمليات: " + throwable.getMessage();
+                                errorMessage = getString(R.string.failed_load_operation_logs_with_error, throwable.getMessage());
                             }
                         } else {
-                            errorMessage = "فشل في تحميل أرشيف العمليات - يرجى المحاولة مرة أخرى";
+                            errorMessage = getString(R.string.failed_load_operation_logs_try_again);
                         }
                         
                         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
@@ -260,9 +260,7 @@ public class OperationLogsActivity extends AppCompatActivity implements Operatio
             }
         }
         
-        String summaryText = String.format(Locale.getDefault(),
-                "إجمالي: %d • حساسة: %d • اليوم: %d • المعروضة: %d",
-                totalLogs, criticalLogs, todayLogs, filteredOperationLogs.size());
+        String summaryText = getString(R.string.operation_logs_summary_format, totalLogs, criticalLogs, todayLogs, filteredOperationLogs.size());
         
         summaryTextView.setText(summaryText);
     }
@@ -279,33 +277,33 @@ public class OperationLogsActivity extends AppCompatActivity implements Operatio
     
     private void exportLogs() {
         // TODO: تطبيق تصدير السجلات
-        Toast.makeText(this, "🚧 ميزة التصدير قيد التطوير", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.export_feature_in_development), Toast.LENGTH_SHORT).show();
     }
     
     private void showCleanOldLogsDialog() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("تنظيف السجلات القديمة")
-                .setMessage("سيتم حذف السجلات الأقدم من 90 يوم.\n\nهل أنت متأكد؟")
+                .setTitle(getString(R.string.clean_old_logs_title))
+                .setMessage(getString(R.string.clean_old_logs_message))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton("تنظيف", (dialog, which) -> cleanOldLogs())
-                .setNegativeButton("إلغاء", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(getString(R.string.clean_label), (dialog, which) -> cleanOldLogs())
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss())
                 .show();
     }
     
     private void cleanOldLogs() {
-        Toast.makeText(this, "جاري تنظيف السجلات القديمة...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.cleaning_old_logs), Toast.LENGTH_SHORT).show();
         
         operationLogService.cleanOldLogs()
                 .thenAccept(deletedCount -> {
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "✅ تم حذف " + deletedCount + " سجل قديم", 
+                        Toast.makeText(this, getString(R.string.deleted_old_logs_success, deletedCount),
                                 Toast.LENGTH_LONG).show();
                         loadOperationLogs(); // إعادة تحميل البيانات
                     });
                 })
                 .exceptionally(throwable -> {
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "❌ فشل في تنظيف السجلات: " + throwable.getMessage(), 
+                        Toast.makeText(this, getString(R.string.failed_clean_old_logs, throwable.getMessage()),
                                 Toast.LENGTH_LONG).show();
                     });
                     return null;
@@ -322,31 +320,31 @@ public class OperationLogsActivity extends AppCompatActivity implements Operatio
         SimpleDateFormat fullDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
         
         StringBuilder details = new StringBuilder();
-        details.append("🔍 تفاصيل العملية\n\n");
-        details.append("📋 النوع: ").append(operationLog.getOperationType().getArabicName()).append("\n");
-        details.append("📦 الكائن: ").append(operationLog.getEntityType().getArabicName()).append("\n");
-        details.append("🆔 المعرف: ").append(operationLog.getEntityId()).append("\n");
-        details.append("👤 المستخدم: ").append(operationLog.getUserName()).append("\n");
+        details.append(getString(R.string.operation_details_header)).append("\n\n");
+        details.append(getString(R.string.operation_type_label)).append(operationLog.getOperationType().getArabicName()).append("\n");
+        details.append(getString(R.string.entity_label)).append(operationLog.getEntityType().getArabicName()).append("\n");
+        details.append(getString(R.string.id_label)).append(operationLog.getEntityId()).append("\n");
+        details.append(getString(R.string.user_label)).append(operationLog.getUserName()).append("\n");
         
         if (operationLog.getTimestamp() != null) {
-            details.append("🕐 التوقيت: ").append(fullDateFormat.format(operationLog.getTimestamp().toDate())).append("\n");
+            details.append(getString(R.string.timestamp_label)).append(fullDateFormat.format(operationLog.getTimestamp().toDate())).append("\n");
         }
         
-        details.append("📝 الوصف: ").append(operationLog.getDescription()).append("\n");
+        details.append(getString(R.string.description_label)).append(operationLog.getDescription()).append("\n");
         
         if (operationLog.getDeviceInfo() != null) {
-            details.append("📱 الجهاز: ").append(operationLog.getDeviceInfo()).append("\n");
+            details.append(getString(R.string.device_label)).append(operationLog.getDeviceInfo()).append("\n");
         }
         
         if (operationLog.getAppVersion() != null) {
-            details.append("📦 الإصدار: ").append(operationLog.getAppVersion()).append("\n");
+            details.append(getString(R.string.app_version_label)).append(operationLog.getAppVersion()).append("\n");
         }
         
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("تفاصيل العملية")
+                .setTitle(getString(R.string.operation_details_title))
                 .setMessage(details.toString())
                 .setIcon(android.R.drawable.ic_dialog_info)
-                .setPositiveButton("إغلاق", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(getString(R.string.close), (dialog, which) -> dialog.dismiss())
                 .show();
     }
     

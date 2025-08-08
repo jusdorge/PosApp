@@ -24,7 +24,7 @@
             android:background="@color/colorPrimary"
             android:gravity="center"
             android:padding="0dp"
-            android:text="الفاتورة الحالية"
+            android:text="@string/current_invoice"
             android:textColor="@color/colorWhite"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -43,7 +43,7 @@
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:gravity="left"
-            android:text="الزبون:مجهول"
+            android:text="@string/customer_label"
             android:textColor="@color/colorWhite"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -95,7 +95,7 @@
                 android:id="@+id/totalPriceTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" 0.00 دج"
+                android:text="@string/total_label"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -103,7 +103,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="المجموع:"
+                android:text="@string/total_label"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -115,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@color/colorPrimary"
-            android:text="الدفع"
+            android:text="@string/checkout"
             android:textColor="@color/colorWhite" />
     </LinearLayout>
 </LinearLayout> 

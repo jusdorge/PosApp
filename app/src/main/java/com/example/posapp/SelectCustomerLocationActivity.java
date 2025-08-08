@@ -98,7 +98,7 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
             selectedMarker = new Marker(mapView);
             selectedMarker.setPosition(defaultGeoPoint);
             selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            selectedMarker.setTitle("موقع العميل");
+            selectedMarker.setTitle(getString(R.string.map_customer_location_title));
             mapView.getOverlays().add(selectedMarker);
             selectedGeoPoint = defaultGeoPoint;
         }
@@ -117,7 +117,7 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
                     selectedMarker = new Marker(mapView);
                     selectedMarker.setPosition(p);
                     selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    selectedMarker.setTitle("موقع العميل");
+                    selectedMarker.setTitle(getString(R.string.map_customer_location_title));
                     mapView.getOverlays().add(selectedMarker);
                     mapView.invalidate();
                     
@@ -159,7 +159,7 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
                     setResult(RESULT_OK, resultIntent);
                     finish();
                 } else {
-                    Toast.makeText(SelectCustomerLocationActivity.this, "يرجى تحديد الموقع على الخريطة", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SelectCustomerLocationActivity.this, getString(R.string.please_select_location_on_map), Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -190,20 +190,20 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
                     if (location != null && isLocationFresh(location)) {
                         // عرض آخر موقع معروف فوراً إذا كان حديث
                         updateLocationOnMap(location);
-                        Toast.makeText(this, "⚡ تم العثور على موقع حديث، جاري تحسين الدقة...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.found_recent_location_improving_accuracy), Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "🔍 جاري تحديد الموقع الحالي...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.determining_current_location), Toast.LENGTH_SHORT).show();
                     }
                     
                     // بدء طلب موقع محدث للحصول على أعلى دقة
                     requestNewLocation();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "🔍 جاري تحديد الموقع الحالي...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.determining_current_location), Toast.LENGTH_SHORT).show();
                     requestNewLocation();
                 });
         } catch (SecurityException e) {
-            Toast.makeText(this, "❌ خطأ في الوصول لخدمات الموقع", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.location_services_access_error), Toast.LENGTH_SHORT).show();
             resetLocationButton();
         }
     }
@@ -233,15 +233,15 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
                 public void run() {
                     stopLocationUpdates();
                     resetLocationButton();
-                    Toast.makeText(SelectCustomerLocationActivity.this, 
-                        "⏰ انتهت مهلة البحث عن الموقع. يرجى المحاولة مرة أخرى.", 
+                    Toast.makeText(SelectCustomerLocationActivity.this,
+                        getString(R.string.location_search_timeout),
                         Toast.LENGTH_LONG).show();
                 }
             };
             locationHandler.postDelayed(locationTimeout, 12000); // 12 ثانية
 
         } catch (SecurityException e) {
-            Toast.makeText(this, "❌ خطأ في الوصول لخدمات الموقع", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.location_services_access_error), Toast.LENGTH_SHORT).show();
             resetLocationButton();
         }
     }
@@ -299,7 +299,7 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
         
         // عرض معلومات الدقة
         float accuracy = location.getAccuracy();
-        selectedMarker.setTitle("موقعي الحالي (دقة: " + Math.round(accuracy) + "م)");
+        selectedMarker.setTitle(getString(R.string.current_location_title_with_accuracy, Math.round(accuracy)));
         mapView.getOverlays().add(selectedMarker);
         
         // تحديث الموقع المحدد
@@ -316,7 +316,7 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
         stopLocationUpdates();
         resetLocationButton();
         
-        Toast.makeText(this, "✅ تم تحديد موقعك الحالي (دقة: " + Math.round(accuracy) + " متر)", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.current_location_found_accuracy_meters, Math.round(accuracy)), Toast.LENGTH_SHORT).show();
     }
     
     // دالة لمعالجة الموقع الجديد من FusedLocationProviderClient
@@ -330,25 +330,23 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
             // إظهار رسالة نجاح مع معلومات الدقة
             String accuracyText;
             if (accuracy <= 10) {
-                accuracyText = "ممتازة";
+                accuracyText = getString(R.string.accuracy_excellent);
             } else if (accuracy <= 20) {
-                accuracyText = "جيدة جداً";
+                accuracyText = getString(R.string.accuracy_very_good);
             } else if (accuracy <= 50) {
-                accuracyText = "جيدة";
+                accuracyText = getString(R.string.accuracy_good);
             } else {
-                accuracyText = "مقبولة";
+                accuracyText = getString(R.string.accuracy_acceptable);
             }
             
-            Toast.makeText(this, "✅ تم تحديد موقعك الحالي - الدقة: " + 
-                Math.round(accuracy) + "م (" + accuracyText + ")", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.current_location_found_accuracy_with_text, Math.round(accuracy), accuracyText), Toast.LENGTH_SHORT).show();
                 
             // إيقاف طلبات الموقع لتوفير البطارية
             stopLocationUpdates();
             resetLocationButton();
         } else {
             // الانتظار للحصول على دقة أفضل
-            Toast.makeText(this, "🔄 جاري تحسين دقة الموقع... (حالياً: " + 
-                Math.round(accuracy) + "م)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.improving_location_accuracy_current, Math.round(accuracy)), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -432,12 +430,12 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
 
     @Override
     public void onProviderEnabled(@NonNull String provider) {
-        Toast.makeText(this, "✅ تم تفعيل خدمة " + provider, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.provider_enabled, provider), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onProviderDisabled(@NonNull String provider) {
-        Toast.makeText(this, "⚠️ تم إيقاف خدمة " + provider, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.provider_disabled, provider), Toast.LENGTH_SHORT).show();
         resetLocationButton();
     }
 

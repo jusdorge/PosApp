@@ -141,7 +141,7 @@ public class QuickInvoiceDialog extends DialogFragment implements InvoiceItemAda
                 productAdapter.updateProducts(productList);
             })
             .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "فشل في تحميل المنتجات: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.failed_load_products, e.getMessage()), Toast.LENGTH_SHORT).show();
             });
     }
     
@@ -190,7 +190,7 @@ public class QuickInvoiceDialog extends DialogFragment implements InvoiceItemAda
         // تحديث العرض
         updateSelectedItems();
         
-        Toast.makeText(getContext(), "✅ تم إضافة " + product.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.added_product_success, product.getName()), Toast.LENGTH_SHORT).show();
     }
     
     private void updateSelectedItems() {
@@ -201,8 +201,8 @@ public class QuickInvoiceDialog extends DialogFragment implements InvoiceItemAda
         }
         
         // تحديث النصوص
-        selectedProductsTextView.setText("المنتجات المختارة: " + selectedItems.size());
-        totalAmountTextView.setText("المجموع: " + CurrencyUtils.formatCurrency(totalAmount));
+        selectedProductsTextView.setText(getString(R.string.selected_products_count, selectedItems.size()));
+        totalAmountTextView.setText(getString(R.string.total_amount_label, CurrencyUtils.formatCurrency(totalAmount)));
         
         // تفعيل/تعطيل زر الإنشاء
         createInvoiceButton.setEnabled(!selectedItems.isEmpty());
@@ -210,7 +210,7 @@ public class QuickInvoiceDialog extends DialogFragment implements InvoiceItemAda
     
     private void createQuickInvoice() {
         if (selectedItems.isEmpty()) {
-            Toast.makeText(getContext(), "الرجاء اختيار منتج واحد على الأقل", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.select_at_least_one_product), Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -232,7 +232,7 @@ public class QuickInvoiceDialog extends DialogFragment implements InvoiceItemAda
         
         // إظهار مؤشر التحميل
         createInvoiceButton.setEnabled(false);
-        createInvoiceButton.setText("جاري الإنشاء...");
+        createInvoiceButton.setText(getString(R.string.creating_invoice));
         
         // إنشاء رقم الفاتورة المخصص
         InvoiceNumberGenerator numberGenerator = new InvoiceNumberGenerator(getContext());
@@ -256,8 +256,8 @@ public class QuickInvoiceDialog extends DialogFragment implements InvoiceItemAda
             })
             .exceptionally(throwable -> {
                 createInvoiceButton.setEnabled(true);
-                createInvoiceButton.setText("إنشاء الفاتورة");
-                Toast.makeText(getContext(), "خطأ في إنشاء رقم الفاتورة: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                createInvoiceButton.setText(getString(R.string.create_invoice));
+                Toast.makeText(getContext(), getString(R.string.error_generating_invoice_number, throwable.getMessage()), Toast.LENGTH_SHORT).show();
                 return null;
             });
     }
@@ -322,7 +322,7 @@ public class QuickInvoiceDialog extends DialogFragment implements InvoiceItemAda
     private void commitBatch(WriteBatch batch) {
         batch.commit()
             .addOnSuccessListener(aVoid -> {
-                Toast.makeText(getContext(), "✅ تم إنشاء الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.invoice_created_success), Toast.LENGTH_SHORT).show();
                 
                 if (onInvoiceCreatedListener != null) {
                     onInvoiceCreatedListener.onInvoiceCreated();
@@ -332,8 +332,8 @@ public class QuickInvoiceDialog extends DialogFragment implements InvoiceItemAda
             })
             .addOnFailureListener(e -> {
                 createInvoiceButton.setEnabled(true);
-                createInvoiceButton.setText("إنشاء الفاتورة");
-                Toast.makeText(getContext(), "فشل في حفظ الفاتورة: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                createInvoiceButton.setText(getString(R.string.create_invoice));
+                Toast.makeText(getContext(), getString(R.string.failed_save_invoice, e.getMessage()), Toast.LENGTH_LONG).show();
             });
     }
 }

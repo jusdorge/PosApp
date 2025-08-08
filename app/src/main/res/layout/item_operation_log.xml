@@ -63,7 +63,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="👤 أحمد محمد"
+                android:text="@string/example_customer_name"
                 android:textSize="12sp"
                 android:textColor="@color/colorTextSecondary"
                 android:drawablePadding="4dp" />
@@ -72,7 +72,7 @@
                 android:id="@+id/entityTypeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📄 فاتورة"
+                android:text="@string/invoice_hash"
                 android:textSize="12sp"
                 android:textColor="@color/colorTextSecondary"
                 android:background="@drawable/search_background"

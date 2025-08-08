@@ -89,7 +89,7 @@ public class CustomerInvoicesAdapter extends RecyclerView.Adapter<CustomerInvoic
             
             // عدد العناصر
             int itemsCount = invoice.getItems() != null ? invoice.getItems().size() : 0;
-            invoiceItemsCountTextView.setText(String.format("%d منتجات", itemsCount));
+            invoiceItemsCountTextView.setText(itemView.getContext().getString(R.string.counter_items_count, itemsCount));
             
             // المبلغ الإجمالي
             invoiceAmountTextView.setText(CurrencyUtils.formatCurrency(invoice.getTotalAmount()));

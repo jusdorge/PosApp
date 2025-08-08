@@ -252,9 +252,7 @@ public class MoreFragment extends Fragment {
             android.content.SharedPreferences prefs = getContext().getSharedPreferences("guest_prefs", android.content.Context.MODE_PRIVATE);
             
             if (!prefs.getBoolean(prefKey, false)) {
-                Toast.makeText(getContext(), 
-                    "أنت تستخدم حساب ضيف مؤقت - صلاحيات محدودة للعرض فقط", 
-                    Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.guest_user_warning), Toast.LENGTH_LONG).show();
                 
                 // تحديد أنه تم عرض التحذير
                 prefs.edit().putBoolean(prefKey, true).apply();
@@ -451,18 +449,17 @@ public class MoreFragment extends Fragment {
     
     private void showShareFileDialog(File file) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("نجح التصدير")
-                .setMessage("تم حفظ الملف في: " + file.getAbsolutePath() + "\n\n" +
-                           getString(R.string.csv_encoding_info) + "\n\nهل تريد مشاركته؟")
-                .setPositiveButton("مشاركة", (dialog, which) -> {
+        builder.setTitle(getString(R.string.export_success_title))
+                .setMessage(getString(R.string.file_saved_path_share_question, file.getAbsolutePath(), getString(R.string.csv_encoding_info)))
+                .setPositiveButton(getString(R.string.share), (dialog, which) -> {
                     csvHelper.shareFile(file);
                 })
-                .setNegativeButton("حسناً", null)
+                .setNegativeButton(getString(R.string.ok), null)
                 .show();
     }
     
     private void createTemplate(String templateType) {
-        Toast.makeText(getContext(), "جاري إنشاء القالب...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.creating_template), Toast.LENGTH_SHORT).show();
         
         csvHelper.createImportTemplate(templateType, new CSVExportImportHelper.ExportListener() {
             @Override
@@ -478,7 +475,7 @@ public class MoreFragment extends Fragment {
             public void onExportFailure(String error) {
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "فشل في إنشاء القالب: " + error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.failed_create_template, error), Toast.LENGTH_LONG).show();
                     });
                 }
             }
@@ -489,14 +486,12 @@ public class MoreFragment extends Fragment {
         String templateName = "customers".equals(templateType) ? "العملاء" : "المنتجات";
         
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("تم إنشاء القالب")
-                .setMessage("تم إنشاء قالب " + templateName + " بنجاح!\n\n" +
-                           getString(R.string.csv_template_info) + "\n\n" +
-                           getString(R.string.csv_encoding_info))
-                .setPositiveButton("مشاركة القالب", (dialog, which) -> {
+        builder.setTitle(getString(R.string.template_created_title))
+                .setMessage(getString(R.string.template_created_message, templateName, getString(R.string.csv_template_info), getString(R.string.csv_encoding_info)))
+                .setPositiveButton(getString(R.string.share_template), (dialog, which) -> {
                     csvHelper.shareFile(file);
                 })
-                .setNegativeButton("حسناً", null)
+                .setNegativeButton(getString(R.string.ok), null)
                 .show();
     }
     
@@ -512,7 +507,7 @@ public class MoreFragment extends Fragment {
         try {
             startActivityForResult(Intent.createChooser(intent, getString(R.string.select_file)), FILE_PICKER_REQUEST_CODE);
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(getContext(), "لم يتم العثور على تطبيق لاختيار الملفات", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.no_file_picker_app_found), Toast.LENGTH_SHORT).show();
         }
     }
     
@@ -785,7 +780,7 @@ public class MoreFragment extends Fragment {
     
     private void loadCustomerById(String customerId) {
         // إظهار مؤشر التحميل
-        Toast.makeText(getContext(), "جاري تحميل بيانات العميل...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.loading_customer_data), Toast.LENGTH_SHORT).show();
         
         db.collection("customers").document(customerId)
                 .get()
@@ -803,16 +798,16 @@ public class MoreFragment extends Fragment {
                                 ((MainActivity) getActivity()).switchToCounterFragment();
                             }
                             
-                            Toast.makeText(getContext(), "تم اختيار العميل: " + customer.getName(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getString(R.string.customer_selected_toast, customer.getName()), Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(getContext(), "خطأ في تحليل بيانات العميل", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getString(R.string.error_parsing_customer_data), Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getContext(), "العميل غير موجود في قاعدة البيانات", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.customer_not_found_database), Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "فشل في تحميل بيانات العميل: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.failed_load_customer_data, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 

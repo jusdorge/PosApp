@@ -60,7 +60,7 @@ public class UserManagementAdapter extends BaseAdapter {
         
         holder.fullNameText.setText(user.getFullName());
         holder.emailText.setText(user.getEmail());
-        holder.roleText.setText(user.getRole() != null ? user.getRole().getDisplayName() : "غير محدد");
+        holder.roleText.setText(user.getRole() != null ? user.getRole().getDisplayName() : context.getString(R.string.not_specified));
         
         // حالة المستخدم
         if (user.isActive()) {

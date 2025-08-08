@@ -224,7 +224,7 @@ public class ReportsFragment extends Fragment {
 
     private void updateSelectedDateDisplay() {
         String dateString = ArabicNumberUtils.formatShortDateWithArabicNumbers(selectedDate.getTime());
-        selectedDateTextView.setText("تقرير ليوم: " + dateString);
+        selectedDateTextView.setText(getString(R.string.report_for_day, dateString));
     }
 
     private void loadReportsData() {
@@ -232,14 +232,14 @@ public class ReportsFragment extends Fragment {
         showLoadingIndicators();
         
         // Set static titles
-        categoryTitleTextView.setText("الفئة الأكثر مبيعاً");
-        receiptsCountTitleTextView.setText("إجمالي عدد الفواتير");
-        taxTitleTextView.setText("الضرائب");
-        discountTitleTextView.setText("الخصومات");
-        avgSalesTitleTextView.setText("متوسط قيمة المبيعات");
-        bestCustomerTitleTextView.setText("أفضل عميل");
-        paymentMethodTitleTextView.setText("طرق الدفع");
-        sellerTitleTextView.setText("البائع");
+        categoryTitleTextView.setText(getString(R.string.most_sold_category_title));
+        receiptsCountTitleTextView.setText(getString(R.string.total_receipts_title));
+        taxTitleTextView.setText(getString(R.string.tax_title));
+        discountTitleTextView.setText(getString(R.string.discounts_title));
+        avgSalesTitleTextView.setText(getString(R.string.avg_sales_title));
+        bestCustomerTitleTextView.setText(getString(R.string.best_customer_title));
+        paymentMethodTitleTextView.setText(getString(R.string.payment_methods_title));
+        sellerTitleTextView.setText(getString(R.string.seller_title));
 
         // مسح البيانات السابقة
         reportData.clear();
@@ -269,17 +269,17 @@ public class ReportsFragment extends Fragment {
         if (shareReportButton != null) shareReportButton.setEnabled(false);
         
         // إظهار رسائل التحميل
-        agrodivValueTextView.setText("جاري التحميل...");
+        agrodivValueTextView.setText(getString(R.string.loading_dots));
         receiptsCountValueTextView.setText("...");
-        avgSalesValueTextView.setText("جاري الحساب...");
-        bestCustomerValueTextView.setText("جاري البحث...");
-        cashValueTextView.setText("💵 جاري الحساب...");
+        avgSalesValueTextView.setText(getString(R.string.calculating_dots));
+        bestCustomerValueTextView.setText(getString(R.string.searching_dots));
+        cashValueTextView.setText(getString(R.string.calculating_cash_prefix));
         if (creditValueTextView != null) {
-            creditValueTextView.setText("📝 جاري الحساب...");
+            creditValueTextView.setText(getString(R.string.calculating_credit_prefix));
         }
-        totalSalesTextView.setText("إجمالي المبيعات: جاري الحساب...");
-        totalProfitTextView.setText("إجمالي الربح: جاري الحساب...");
-        performanceIndicatorTextView.setText("جاري تقييم الأداء...");
+        totalSalesTextView.setText(getString(R.string.total_sales_calculating));
+        totalProfitTextView.setText(getString(R.string.total_profit_calculating));
+        performanceIndicatorTextView.setText(getString(R.string.evaluating_performance));
         
         // إظهار رسائل تحميل النقود المحصلة
         if (cashSalesAmountTextView != null) {
@@ -328,7 +328,7 @@ public class ReportsFragment extends Fragment {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     Map<String, Integer> productCounts = new HashMap<>();
-                    String topProductName = "غير محدد";
+                    String topProductName = getString(R.string.not_specified);
                     int topCount = 0;
 
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
@@ -359,18 +359,18 @@ public class ReportsFragment extends Fragment {
                         }
                     }
 
-                    if (!topProductName.equals("غير محدد")) {
-                        agrodivValueTextView.setText(topProductName + " : " + topCount);
-                        agrodivDescTextView.setText((productCounts.size() - 1) + " منتجات أخرى • اضغط للتفاصيل 📊");
+                    if (!topProductName.equals(getString(R.string.not_specified))) {
+                        agrodivValueTextView.setText(getString(R.string.top_product_with_count, topProductName, topCount));
+                        agrodivDescTextView.setText(getString(R.string.other_products_with_hint, productCounts.size() - 1));
                         reportData.put("topProduct", topProductName + " : " + topCount);
                     } else {
-                        agrodivValueTextView.setText("لا توجد مبيعات");
-                        agrodivDescTextView.setText("0 منتجات • اضغط للتفاصيل 📊");
-                        reportData.put("topProduct", "لا توجد مبيعات");
+                        agrodivValueTextView.setText(getString(R.string.no_sales));
+                        agrodivDescTextView.setText(getString(R.string.zero_products_with_hint));
+                        reportData.put("topProduct", getString(R.string.no_sales));
                     }
                 })
                 .addOnFailureListener(e -> {
-                    agrodivValueTextView.setText("خطأ في التحميل");
+                    agrodivValueTextView.setText(getString(R.string.load_error));
                     agrodivDescTextView.setText("--");
                 });
     }
@@ -457,18 +457,18 @@ public class ReportsFragment extends Fragment {
                             bestCustomer = customerPhone;
                             bestCustomerValueTextView.setText(customerPhone);
                         } else {
-                            bestCustomer = "غير محدد";
-                            bestCustomerValueTextView.setText("غير محدد");
+                            bestCustomer = getString(R.string.not_specified);
+                            bestCustomerValueTextView.setText(getString(R.string.not_specified));
                         }
-                        bestCustomerDescTextView.setText("أفضل عميل اليوم");
+                        bestCustomerDescTextView.setText(getString(R.string.best_customer_today));
                         reportData.put("bestCustomer", bestCustomer);
                     } else {
-                        bestCustomerValueTextView.setText("لا يوجد زبائن");
-                        bestCustomerDescTextView.setText("0 زبون");
+                        bestCustomerValueTextView.setText(getString(R.string.no_customers));
+                        bestCustomerDescTextView.setText(getString(R.string.zero_customers));
                     }
                 })
                 .addOnFailureListener(e -> {
-                    bestCustomerValueTextView.setText("خطأ في التحميل");
+                    bestCustomerValueTextView.setText(getString(R.string.load_error));
                     bestCustomerDescTextView.setText("--");
                 });
     }
@@ -499,8 +499,8 @@ public class ReportsFragment extends Fragment {
                         }
                     }
 
-                    String cashText = "💵 نقدي: " + CurrencyUtils.formatCurrencyForReports(totalCash);
-                    String creditText = "📝 دين: " + CurrencyUtils.formatCurrencyForReports(totalCredit);
+                    String cashText = getString(R.string.cash_sales_format, CurrencyUtils.formatCurrencyForReports(totalCash));
+                    String creditText = getString(R.string.debt_payments_format, CurrencyUtils.formatCurrencyForReports(totalCredit));
                     
                     cashValueTextView.setText(cashText);
                     if (creditValueTextView != null) {
@@ -511,9 +511,9 @@ public class ReportsFragment extends Fragment {
                     reportData.put("creditSales", CurrencyUtils.formatCurrencyForReports(totalCredit));
                 })
                 .addOnFailureListener(e -> {
-                    cashValueTextView.setText("💵 نقدي: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                    cashValueTextView.setText(getString(R.string.cash_sales_format, CurrencyUtils.formatCurrencyForReports(0.0)));
                     if (creditValueTextView != null) {
-                        creditValueTextView.setText("📝 دين: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                        creditValueTextView.setText(getString(R.string.debt_payments_format, CurrencyUtils.formatCurrencyForReports(0.0)));
                     }
                 });
     }
@@ -562,8 +562,8 @@ public class ReportsFragment extends Fragment {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int activeUsersCount = queryDocumentSnapshots.size();
-                    String desc = activeUsersCount == 1 ? "بائع واحد فقط!" : 
-                                 activeUsersCount + " بائعين نشطين";
+                        String desc = activeUsersCount == 1 ? getString(R.string.only_one_seller) :
+                                 getString(R.string.active_sellers_count, activeUsersCount);
                     sellerDescTextView.setText(desc);
                     
                     // حفظ في cache
@@ -576,8 +576,8 @@ public class ReportsFragment extends Fragment {
                     reportData.put("sellerName", finalDisplayName);
                 });
         } else {
-            sellerNameTextView.setText("غير مسجل");
-            sellerDescTextView.setText("يرجى تسجيل الدخول");
+            sellerNameTextView.setText(getString(R.string.not_logged_in));
+            sellerDescTextView.setText(getString(R.string.please_login));
         }
     }
 
@@ -594,8 +594,8 @@ public class ReportsFragment extends Fragment {
                     int totalInvoices = queryDocumentSnapshots.size();
                     
                     if (totalInvoices == 0) {
-                        totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(0.0));
-                        totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                        totalSalesTextView.setText(getString(R.string.total_sales_label, CurrencyUtils.formatCurrencyForReports(0.0)));
+                        totalProfitTextView.setText(getString(R.string.total_profit_label, CurrencyUtils.formatCurrencyForReports(0.0)));
                         return;
                     }
 
@@ -620,8 +620,8 @@ public class ReportsFragment extends Fragment {
                                     
                                     // إذا انتهينا من معالجة جميع الفواتير
                                     if (processedInvoices[0] == totalInvoices) {
-                                        totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(finalTotalSales[0]));
-                                        totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(finalTotalProfit[0]));
+                                        totalSalesTextView.setText(getString(R.string.total_sales_label, CurrencyUtils.formatCurrencyForReports(finalTotalSales[0])));
+                                        totalProfitTextView.setText(getString(R.string.total_profit_label, CurrencyUtils.formatCurrencyForReports(finalTotalProfit[0])));
                                         
                                         // حفظ البيانات في cache
                                         reportData.put("totalSales", CurrencyUtils.formatCurrencyForReports(finalTotalSales[0]));
@@ -636,8 +636,8 @@ public class ReportsFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrencyForReports(0.0));
-                    totalProfitTextView.setText("إجمالي الربح: " + CurrencyUtils.formatCurrencyForReports(0.0));
+                    totalSalesTextView.setText(getString(R.string.total_sales_label, CurrencyUtils.formatCurrencyForReports(0.0)));
+                    totalProfitTextView.setText(getString(R.string.total_profit_label, CurrencyUtils.formatCurrencyForReports(0.0)));
                 });
     }
     
@@ -995,19 +995,19 @@ public class ReportsFragment extends Fragment {
         
         // حساب مؤشر الأداء بناءً على عدة معايير
         if (totalSales >= 10000 && receiptsCount >= 10 && totalProfit > 0) {
-            performanceText = "أداء ممتاز! 🎉";
+            performanceText = getString(R.string.performance_excellent);
             cardColor = R.color.performanceExcellent;
         } else if (totalSales >= 5000 && receiptsCount >= 5 && totalProfit > 0) {
-            performanceText = "أداء جيد جداً ✅";
+            performanceText = getString(R.string.performance_very_good);
             cardColor = R.color.performanceGood;
         } else if (totalSales >= 1000 && receiptsCount >= 2) {
-            performanceText = "أداء جيد 👍";
+            performanceText = getString(R.string.performance_good);
             cardColor = R.color.performanceAverage;
         } else if (totalSales > 0 || receiptsCount > 0) {
-            performanceText = "بداية النشاط 📈";
+            performanceText = getString(R.string.performance_starting);
             cardColor = R.color.performanceLow;
         } else {
-            performanceText = "لا توجد مبيعات 😴";
+            performanceText = getString(R.string.performance_no_sales);
             cardColor = R.color.performancePoor;
         }
         
@@ -1027,7 +1027,7 @@ public class ReportsFragment extends Fragment {
     public void refreshReportsData() {
         if (getView() != null) {
             loadReportsData();
-            Toast.makeText(getContext(), "🔄 تم تحديث التقرير", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.report_refreshed), Toast.LENGTH_SHORT).show();
         }
     }
     

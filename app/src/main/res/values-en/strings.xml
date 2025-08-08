@@ -1,4 +1,215 @@
 <resources>
+    <!-- TodayFragment strings -->
+    <string name="error_loading_invoices">Error loading invoices: %1$s</string>
+    <string name="invoice_summary_message">Customer: %1$s
+Total: %2$s
+
+Choose an action:</string>
+    <string name="print_action">Print</string>
+    <string name="load_in_counter">Load in Counter</string>
+    <string name="more_options_action">More options</string>
+    <string name="add_products_option">Add Products</string>
+    <string name="customer_location_option">📍 Customer Location</string>
+    <string name="delete_invoice_option">Delete Invoice</string>
+    <string name="generic_error">Error: %1$s</string>
+    <string name="error_showing_options">Error showing options: %1$s</string>
+    <string name="create_new_invoice_title">Create New Invoice</string>
+    <string name="how_to_add_product_message">How would you like to add a product?</string>
+    <string name="go_to_counter">Go to Counter</string>
+    <string name="invoice_created_success">🆕 New invoice created in counter</string>
+    <string name="load_in_counter_title">Load in Counter</string>
+    <string name="load_in_counter_warning">This invoice will be loaded in the counter for editing.
+
+Note: Any current invoice in the counter will be cleared.
+⚠️ The original invoice will be updated, not a new one created.</string>
+    <string name="load_label">Load</string>
+    <string name="invoice_loaded_for_edit">✅ Invoice loaded for edit - No.: %1$s</string>
+    <string name="invoice_loaded_without_customer">✅ Invoice loaded for edit (without customer info)</string>
+    <string name="delete_invoice_warning_title">⚠️ Delete Invoice</string>
+    <string name="delete_invoice_confirm_message">Are you sure you want to permanently delete the invoice?
+
+📄 Invoice number: %1$s
+👤 Customer: %2$s
+💰 Amount: %3$s
+
+⚠️ Warning: This action cannot be undone!
+The invoice and its contents will be permanently deleted from the system.</string>
+    <string name="delete_permanently">🗑️ Delete Permanently</string>
+    <string name="deleting_invoice">Deleting invoice...</string>
+    <string name="invoice_deleted_success">✅ Invoice %1$s deleted permanently</string>
+    <string name="failed_delete_invoice">❌ Failed to delete invoice: %1$s</string>
+    <string name="choose_date_to_load_invoices">Choose a date to load its invoices</string>
+    <string name="loaded_invoices_for_date">✅ Loaded %1$d invoices for %2$s</string>
+    <string name="invoice_data_unavailable">Invoice data unavailable</string>
+    <string name="invoice_missing_customer_data">This invoice does not contain specified customer data</string>
+    <string name="customer_not_found_system">Customer data not found in the system</string>
+    <string name="location_permissions_title">Location Permissions</string>
+    <string name="location_permission_request_message">The app needs location permission to show the route to the customer.
+
+Would you like to grant the permission?</string>
+    <string name="try_again_after_permission">After granting permission, please try again</string>
+    <string name="error_searching_customer_data">Error searching customer data: %1$s</string>
+    <string name="export_success_title">Export successful</string>
+    <string name="file_saved_path_share_question">File saved at: %1$s\n\n%2$s\n\nWould you like to share it?</string>
+    <string name="creating_template">Creating template...</string>
+    <string name="failed_create_template">Failed to create template: %1$s</string>
+    <string name="template_created_title">Template created</string>
+    <string name="template_created_message">%1$s template created successfully!\n\n%2$s\n\n%3$s</string>
+    <string name="share_template">Share template</string>
+    <string name="no_file_picker_app_found">No file picker app found</string>
+    <string name="loading_customer_data">Loading customer data...</string>
+    <string name="customer_selected_toast">Customer selected: %1$s</string>
+    <string name="error_parsing_customer_data">Error parsing customer data</string>
+    <string name="customer_not_found_database">Customer not found in database</string>
+    <string name="failed_load_customer_data">Failed to load customer data: %1$s</string>
+    <string name="guest_user_warning">You are using a guest account - limited view-only permissions</string>
+    <string name="logout_title">Logout</string>
+    <string name="logout_confirm_message">Are you sure you want to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_marked_read">Notifications marked as read</string>
+
+    <!-- SelectCustomerLocationActivity -->
+    <string name="map_customer_location_title">Customer location</string>
+    <string name="please_select_location_on_map">Please select a location on the map</string>
+    <string name="found_recent_location_improving_accuracy">⚡ Found a recent location, improving accuracy...</string>
+    <string name="determining_current_location">🔍 Determining current location...</string>
+    <string name="location_services_access_error">❌ Error accessing location services</string>
+    <string name="location_search_timeout">⏰ Location search timed out. Please try again.</string>
+    <string name="current_location_title_with_accuracy">My current location (Accuracy: %1$dm)</string>
+    <string name="current_location_found_accuracy_meters">✅ Current location found (Accuracy: %1$d meters)</string>
+    <string name="accuracy_excellent">Excellent</string>
+    <string name="accuracy_very_good">Very good</string>
+    <string name="accuracy_good">Good</string>
+    <string name="accuracy_acceptable">Acceptable</string>
+    <string name="current_location_found_accuracy_with_text">✅ Current location - Accuracy: %1$dm (%2$s)</string>
+    <string name="improving_location_accuracy_current">🔄 Improving location accuracy... (Current: %1$dm)</string>
+    <string name="provider_enabled">✅ Service enabled: %1$s</string>
+    <string name="provider_disabled">⚠️ Service disabled: %1$s</string>
+
+    <!-- QRCodePrintActivity -->
+    <string name="qr_print_title">Print QR Code</string>
+    <string name="name_colon_value">Name: %1$s</string>
+    <string name="phone_colon_value">Phone: %1$s</string>
+    <string name="total_debt_formatted">Total debt: %.2f DZD</string>
+    <string name="error_opening_printers">Error opening printers list: %1$s</string>
+    <string name="error_sharing_qr">Error sharing QR Code: %1$s</string>
+    <string name="bluetooth_not_supported">Bluetooth is not supported on this device</string>
+    <string name="enable_bluetooth_first">Please enable Bluetooth first</string>
+    <string name="no_permission_bluetooth_devices">No permission to access Bluetooth devices</string>
+    <string name="no_paired_bluetooth_devices">No paired Bluetooth devices</string>
+    <string name="no_permission_device_info">No permission to access device info</string>
+    <string name="select_printer">Select printer</string>
+    <string name="connecting_to_printer">Connecting to printer...</string>
+    <string name="connected_printing">Connected, printing...</string>
+    <string name="failed_connect_printer">Failed to connect to printer: %1$s</string>
+    <string name="no_permission_connect_printer">No permission to connect to printer</string>
+    <string name="qr_printed_success">QR Code printed successfully</string>
+    <string name="failed_print_qr">Failed to print QR Code: %1$s</string>
+    <string name="print_error_generic">Print error: %1$s</string>
+    <string name="qr_not_available">QR Code not available</string>
+    <string name="failed_save_qr">Failed to save QR Code</string>
+    <string name="customer_qr_subject">Customer QR Code: %1$s</string>
+    <string name="customer_qr_share_text">Customer QR Code: %1$s
+Phone: %2$s
+Total debt: %3$s</string>
+    <string name="share_qr_code">Share QR Code</string>
+    <string name="no_apps_to_share">No apps available to share</string>
+    <string name="failed_share_qr">Failed to share QR Code: %1$s</string>
+    <string name="share_customer_info">Share customer info</string>
+    <string name="failed_share_customer_info">Failed to share customer info</string>
+
+    <!-- OperationLogsActivity -->
+    <string name="operation_logs_title">Operation Logs</string>
+    <string name="failed_load_operation_logs">Failed to load operation logs</string>
+    <string name="no_permission_view_operation_logs">You do not have permission to view operation logs</string>
+    <string name="check_internet_try_again">Check your internet connection and try again</string>
+    <string name="database_being_prepared_try_later">Database is being prepared - please try again later</string>
+    <string name="failed_load_operation_logs_with_error">Failed to load operation logs: %1$s</string>
+    <string name="failed_load_operation_logs_try_again">Failed to load operation logs - please try again</string>
+    <string name="operation_logs_summary_format">Total: %1$d • Critical: %2$d • Today: %3$d • Shown: %4$d</string>
+    <string name="export_feature_in_development">🚧 Export feature in development</string>
+    <string name="clean_old_logs_title">Clean old logs</string>
+    <string name="clean_old_logs_message">Logs older than 90 days will be deleted.
+\nAre you sure?</string>
+    <string name="clean_label">Clean</string>
+    <string name="cleaning_old_logs">Cleaning old logs...</string>
+    <string name="deleted_old_logs_success">✅ Deleted %1$d old logs</string>
+    <string name="failed_clean_old_logs">❌ Failed to clean logs: %1$s</string>
+    <string name="operation_details_header">🔍 Operation Details</string>
+    <string name="operation_type_label">📋 Type: </string>
+    <string name="entity_label">📦 Entity: </string>
+    <string name="id_label">🆔 ID: </string>
+    <string name="user_label">👤 User: </string>
+    <string name="timestamp_label">🕐 Timestamp: </string>
+    <string name="description_label">📝 Description: </string>
+    <string name="device_label">📱 Device: </string>
+    <string name="app_version_label">📦 Version: </string>
+    <string name="operation_details_title">Operation Details</string>
+
+    <!-- QuickInvoiceDialog -->
+    <string name="failed_load_products">Failed to load products: %1$s</string>
+    <string name="added_product_success">✅ Added %1$s</string>
+    <string name="selected_products_count">Selected products: %1$d</string>
+    <string name="select_at_least_one_product">Please select at least one product</string>
+    <string name="error_generating_invoice_number">Error generating invoice number: %1$s</string>
+    <string name="failed_save_invoice">Failed to save invoice: %1$s</string>
+
+    <!-- NetworkErrorHandler -->
+    <string name="unexpected_error">An unexpected error occurred</string>
+    <string name="no_permission_access_data">You do not have permission to access this data</string>
+    <string name="service_unavailable_try_later">Service is currently unavailable. Please try again later</string>
+    <string name="deadline_exceeded_check_internet">Request timed out. Check your internet speed</string>
+    <string name="session_expired_login_again">Session expired. Please log in again</string>
+    <string name="data_not_found">Requested data not found</string>
+    <string name="data_already_exists">Data already exists</string>
+    <string name="resource_exhausted_try_later">Resource limit exceeded. Please try again later</string>
+    <string name="no_internet_check_connection">No internet connection. Check WiFi or mobile data</string>
+    <string name="service_error_with_operation">Service error: %1$s</string>
+    <string name="network_error_check_connection">Network error. Check your internet connection</string>
+    <string name="error_in_operation">Error in %1$s</string>
+    <string name="retry_question_with_message">%1$s\n\nWould you like to retry?</string>
+    <string name="please_retry_operation">Please retry the operation</string>
+    <string name="data_error_missing_or_corrupt">Data error: %1$s is missing or corrupted</string>
+    <string name="data_error_title">Data Error</string>
+    <string name="data_error_message_with_support">%1$s\n\nPlease contact support if the issue persists.</string>
+    <string name="sync_failed_for_operation">Sync failed for %1$s</string>
+    <string name="no_internet_suffix">No internet connection</string>
+    <string name="server_error_suffix">Server error</string>
+
+    <!-- ReportsFragment additions -->
+    <string name="report_for_day">Report for: %1$s</string>
+    <string name="most_sold_category_title">Top selling category</string>
+    <string name="total_receipts_title">Total receipts</string>
+    <string name="tax_title">Tax</string>
+    <string name="discounts_title">Discounts</string>
+    <string name="avg_sales_title">Average sales value</string>
+    <string name="best_customer_title">Best customer</string>
+    <string name="payment_methods_title">Payment methods</string>
+    <string name="seller_title">Seller</string>
+    <string name="loading_dots">Loading...</string>
+    <string name="calculating_dots">Calculating...</string>
+    <string name="searching_dots">Searching...</string>
+    <string name="calculating_cash_prefix">💵 Calculating...</string>
+    <string name="calculating_credit_prefix">📝 Calculating...</string>
+    <string name="total_sales_calculating">Total sales: Calculating...</string>
+    <string name="total_profit_calculating">Total profit: Calculating...</string>
+    <string name="top_product_with_count">%1$s : %2$d</string>
+    <string name="other_products_with_hint">%1$d other products • tap for details 📊</string>
+    <string name="zero_products_with_hint">0 products • tap for details 📊</string>
+    <string name="load_error">Load error</string>
+    <string name="zero_customers">0 customers</string>
+    <string name="only_one_seller">Only one seller!</string>
+    <string name="active_sellers_count">%1$d active sellers</string>
+    <string name="total_profit_label">Total profit: %1$s</string>
+    <string name="performance_excellent">Excellent performance! 🎉</string>
+    <string name="performance_very_good">Very good performance ✅</string>
+    <string name="performance_good">Good performance 👍</string>
+    <string name="performance_starting">Getting started 📈</string>
+    <string name="performance_no_sales">No sales 😴</string>
+    <string name="report_refreshed">🔄 Report refreshed</string>
+
     <!-- =============================== -->
     <!-- APP BASIC INFO -->
     <!-- =============================== -->
@@ -18,7 +229,6 @@
     <string name="counterMenu">Counter</string>
     <string name="reports">Reports</string>
     <string name="reportsMenu">Reports</string>
-    <string name="today">Today</string>
     <string name="todayMenu">Today</string>
     <string name="items">Items</string>
     <string name="itemsMenu">Items</string>
@@ -69,7 +279,6 @@
     <!-- =============================== -->
     <string name="fix_users">Fix Users</string>
     <string name="fix_users_message">This function will fix all users in the system</string>
-    <string name="fix_users_progress">Fixing users...</string>
     <string name="users_fixed_successfully">Users fixed successfully</string>
     <string name="fix_users_report_title">Fix Report</string>
     
@@ -156,11 +365,8 @@
     <!-- Common Actions -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
-    <string name="edit">Edit</string>
     <string name="add">Add</string>
     <string name="search">Search</string>
     <string name="loading">Loading...</string>
@@ -184,6 +390,7 @@
     <string name="current_language">Current Language</string>
     <string name="language_settings">Language Settings</string>
     <string name="change_language">Change Language</string>
+    <string name="change_language_title">🌐 Change Language</string>
     <string name="restart_app">Restart App</string>
     <string name="language_applied">New language applied</string>
     
@@ -312,6 +519,9 @@
     <!-- =============================== -->
     <string name="saving_data">Saving...</string>
     <string name="current_method_label">Current Method: %1$s</string>
+    <string name="edit_payment_method">💳 Edit Payment Method</string>
+    <string name="select_new_method">Select new method:</string>
+    <string name="edit_payment_note">💡 Note: Changing the payment method will affect sales reports</string>
     
     <!-- =============================== -->
     <!-- NOTIFICATIONS -->
@@ -324,7 +534,6 @@
     <!-- =============================== -->
     <string name="username">Username</string>
     <string name="product_name">Product Name</string>
-    <string name="customer_name">Customer Name</string>
     <string name="customer_email">Email</string>
     <string name="customer_address">Address</string>
     <string name="invoice_number">Invoice Number</string>
@@ -368,6 +577,25 @@
     <string name="today">Today</string>
     <string name="choose_date">Choose Date</string>
     <string name="logout">Logout</string>
+    <string name="search_movements_hint">Search movements...</string>
+    <string name="search_product_hint">Search for a product...</string>
+    <string name="search_customer_hint">Search for a customer...</string>
+    <string name="search_inventory_hint">Search inventory...</string>
+    <string name="scan_barcode">Scan barcode</string>
+    <string name="current_invoice">Current Invoice</string>
+    <string name="checkout">Checkout</string>
+    <string name="select_customer_for_invoice">Select customer for invoice</string>
+    <string name="search_customer_by_name_or_phone">Search by name or phone number</string>
+    <string name="add_new_customer">Add new customer</string>
+    <string name="create_quick_invoice">Create quick invoice</string>
+    <string name="search_in_products">Search in products...</string>
+    <string name="select_products">Select products:</string>
+    <string name="customer_info_optional">Customer info (optional):</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="select_customer">Select Customer</string>
+    <string name="home">Home</string>
+    <string name="customer_locations">Customer Locations</string>
+    <string name="user_tools">User Tools</string>
     
     <!-- =============================== -->
     <!-- MENU ITEMS -->
@@ -377,6 +605,7 @@
     <string name="user_management">User Management</string>
     <string name="notifications">Notifications</string>
     <string name="invoice_gallery">Invoice Gallery</string>
+    <string name="operation_logs">📋 Operation Logs</string>
     
     <!-- =============================== -->
     <!-- EMPTY STATES -->
@@ -389,6 +618,7 @@
     <!-- =============================== -->
     <string name="performance_indicator">Performance Indicator</string>
     <string name="good_performance">Good Performance ✅</string>
+    <string name="load_other_date_invoices">📅 Load invoices for another date</string>
     
     <!-- =============================== -->
     <!-- INVOICE CREATION -->
@@ -410,5 +640,99 @@
     <string name="example_report_date">Report for: 2025/01/17</string>
     <string name="example_total_sales">Total Sales: 0.00DZ</string>
     <string name="example_total_profit">Total Profit: 0.00DZ</string>
-    
+    <string name="phone">Phone</string>
+  <string name="system_admin">System Admin</string>
+  <string name="not_logged_in">Not logged in</string>
+  <string name="guest_account_limited">Guest account (limited permissions)</string>
+  <!-- User management strings -->
+  <string name="not_allowed_admin_privileges">❌ Not allowed: This user is not authorized for admin privileges</string>
+  <string name="not_allowed_change_primary_admin_role">❌ Not allowed: Cannot change primary admin role</string>
+  <string name="error_loading_users">Error loading users: %1$s</string>
+  <string name="add_new_user">Add New User</string>
+  <string name="please_enter_username">Please enter username</string>
+  <string name="please_enter_valid_email">Please enter a valid email</string>
+  <string name="please_enter_full_name">Please enter full name</string>
+  <string name="please_select_user_role">Please select a user role</string>
+  <string name="user_created_successfully">User created successfully</string>
+  <string name="error_creating_user">Error creating user: %1$s</string>
+  <string name="no_permission_manage_user">You do not have permission to manage this user</string>
+  <string name="edit_data">Edit Data</string>
+  <string name="change_role">Change Role</string>
+  <string name="toggle_activate">Activate/Deactivate</string>
+  <string name="delete_user">Delete User</string>
+  <string name="edit_user_title">Edit %1$s</string>
+  <string name="change_role_for_user">Change role for %1$s</string>
+  <string name="no_permission_assign_role">You do not have permission to assign this role</string>
+  <string name="activated">Activated</string>
+  <string name="deactivated">Deactivated</string>
+  <string name="user">user</string>
+  <string name="not_allowed_delete_primary_admin">❌ Not allowed: Cannot delete the primary admin</string>
+  <string name="confirm_delete">Confirm Delete</string>
+  <string name="confirm_delete_user">Are you sure you want to delete user: %1$s?</string>
+  <string name="user_deleted">User deleted</string>
+  <string name="error_deleting_user">Error deleting user: %1$s</string>
+  <string name="fix_all_users">Fix All Users</string>
+  <string name="quick_diagnosis">Quick Diagnosis</string>
+  <string name="login_test">Login Test</string>
+  <string name="fix_now">Fix Now</string>
+  <string name="quick_diagnosis_in_progress">Running quick diagnosis...</string>
+  <string name="quick_diagnosis_report_header">📊 Quick diagnosis report:\n\n</string>
+  <string name="total_users_label">👥 Total users: </string>
+  <string name="active_users_label">✅ Active: </string>
+  <string name="inactive_users_label">❌ Inactive: </string>
+  <string name="users_without_role_label">⚠️ Without role: </string>
+  <string name="corrupted_users_label">🚫 Corrupted: </string>
+  <string name="recommend_run_fix">💡 Recommended to run user fix.</string>
+  <string name="all_users_good">✨ All users are in good condition!</string>
+  <string name="diagnosis_result">Diagnosis Result</string>
+  <string name="diagnosis_failed">Diagnosis failed: %1$s</string>
+  <string name="enter_email_for_test">Enter email for test</string>
+  <string name="enter_email_to_test_login">Enter email to test login capability:</string>
+  <string name="test_action">Test</string>
+  <string name="testing_email">Testing: %1$s</string>
+  <string name="failed_mark">❌ Failed</string>
+  <string name="user_not_found_db">User not found in database</string>
+  <string name="user_exists">✅ User exists</string>
+  <string name="email_label">📧 Email: </string>
+  <string name="name_label">👤 Name: </string>
+  <string name="account_active">✅ Account is active</string>
+  <string name="account_inactive">❌ Account is inactive</string>
+  <string name="role_ok_label">✅ Role: </string>
+  <string name="role_unspecified_label">⚠️ Role: Not specified</string>
+  <string name="success_mark">✅ Success</string>
+  <string name="needs_fix_mark">⚠️ Needs fix</string>
+  <string name="error_reading_user_data">Error reading user data: %1$s</string>
+  <string name="search_error">Search error: %1$s</string>
+  <string name="test_result_for_email">Test result for %1$s</string>
+  <string name="result_with_details">Result: %1$s\n\n%2$s</string>
+  <string name="fix_this_user">Fix this user</string>
+  <string name="downgraded_unauthorized_admin">Downgraded unauthorized admin: %1$s</string>
+  <string name="user_fixed">User fixed: %1$s</string>
+  <string name="role_changed_from_to"> (Role changed from %1$s to %2$s)</string>
+  <string name="fix_users_progress">Fixing users...</string>
+  <string name="fixed_users_of_total">Fixed %1$d of %2$d users</string>
+  <string name="no_users_to_fix">No users to fix</string>
+  <string name="fix_users_report">Users Fix Report:\n\n• Total users: %1$d\n• Fixed: %2$d\n• Healthy: %3$d\n\nUsers can now log in successfully.</string>
+  <string name="fixed_done">Fix completed!</string>
+  <string name="user_no_fix_needed">User does not need fixing</string>
+  <string name="error_updating_user">Error updating user: %1$s</string>
+    <string name="customer_data_unavailable">Customer data unavailable</string>
+    <string name="customer_location_not_set_system">Customer location is not set in the system</string>
+    <string name="location_label">Location</string>
+    <string name="opening_maps">Opening maps...</string>
+    <string name="open_location">Open %1$s</string>
+    <string name="open_location_in_browser">Open %1$s in browser</string>
+    <string name="cannot_open_maps">Cannot open maps</string>
+    <string name="open_route_to_name">Open route to %1$s</string>
+    <string name="open_location_in_maps_app">Open %1$s in maps app</string>
+    <string name="could_not_open_maps_check_internet">Could not open maps. Check your internet connection</string>
+    <string name="choose_maps_app">Choose maps app</string>
+    <string name="choose_app_to_open_location">Choose an app to open %1$s</string>
+    <string name="error_with_message">Error: %1$s</string>
+    <string name="test_customer_name">Test Customer</string>
+    <string name="test_opening_maps">Testing opening maps...</string>
+    <string name="bluetooth_permissions_required">bluetooth permission required</string>
+    <string name="add_quick_product">add quick product</string>
+
+
 </resources>

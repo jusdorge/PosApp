@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Point de Vente</string>
+    <string name="action_settings">Paramétre</string>
+
+    <string name="navigation_drawer_open">Ouvrir la liste</string>
+
+    <string name="navigation_drawer_close">Fermer la liste</string>
+
+    <string name="counter">Compteur</string>
+    <string name="counterMenu">Compteur</string>
+    <string name="reports">Rapports</string>
+
+    <string name="reportsMenu">Rapport</string>
+    <string name="today">Aujourd\'hui</string>
+    <string name="todayMenu">Aujourd\'hui</string>
+    <string name="items">Elements</string>
+    <string name="itemsMenu">Elements</string>
+    <string name="more">Plus</string>
+    <string name="moreMenu">Plus</string>
+    <string name="inventoryManagement">Gestion des produits</string>
+    <string name="settings">Paramètre</string>
+    <string name="title_activity_profit_details">Détail des profits</string>
+    <string name="title_Selected_Customer_Location">Localiser le client</string>
+    <string name="title_activity_all_invoices">Toutes les factures</string>
+    <string name="title_activity_qr_code">Imprimer code QR</string>
+    <string name="bmp_gallery_title">Gallerie des photos</string>
+    <string name="saveLocation">Enregistrer la localisation</string>
+    <string name="my_location">Ma Localisation</string>
+    <string name="getting_location">Localisation en cours</string>
+    <string name="location_permission_required">La Permission est requise</string>
+    <string name="location_service_disabled">Veillez Activer la localisation</string>
+    <string name="current_location_set">La localisation courrente faite</string>
+    <string name="location_error">Erreur Localisation</string>
+    <string name="edit_invoice">Editer la facture</string>
+    <string name="finish_editing">Edition terminée</string>
+    <string name="edit_mode_enabled">Edition Activée : appuyer sur n\'importe quel elements pour le modifié</string>
+    <string name="edit_mode_disabled">Mode edition desactivé</string>
+    <string name="click_to_edit">Appuyer pour modifier</string>
+    <string name="save_changes">Enregistrer les modifications</string>
+    <string name="save_changes_question">Voulez vous enregistrez les modificatios apportées a la facture</string>
+    <string name="saving_changes">Enregistrement des modifications en cours</string>
+    <string name="changes_saved">Modifications enregistrer avec succés</string>
+    <string name="phone">Telephone</string>
+</resources>

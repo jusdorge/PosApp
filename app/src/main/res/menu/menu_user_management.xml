@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/action_fix_users"
-        android:title="أدوات المستخدمين"
+        android:title="@string/user_tools"
         android:icon="@android:drawable/ic_menu_preferences"
         app:showAsAction="always|withText" />
 
