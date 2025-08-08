@@ -51,7 +51,7 @@
             android:id="@+id/noResultsTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="لا توجد نتائج للبحث"
+            android:text="@string/no_search_results"
             android:textAlignment="center"
             android:textSize="16sp"
             android:textColor="@color/colorPrimary"
@@ -61,7 +61,7 @@
             android:id="@+id/addNewProductButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="إضافة منتوج جديد"
+            android:text="@string/add_new_product"
             android:backgroundTint="@color/colorAccent"
             android:textColor="@color/colorWhite"
             android:layout_marginBottom="8dp" />

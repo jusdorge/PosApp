@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="فواتير اليوم"
+            android:text="@string/todays_invoices"
             android:textColor="@color/colorWhite"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -30,7 +30,7 @@
             android:background="@color/colorAccent"
             android:drawableLeft="@android:drawable/ic_input_add"
             android:drawablePadding="4dp"
-            android:text="فاتورة جديدة"
+            android:text="@string/new_invoice"
             android:textColor="@color/colorWhite"
             android:textSize="12sp"
             android:layout_marginStart="8dp" />
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:text="إجمالي المبيعات: 0.00 دج"
+                android:text="@string/total_sales_zero"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -65,7 +65,7 @@
                 android:id="@+id/invoiceCountTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="عدد الفواتير: 0"
+                android:text="@string/invoice_count_zero"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -114,7 +114,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="لا توجد فواتير لهذا اليوم"
+            android:text="@string/no_invoices_today"
             android:textSize="18sp"
             android:visibility="gone" />
     </FrameLayout>

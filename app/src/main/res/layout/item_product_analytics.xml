@@ -39,7 +39,7 @@
                 android:id="@+id/productNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="اسم المنتج"
+                android:text="@string/product_name"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black"
@@ -57,7 +57,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="الكمية: 25"
+                    android:text="@string/example_quantity"
                     android:textSize="12sp"
                     android:textColor="@color/colorPrimary" />
 
@@ -66,7 +66,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="الإيرادات: 1500.00دج"
+                    android:text="@string/example_revenue"
                     android:textSize="12sp"
                     android:textColor="@color/colorAccent"
                     android:gravity="end" />

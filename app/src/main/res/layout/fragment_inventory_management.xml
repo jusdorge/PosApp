@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="إدارة المخزون"
+            android:text="@string/inventory_management"
             android:textColor="@color/colorWhite"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -62,7 +62,7 @@
                 android:id="@+id/totalProductsTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="إجمالي المنتجات: 0"
+                android:text="@string/total_products_zero"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -72,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="تحذير: 0 منتج بكمية منخفضة"
+                android:text="@string/low_stock_zero"
                 android:textColor="@color/design_default_color_error"
                 android:textSize="14sp"
                 android:visibility="gone" />
@@ -90,7 +90,7 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:backgroundTint="@color/colorAccent"
-                    android:text="حركات المخزون"
+                    android:text="@string/stock_movements"
                     android:textColor="@color/colorWhite"
                     android:textSize="14sp" />
 
@@ -101,7 +101,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:backgroundTint="@color/colorPrimary"
-                    android:text="تصدير التقرير"
+                    android:text="@string/export_report"
                     android:textColor="@color/colorWhite"
                     android:textSize="14sp" />
 

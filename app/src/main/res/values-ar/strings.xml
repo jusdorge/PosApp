@@ -220,7 +220,9 @@
     <string name="invoice_status_unpaid">غير مدفوعة</string>
     <string name="invoice_status_debt">دين</string>
     <string name="invoice_count_label">عدد الفواتير: %1$d</string>
+    <string name="invoice_count_zero">عدد الفواتير: 0</string>
     <string name="total_sales_label">إجمالي المبيعات: %1$s</string>
+    <string name="total_sales_zero">إجمالي المبيعات: 0.00 دج</string>
     <string name="invoices_today">فواتير %1$s</string>
     
     <!-- =============================== -->
@@ -283,8 +285,13 @@
     <string name="select_start_date">اختر تاريخ البداية</string>
     <string name="select_end_date">اختر تاريخ النهاية</string>
     <string name="total_movements_label">إجمالي الحركات: %1$d</string>
+    <string name="total_movements_zero">إجمالي الحركات: 0</string>
     <string name="incoming_movements_label">حركات الدخول: %1$d</string>
+    <string name="incoming_movements_zero">حركات الدخول: 0</string>
     <string name="outgoing_movements_label">حركات الخروج: %1$d</string>
+    <string name="outgoing_movements_zero">حركات الخروج: 0</string>
+    <string name="total_products_zero">إجمالي المنتجات: 0</string>
+    <string name="low_stock_zero">تحذير: 0 منتج بكمية منخفضة</string>
     
     <!-- =============================== -->
     <!-- LOCATION SERVICES -->
@@ -311,5 +318,97 @@
     <!-- =============================== -->
     <string name="no_new_notifications">لا توجد إشعارات جديدة</string>
     <string name="error_loading_notifications">خطأ في تحميل الإشعارات</string>
+    
+    <!-- =============================== -->
+    <!-- UI LABELS & PLACEHOLDERS -->
+    <!-- =============================== -->
+    <string name="username">اسم المستخدم</string>
+    <string name="product_name">اسم المنتج</string>
+    <string name="customer_name">اسم الزبون</string>
+    <string name="customer_email">البريد الإلكتروني</string>
+    <string name="customer_address">العنوان</string>
+    <string name="invoice_number">رقم الفاتورة</string>
+    <string name="file_name">اسم الملف</string>
+    <string name="file_date">التاريخ</string>
+    <string name="file_size">الحجم</string>
+    <string name="transaction_description">وصف المعاملة</string>
+    <string name="reason">السبب</string>
+    <string name="notes">ملاحظات</string>
+    <string name="category">الفئة</string>
+    <string name="role_label">الدور: </string>
+    <string name="manager">مدير</string>
+    <string name="active">نشط</string>
+    
+    <!-- =============================== -->
+    <!-- FRAGMENT TITLES -->
+    <!-- =============================== -->
+    <string name="todays_invoices">فواتير اليوم</string>
+    <string name="products_management">إدارة المنتجات</string>
+    <string name="customers_management">إدارة الزبائن</string>
+    <string name="inventory_management">إدارة المخزون</string>
+    <string name="stock_movements">حركات المخزون</string>
+    <string name="pos_reports">تقارير نقطة البيع</string>
+    <string name="more_options">المزيد من الخيارات</string>
+    
+    <!-- =============================== -->
+    <!-- BUTTONS & ACTIONS -->
+    <!-- =============================== -->
+    <string name="new_invoice">فاتورة جديدة</string>
+    <string name="add_product">إضافة منتج</string>
+    <string name="add_customer">إضافة زبون</string>
+    <string name="add_new_product">إضافة منتوج جديد</string>
+    <string name="edit">تعديل</string>
+    <string name="add_to_invoice">إضافة للفاتورة</string>
+    <string name="filter">تصفية</string>
+    <string name="clear">مسح</string>
+    <string name="export_report">تصدير التقرير</string>
+    <string name="text">نص</string>
+    <string name="share">مشاركة</string>
+    <string name="yesterday">أمس</string>
+    <string name="today">اليوم</string>
+    <string name="choose_date">اختر تاريخ</string>
+    <string name="logout">تسجيل الخروج</string>
+    
+    <!-- =============================== -->
+    <!-- MENU ITEMS -->
+    <!-- =============================== -->
+    <string name="all_invoices">جميع الفواتير</string>
+    <string name="scan_qr_customer">مسح QR Code للعميل</string>
+    <string name="user_management">إدارة المستخدمين</string>
+    <string name="notifications">الإشعارات</string>
+    <string name="invoice_gallery">معرض الفواتير</string>
+    
+    <!-- =============================== -->
+    <!-- EMPTY STATES -->
+    <!-- =============================== -->
+    <string name="no_invoices_today">لا توجد فواتير لهذا اليوم</string>
+    <string name="no_notifications">لا توجد إشعارات</string>
+    
+    <!-- =============================== -->
+    <!-- PERFORMANCE INDICATOR -->
+    <!-- =============================== -->
+    <string name="performance_indicator">مؤشر الأداء</string>
+    <string name="good_performance">أداء جيد ✅</string>
+    
+    <!-- =============================== -->
+    <!-- INVOICE CREATION -->
+    <!-- =============================== -->
+    <string name="create_invoice_operation">إنشاء فاتورة</string>
+    <string name="create_invoice_description">إنشاء فاتورة جديدة بقيمة 150.00 دج تحتوي على 3 منتجات</string>
+    
+    <!-- =============================== -->
+    <!-- EXAMPLE DATA (for previews) -->
+    <!-- =============================== -->
+    <string name="example_invoice_number">فاتورة #12345</string>
+    <string name="example_customer_name">العميل: أحمد محمد</string>
+    <string name="example_invoice_date">التاريخ: 01/01/2024 14:30</string>
+    <string name="example_invoice_amount">المبلغ: 1250.00 دج</string>
+    <string name="example_product_price">السعر: $10.00</string>
+    <string name="example_quantity">الكمية: 25</string>
+    <string name="example_revenue">الإيرادات: 1500.00دج</string>
+    <string name="example_last_login">آخر دخول: 01/01/2024</string>
+    <string name="example_report_date">تقرير ليوم: 2025/01/17</string>
+    <string name="example_total_sales">إجمالي المبيعات: 0.00دج</string>
+    <string name="example_total_profit">إجمالي الربح: 0.00دج</string>
     
 </resources>

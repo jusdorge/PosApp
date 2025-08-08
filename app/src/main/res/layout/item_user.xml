@@ -24,7 +24,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="اسم المستخدم"
+                android:text="@string/username"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />
@@ -33,7 +33,7 @@
                 android:id="@+id/statusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="نشط"
+                android:text="@string/active"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:background="@android:drawable/button_onoff_indicator_on"
@@ -61,7 +61,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="الدور: "
+                android:text="@string/role_label"
                 android:textSize="14sp"
                 android:textColor="@android:color/darker_gray" />
 
@@ -69,7 +69,7 @@
                 android:id="@+id/roleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="مدير"
+                android:text="@string/manager"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/colorPrimary" />
@@ -80,7 +80,7 @@
             android:id="@+id/lastLoginText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="آخر دخول: 01/01/2024"
+            android:text="@string/example_last_login"
             android:textSize="12sp"
             android:textColor="@android:color/darker_gray" />
 

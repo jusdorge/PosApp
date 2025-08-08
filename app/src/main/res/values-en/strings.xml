@@ -220,7 +220,9 @@
     <string name="invoice_status_unpaid">Unpaid</string>
     <string name="invoice_status_debt">Debt</string>
     <string name="invoice_count_label">Invoice Count: %1$d</string>
+    <string name="invoice_count_zero">Invoice Count: 0</string>
     <string name="total_sales_label">Total Sales: %1$s</string>
+    <string name="total_sales_zero">Total Sales: 0.00 DZ</string>
     <string name="invoices_today">Invoices for %1$s</string>
     
     <!-- =============================== -->
@@ -283,8 +285,13 @@
     <string name="select_start_date">Select start date</string>
     <string name="select_end_date">Select end date</string>
     <string name="total_movements_label">Total Movements: %1$d</string>
+    <string name="total_movements_zero">Total Movements: 0</string>
     <string name="incoming_movements_label">Incoming Movements: %1$d</string>
+    <string name="incoming_movements_zero">Incoming Movements: 0</string>
     <string name="outgoing_movements_label">Outgoing Movements: %1$d</string>
+    <string name="outgoing_movements_zero">Outgoing Movements: 0</string>
+    <string name="total_products_zero">Total Products: 0</string>
+    <string name="low_stock_zero">Warning: 0 products with low stock</string>
     
     <!-- =============================== -->
     <!-- LOCATION SERVICES -->
@@ -311,5 +318,97 @@
     <!-- =============================== -->
     <string name="no_new_notifications">No new notifications</string>
     <string name="error_loading_notifications">Error loading notifications</string>
+    
+    <!-- =============================== -->
+    <!-- UI LABELS & PLACEHOLDERS -->
+    <!-- =============================== -->
+    <string name="username">Username</string>
+    <string name="product_name">Product Name</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="customer_email">Email</string>
+    <string name="customer_address">Address</string>
+    <string name="invoice_number">Invoice Number</string>
+    <string name="file_name">File Name</string>
+    <string name="file_date">Date</string>
+    <string name="file_size">Size</string>
+    <string name="transaction_description">Transaction Description</string>
+    <string name="reason">Reason</string>
+    <string name="notes">Notes</string>
+    <string name="category">Category</string>
+    <string name="role_label">Role: </string>
+    <string name="manager">Manager</string>
+    <string name="active">Active</string>
+    
+    <!-- =============================== -->
+    <!-- FRAGMENT TITLES -->
+    <!-- =============================== -->
+    <string name="todays_invoices">Today\'s Invoices</string>
+    <string name="products_management">Products Management</string>
+    <string name="customers_management">Customers Management</string>
+    <string name="inventory_management">Inventory Management</string>
+    <string name="stock_movements">Stock Movements</string>
+    <string name="pos_reports">POS Reports</string>
+    <string name="more_options">More Options</string>
+    
+    <!-- =============================== -->
+    <!-- BUTTONS & ACTIONS -->
+    <!-- =============================== -->
+    <string name="new_invoice">New Invoice</string>
+    <string name="add_product">Add Product</string>
+    <string name="add_customer">Add Customer</string>
+    <string name="add_new_product">Add New Product</string>
+    <string name="edit">Edit</string>
+    <string name="add_to_invoice">Add to Invoice</string>
+    <string name="filter">Filter</string>
+    <string name="clear">Clear</string>
+    <string name="export_report">Export Report</string>
+    <string name="text">Text</string>
+    <string name="share">Share</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="today">Today</string>
+    <string name="choose_date">Choose Date</string>
+    <string name="logout">Logout</string>
+    
+    <!-- =============================== -->
+    <!-- MENU ITEMS -->
+    <!-- =============================== -->
+    <string name="all_invoices">All Invoices</string>
+    <string name="scan_qr_customer">Scan Customer QR Code</string>
+    <string name="user_management">User Management</string>
+    <string name="notifications">Notifications</string>
+    <string name="invoice_gallery">Invoice Gallery</string>
+    
+    <!-- =============================== -->
+    <!-- EMPTY STATES -->
+    <!-- =============================== -->
+    <string name="no_invoices_today">No invoices for today</string>
+    <string name="no_notifications">No notifications</string>
+    
+    <!-- =============================== -->
+    <!-- PERFORMANCE INDICATOR -->
+    <!-- =============================== -->
+    <string name="performance_indicator">Performance Indicator</string>
+    <string name="good_performance">Good Performance ✅</string>
+    
+    <!-- =============================== -->
+    <!-- INVOICE CREATION -->
+    <!-- =============================== -->
+    <string name="create_invoice_operation">Create Invoice</string>
+    <string name="create_invoice_description">Create new invoice worth 150.00 DZ containing 3 products</string>
+    
+    <!-- =============================== -->
+    <!-- EXAMPLE DATA (for previews) -->
+    <!-- =============================== -->
+    <string name="example_invoice_number">Invoice #12345</string>
+    <string name="example_customer_name">Customer: Ahmed Mohamed</string>
+    <string name="example_invoice_date">Date: 01/01/2024 14:30</string>
+    <string name="example_invoice_amount">Amount: 1250.00 DZ</string>
+    <string name="example_product_price">Price: $10.00</string>
+    <string name="example_quantity">Quantity: 25</string>
+    <string name="example_revenue">Revenue: 1500.00DZ</string>
+    <string name="example_last_login">Last login: 01/01/2024</string>
+    <string name="example_report_date">Report for: 2025/01/17</string>
+    <string name="example_total_sales">Total Sales: 0.00DZ</string>
+    <string name="example_total_profit">Total Profit: 0.00DZ</string>
     
 </resources>

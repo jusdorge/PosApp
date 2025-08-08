@@ -23,7 +23,7 @@
                 android:id="@+id/customerNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="اسم الزبون"
+                android:text="@string/customer_name"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="رقم الهاتف"
+                android:text="@string/phone"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="14sp" />
 
@@ -41,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="البريد الإلكتروني"
+                android:text="@string/customer_email"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp"
                 android:visibility="gone" />
@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="العنوان"
+                android:text="@string/customer_address"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp"
                 android:visibility="gone"

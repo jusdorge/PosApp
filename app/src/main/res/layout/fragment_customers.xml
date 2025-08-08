@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="إدارة الزبائن"
+            android:text="@string/customers_management"
             android:textColor="@color/colorWhite"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:backgroundTint="@color/colorAccent"
-            android:text="إضافة زبون"
+            android:text="@string/add_customer"
             android:textColor="@color/colorWhite" />
     </LinearLayout>
 
@@ -66,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="لا يوجد زبائن"
+            android:text="@string/no_customers"
             android:textSize="18sp"
             android:visibility="gone" />
     </FrameLayout>

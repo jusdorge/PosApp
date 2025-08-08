@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="اسم المستخدم"
+        android:text="@string/username"
         android:textSize="16sp"
         android:textColor="@color/colorWhite"
         app:layout_constraintTop_toBottomOf="@id/program_title"

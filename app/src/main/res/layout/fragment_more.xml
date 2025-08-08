@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="المزيد من الخيارات"
+            android:text="@string/more_options"
             android:textColor="@color/colorWhite"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -61,7 +61,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="إدارة الزبائن"
+                        android:text="@string/customers_management"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -100,7 +100,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="إدارة المنتجات"
+                        android:text="@string/products_management"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -139,7 +139,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="جميع الفواتير"
+                        android:text="@string/all_invoices"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -178,7 +178,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="مسح QR Code للعميل"
+                        android:text="@string/scan_qr_customer"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -295,7 +295,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="إدارة المستخدمين"
+                        android:text="@string/user_management"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -339,7 +339,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="الإشعارات"
+                            android:text="@string/notifications"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -347,7 +347,7 @@
                             android:id="@+id/notificationBadge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="لا توجد إشعارات"
+                            android:text="@string/no_notifications"
                             android:textSize="12sp"
                             android:textColor="@android:color/darker_gray" />
 
@@ -389,7 +389,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="تسجيل الخروج"
+                        android:text="@string/logout"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:textColor="@color/reportDanger" />
@@ -472,7 +472,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="معرض الفواتير"
+                        android:text="@string/invoice_gallery"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
