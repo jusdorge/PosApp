@@ -144,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="حذف المنتج"
-                android:textColor="@android:color/holo_red_dark" />
+                android:textColor="@color/reportDanger" />
 
         </LinearLayout>
     </ScrollView>

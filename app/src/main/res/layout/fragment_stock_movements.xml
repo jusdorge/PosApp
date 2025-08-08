@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="حركات الدخول: 0"
-                android:textColor="@android:color/holo_green_dark"
+                android:textColor="@color/reportSuccess"
                 android:textSize="14sp" />
 
             <TextView
@@ -132,7 +132,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="حركات الخروج: 0"
-                android:textColor="@android:color/holo_red_dark"
+                android:textColor="@color/reportDanger"
                 android:textSize="14sp" />
 
         </LinearLayout>

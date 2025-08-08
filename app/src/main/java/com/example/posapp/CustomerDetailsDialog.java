@@ -360,7 +360,7 @@ public class CustomerDetailsDialog extends DialogFragment implements AddPaymentD
         
         // عرض مؤشر التحميل
         deleteCustomerButton.setEnabled(false);
-        deleteCustomerButton.setText("جاري الحذف...");
+        deleteCustomerButton.setText(getString(R.string.deleting_customer));
         
         // حذف جميع فواتير العميل أولاً
         db.collection("invoices")

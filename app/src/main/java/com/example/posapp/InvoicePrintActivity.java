@@ -512,18 +512,18 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
 
     private void displayInvoiceData() {
         // عرض معلومات الفاتورة
-        invoiceNumberTextView.setText("رقم الفاتورة: " + currentInvoice.getDisplayNumber());
+        invoiceNumberTextView.setText(getString(R.string.invoice_number_label, currentInvoice.getDisplayNumber()));
         
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-        invoiceDateTextView.setText("التاريخ: " + dateFormat.format(currentInvoice.getDate().toDate()));
+        invoiceDateTextView.setText(getString(R.string.invoice_date_label, dateFormat.format(currentInvoice.getDate().toDate())));
         
-        customerNameTextView.setText("العميل: " + (currentInvoice.getCustomerName() != null ? currentInvoice.getCustomerName() : "غير محدد"));
-        customerPhoneTextView.setText("الهاتف: " + (currentInvoice.getCustomerPhone() != null ? currentInvoice.getCustomerPhone() : "غير محدد"));
+        customerNameTextView.setText(getString(R.string.customer_label, currentInvoice.getCustomerName() != null ? currentInvoice.getCustomerName() : getString(R.string.not_specified)));
+        customerPhoneTextView.setText(getString(R.string.phone_label, currentInvoice.getCustomerPhone() != null ? currentInvoice.getCustomerPhone() : getString(R.string.not_specified)));
         
         // عرض طريقة الدفع باستخدام النظام الجديد
         updatePaymentMethodDisplay();
         
-        totalAmountTextView.setText("المجموع: " + CurrencyUtils.formatCurrency(currentInvoice.getTotalAmount()));
+        totalAmountTextView.setText(getString(R.string.total_amount_label, CurrencyUtils.formatCurrency(currentInvoice.getTotalAmount())));
         
         // عرض عناصر الفاتورة
         if (currentInvoice.getItems() != null) {
@@ -1228,7 +1228,7 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
         }
         
         // تحديث المجموع في واجهة المستخدم
-        totalAmountTextView.setText("المجموع: " + CurrencyUtils.formatCurrency(newTotal));
+                        totalAmountTextView.setText(getString(R.string.total_amount_label, CurrencyUtils.formatCurrency(newTotal)));
         
         // تحديث المجموع في كائن الفاتورة
         if (currentInvoice != null) {
@@ -1313,7 +1313,7 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
     private void updatePaymentMethodDisplay() {
         if (currentInvoice != null && paymentMethodTextView != null) {
             PaymentMethod method = currentInvoice.getPaymentMethod();
-            paymentMethodTextView.setText("طريقة الدفع: " + method.getDisplayWithIcon());
+            paymentMethodTextView.setText(getString(R.string.payment_method_label, method.getDisplayWithIcon()));
             
             // تغيير لون النص حسب نوع الدفع
             if (method == PaymentMethod.CREDIT) {

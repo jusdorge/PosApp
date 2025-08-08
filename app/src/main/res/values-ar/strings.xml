@@ -192,4 +192,124 @@
     <string name="language_english">الإنجليزية</string>
     <string name="language_auto">تلقائي</string>
     
+    <!-- =============================== -->
+    <!-- CUSTOMER MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="customer_name_label">الاسم: %1$s</string>
+    <string name="customer_phone_label">الهاتف: %1$s</string>
+    <string name="customer_debt_label">دين: %1$s</string>
+    <string name="customer_location_not_set">غير محدد</string>
+    <string name="update_location">تحديد الموقع</string>
+    <string name="set_location">تحديد موقع</string>
+    <string name="update_location_button">تحديث</string>
+    <string name="set_location_button">تحديد</string>
+    <string name="deleting_customer">جاري الحذف...</string>
+    <string name="delete_customer">حذف العميل</string>
+    
+    <!-- =============================== -->
+    <!-- INVOICE MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="invoice_number_label">رقم الفاتورة: %1$s</string>
+    <string name="invoice_date_label">التاريخ: %1$s</string>
+    <string name="customer_label">العميل: %1$s</string>
+    <string name="phone_label">الهاتف: %1$s</string>
+    <string name="total_amount_label">المجموع: %1$s</string>
+    <string name="payment_method_label">طريقة الدفع: %1$s</string>
+    <string name="invoice_hash">فاتورة #%1$s</string>
+    <string name="invoice_status_paid">مدفوعة</string>
+    <string name="invoice_status_unpaid">غير مدفوعة</string>
+    <string name="invoice_status_debt">دين</string>
+    <string name="invoice_count_label">عدد الفواتير: %1$d</string>
+    <string name="total_sales_label">إجمالي المبيعات: %1$s</string>
+    <string name="invoices_today">فواتير %1$s</string>
+    
+    <!-- =============================== -->
+    <!-- PRODUCT MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="product_price_label">السعر: %1$s</string>
+    <string name="product_quantity_label">الكمية: %1$d</string>
+    <string name="product_min_quantity_label">الحد الأدنى: %1$d</string>
+    <string name="product_cost_price_label">سعر التكلفة: %1$s</string>
+    <string name="stock_value_label">قيمة المخزون: %1$s</string>
+    <string name="current_quantity_label">الكمية الحالية: %1$d</string>
+    <string name="total_products_label">إجمالي المنتجات: %1$d</string>
+    <string name="low_stock_alert">تحذير: %1$d منتج بكمية منخفضة</string>
+    <string name="no_search_results">لا توجد نتائج للبحث</string>
+    <string name="no_products">لا توجد منتجات</string>
+    <string name="no_customers">لا يوجد زبائن</string>
+    
+    <!-- =============================== -->
+    <!-- USER MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="user_status_active">نشط</string>
+    <string name="user_status_disabled">معطل</string>
+    <string name="last_login_label">آخر دخول: %1$s</string>
+    <string name="never_logged_in">لم يسجل دخول من قبل</string>
+    <string name="not_registered">غير مسجل</string>
+    <string name="please_login">يرجى تسجيل الدخول</string>
+    
+    <!-- =============================== -->
+    <!-- REPORTS & ANALYTICS -->
+    <!-- =============================== -->
+    <string name="report_for_date">تقرير ليوم: %1$s</string>
+    <string name="most_sold_category">الفئة الأكثر مبيعاً</string>
+    <string name="total_invoices_count">إجمالي عدد الفواتير</string>
+    <string name="taxes_label">الضرائب</string>
+    <string name="discounts_label">الخصومات</string>
+    <string name="avg_sales_label">متوسط قيمة المبيعات</string>
+    <string name="best_customer_label">أفضل عميل</string>
+    <string name="payment_methods_label">طرق الدفع</string>
+    <string name="seller_label">البائع</string>
+    <string name="loading_data">جاري التحميل...</string>
+    <string name="calculating_data">جاري الحساب...</string>
+    <string name="searching_data">جاري البحث...</string>
+    <string name="evaluating_performance">جاري تقييم الأداء...</string>
+    <string name="no_sales">لا توجد مبيعات</string>
+    <string name="loading_error">خطأ في التحميل</string>
+    <string name="not_specified">غير محدد</string>
+    <string name="no_customers_found">لا يوجد زبائن</string>
+    <string name="best_customer_today">أفضل عميل اليوم</string>
+    <string name="quantity_sold_label">الكمية: %1$d</string>
+    <string name="revenue_label">الإيرادات: %1$s</string>
+    
+    <!-- =============================== -->
+    <!-- STOCK MOVEMENTS -->
+    <!-- =============================== -->
+    <string name="movement_type_incoming">دخول</string>
+    <string name="movement_type_outgoing">خروج</string>
+    <string name="movement_type_adjustment">تعديل</string>
+    <string name="date_from_label">من: %1$s</string>
+    <string name="date_to_label">إلى: %1$s</string>
+    <string name="select_start_date">اختر تاريخ البداية</string>
+    <string name="select_end_date">اختر تاريخ النهاية</string>
+    <string name="total_movements_label">إجمالي الحركات: %1$d</string>
+    <string name="incoming_movements_label">حركات الدخول: %1$d</string>
+    <string name="outgoing_movements_label">حركات الخروج: %1$d</string>
+    
+    <!-- =============================== -->
+    <!-- LOCATION SERVICES -->
+    <!-- =============================== -->
+    <string name="getting_location_text">جاري التحديد...</string>
+    <string name="my_current_location">موقعي الحالي</string>
+    
+    <!-- =============================== -->
+    <!-- QUICK INVOICE -->
+    <!-- =============================== -->
+    <string name="selected_products_label">المنتجات المختارة: %1$d</string>
+    <string name="total_label">المجموع: %1$s</string>
+    <string name="creating_invoice">جاري الإنشاء...</string>
+    <string name="create_invoice">إنشاء الفاتورة</string>
+    
+    <!-- =============================== -->
+    <!-- SAVING STATES -->
+    <!-- =============================== -->
+    <string name="saving_data">جاري الحفظ...</string>
+    <string name="current_method_label">الطريقة الحالية: %1$s</string>
+    
+    <!-- =============================== -->
+    <!-- NOTIFICATIONS -->
+    <!-- =============================== -->
+    <string name="no_new_notifications">لا توجد إشعارات جديدة</string>
+    <string name="error_loading_notifications">خطأ في تحميل الإشعارات</string>
+    
 </resources>

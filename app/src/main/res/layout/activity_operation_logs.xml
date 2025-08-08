@@ -168,7 +168,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:background="@android:color/holo_orange_dark"
+            android:background="@color/reportWarning"
             android:text="🗑️ تنظيف قديم"
             android:textColor="@color/colorWhite"
             android:textSize="14sp" />

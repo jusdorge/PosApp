@@ -123,9 +123,9 @@ public class ProductsManagementFragment extends Fragment {
             emptyProductsTextView.setVisibility(View.VISIBLE);
             
             if (!searchProductEditText.getText().toString().isEmpty()) {
-                emptyProductsTextView.setText("لا توجد نتائج للبحث");
+                emptyProductsTextView.setText(getString(R.string.no_search_results));
             } else {
-                emptyProductsTextView.setText("لا توجد منتجات");
+                emptyProductsTextView.setText(getString(R.string.no_products));
             }
         } else {
             productsRecyclerView.setVisibility(View.VISIBLE);

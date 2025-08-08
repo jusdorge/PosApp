@@ -192,4 +192,124 @@
     <string name="language_english">English</string>
     <string name="language_auto">Automatic</string>
     
+    <!-- =============================== -->
+    <!-- CUSTOMER MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="customer_name_label">Name: %1$s</string>
+    <string name="customer_phone_label">Phone: %1$s</string>
+    <string name="customer_debt_label">Debt: %1$s</string>
+    <string name="customer_location_not_set">Not specified</string>
+    <string name="update_location">Update Location</string>
+    <string name="set_location">Set Location</string>
+    <string name="update_location_button">Update</string>
+    <string name="set_location_button">Set</string>
+    <string name="deleting_customer">Deleting...</string>
+    <string name="delete_customer">Delete Customer</string>
+    
+    <!-- =============================== -->
+    <!-- INVOICE MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="invoice_number_label">Invoice Number: %1$s</string>
+    <string name="invoice_date_label">Date: %1$s</string>
+    <string name="customer_label">Customer: %1$s</string>
+    <string name="phone_label">Phone: %1$s</string>
+    <string name="total_amount_label">Total: %1$s</string>
+    <string name="payment_method_label">Payment Method: %1$s</string>
+    <string name="invoice_hash">Invoice #%1$s</string>
+    <string name="invoice_status_paid">Paid</string>
+    <string name="invoice_status_unpaid">Unpaid</string>
+    <string name="invoice_status_debt">Debt</string>
+    <string name="invoice_count_label">Invoice Count: %1$d</string>
+    <string name="total_sales_label">Total Sales: %1$s</string>
+    <string name="invoices_today">Invoices for %1$s</string>
+    
+    <!-- =============================== -->
+    <!-- PRODUCT MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="product_price_label">Price: %1$s</string>
+    <string name="product_quantity_label">Quantity: %1$d</string>
+    <string name="product_min_quantity_label">Min Quantity: %1$d</string>
+    <string name="product_cost_price_label">Cost Price: %1$s</string>
+    <string name="stock_value_label">Stock Value: %1$s</string>
+    <string name="current_quantity_label">Current Quantity: %1$d</string>
+    <string name="total_products_label">Total Products: %1$d</string>
+    <string name="low_stock_alert">Warning: %1$d products with low stock</string>
+    <string name="no_search_results">No search results</string>
+    <string name="no_products">No products</string>
+    <string name="no_customers">No customers</string>
+    
+    <!-- =============================== -->
+    <!-- USER MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="user_status_active">Active</string>
+    <string name="user_status_disabled">Disabled</string>
+    <string name="last_login_label">Last Login: %1$s</string>
+    <string name="never_logged_in">Never logged in</string>
+    <string name="not_registered">Not registered</string>
+    <string name="please_login">Please login</string>
+    
+    <!-- =============================== -->
+    <!-- REPORTS & ANALYTICS -->
+    <!-- =============================== -->
+    <string name="report_for_date">Report for: %1$s</string>
+    <string name="most_sold_category">Most Sold Category</string>
+    <string name="total_invoices_count">Total Invoice Count</string>
+    <string name="taxes_label">Taxes</string>
+    <string name="discounts_label">Discounts</string>
+    <string name="avg_sales_label">Average Sales Value</string>
+    <string name="best_customer_label">Best Customer</string>
+    <string name="payment_methods_label">Payment Methods</string>
+    <string name="seller_label">Seller</string>
+    <string name="loading_data">Loading...</string>
+    <string name="calculating_data">Calculating...</string>
+    <string name="searching_data">Searching...</string>
+    <string name="evaluating_performance">Evaluating performance...</string>
+    <string name="no_sales">No sales</string>
+    <string name="loading_error">Loading error</string>
+    <string name="not_specified">Not specified</string>
+    <string name="no_customers_found">No customers found</string>
+    <string name="best_customer_today">Best customer today</string>
+    <string name="quantity_sold_label">Quantity: %1$d</string>
+    <string name="revenue_label">Revenue: %1$s</string>
+    
+    <!-- =============================== -->
+    <!-- STOCK MOVEMENTS -->
+    <!-- =============================== -->
+    <string name="movement_type_incoming">Incoming</string>
+    <string name="movement_type_outgoing">Outgoing</string>
+    <string name="movement_type_adjustment">Adjustment</string>
+    <string name="date_from_label">From: %1$s</string>
+    <string name="date_to_label">To: %1$s</string>
+    <string name="select_start_date">Select start date</string>
+    <string name="select_end_date">Select end date</string>
+    <string name="total_movements_label">Total Movements: %1$d</string>
+    <string name="incoming_movements_label">Incoming Movements: %1$d</string>
+    <string name="outgoing_movements_label">Outgoing Movements: %1$d</string>
+    
+    <!-- =============================== -->
+    <!-- LOCATION SERVICES -->
+    <!-- =============================== -->
+    <string name="getting_location_text">Getting location...</string>
+    <string name="my_current_location">My Current Location</string>
+    
+    <!-- =============================== -->
+    <!-- QUICK INVOICE -->
+    <!-- =============================== -->
+    <string name="selected_products_label">Selected Products: %1$d</string>
+    <string name="total_label">Total: %1$s</string>
+    <string name="creating_invoice">Creating...</string>
+    <string name="create_invoice">Create Invoice</string>
+    
+    <!-- =============================== -->
+    <!-- SAVING STATES -->
+    <!-- =============================== -->
+    <string name="saving_data">Saving...</string>
+    <string name="current_method_label">Current Method: %1$s</string>
+    
+    <!-- =============================== -->
+    <!-- NOTIFICATIONS -->
+    <!-- =============================== -->
+    <string name="no_new_notifications">No new notifications</string>
+    <string name="error_loading_notifications">Error loading notifications</string>
+    
 </resources>

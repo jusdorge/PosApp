@@ -64,19 +64,19 @@ public class UserManagementAdapter extends BaseAdapter {
         
         // حالة المستخدم
         if (user.isActive()) {
-            holder.statusText.setText("نشط");
+            holder.statusText.setText(context.getString(R.string.user_status_active));
             holder.statusText.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
         } else {
-            holder.statusText.setText("معطل");
+            holder.statusText.setText(context.getString(R.string.user_status_disabled));
             holder.statusText.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
         }
         
         // آخر تسجيل دخول
         if (user.getLastLogin() != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-            holder.lastLoginText.setText("آخر دخول: " + sdf.format(user.getLastLogin().toDate()));
+            holder.lastLoginText.setText(context.getString(R.string.last_login_label, sdf.format(user.getLastLogin().toDate())));
         } else {
-            holder.lastLoginText.setText("لم يسجل دخول من قبل");
+            holder.lastLoginText.setText(context.getString(R.string.never_logged_in));
         }
         
         return convertView;

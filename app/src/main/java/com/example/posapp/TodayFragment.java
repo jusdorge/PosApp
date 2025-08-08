@@ -198,8 +198,8 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
     }
     
     private void updateSummary(int count, double total, double cashSales, double creditSales) {
-        invoiceCountTextView.setText("عدد الفواتير: " + count);
-        totalSalesTextView.setText("إجمالي المبيعات: " + CurrencyUtils.formatCurrency(total));
+        invoiceCountTextView.setText(getString(R.string.invoice_count_label, count));
+        totalSalesTextView.setText(getString(R.string.total_sales_label, CurrencyUtils.formatCurrency(total)));
         
         // عرض تفصيل المبيعات النقدية والدين
         if (cashSalesTextView != null) {
@@ -603,11 +603,11 @@ public class TodayFragment extends Fragment implements InvoiceListAdapter.OnInvo
         if (dateCompareFormat.format(currentDisplayDate).equals(dateCompareFormat.format(today))) {
             // عرض "فواتير اليوم" مع التاريخ
             String todayDate = ArabicNumberUtils.formatLongDateWithArabicNumbers(currentDisplayDate);
-            todayDateTextView.setText("فواتير " + todayDate);
+            todayDateTextView.setText(getString(R.string.invoices_today, todayDate));
         } else {
             // عرض "فواتير تاريخ" مع التاريخ المحدد
             String selectedDate = ArabicNumberUtils.formatLongDateWithArabicNumbers(currentDisplayDate);
-            todayDateTextView.setText("فواتير " + selectedDate);
+            todayDateTextView.setText(getString(R.string.invoices_today, selectedDate));
         }
     }
     

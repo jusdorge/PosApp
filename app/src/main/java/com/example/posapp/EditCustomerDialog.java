@@ -151,11 +151,11 @@ public class EditCustomerDialog extends DialogFragment {
         if (latitude != 0.0 && longitude != 0.0) {
             locationTextView.setText(String.format("%.4f, %.4f", latitude, longitude));
             showLocationButton.setEnabled(true);
-            setLocationButton.setText("تحديث الموقع");
+            setLocationButton.setText(getString(R.string.update_location));
         } else {
-            locationTextView.setText("غير محدد");
+            locationTextView.setText(getString(R.string.customer_location_not_set));
             showLocationButton.setEnabled(false);
-            setLocationButton.setText("تحديد موقع");
+            setLocationButton.setText(getString(R.string.set_location));
         }
     }
     
@@ -183,7 +183,7 @@ public class EditCustomerDialog extends DialogFragment {
         
         // تعطيل زر الحفظ أثناء الحفظ
         saveButton.setEnabled(false);
-        saveButton.setText("جاري الحفظ...");
+        saveButton.setText(getString(R.string.saving_data));
         
         // تحديث البيانات في Firestore
         db.collection("customers").document(customerId)
@@ -210,7 +210,7 @@ public class EditCustomerDialog extends DialogFragment {
                 android.util.Log.e("EditCustomerDialog", "فشل في تحديث بيانات العميل", e);
                 DialogUtils.showToastSafely(this, "فشل في تحديث بيانات العميل: " + e.getMessage(), Toast.LENGTH_LONG);
                 saveButton.setEnabled(true);
-                saveButton.setText("حفظ");
+                saveButton.setText(getString(R.string.save));
             });
     }
     

@@ -110,10 +110,10 @@ public class InvoiceListAdapter extends RecyclerView.Adapter<InvoiceListAdapter.
             
             // حالة الفاتورة
             if (invoice.isPaid()) {
-                invoiceStatusTextView.setText("مدفوعة");
+                invoiceStatusTextView.setText(context.getString(R.string.invoice_status_paid));
                 invoiceStatusTextView.setTextColor(itemView.getContext().getResources().getColor(R.color.colorPrimary));
             } else {
-                invoiceStatusTextView.setText("دين");
+                invoiceStatusTextView.setText(context.getString(R.string.invoice_status_debt));
                 invoiceStatusTextView.setTextColor(itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
             }
             

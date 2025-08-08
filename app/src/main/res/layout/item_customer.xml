@@ -83,34 +83,52 @@
                 android:layout_marginTop="4dp"
                 android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/editCustomerButton"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="2dp"
-                    android:background="@android:color/holo_blue_dark"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/button_edit_customer"
                     android:text="✏️"
                     android:textColor="@color/colorWhite"
-                    android:textSize="10sp" />
+                    android:textSize="12sp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    app:cornerRadius="6dp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/qrCodeButton"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="2dp"
-                    android:background="@color/colorPrimary"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/button_qr_code"
                     android:text="QR"
                     android:textColor="@color/colorWhite"
-                    android:textSize="8sp" />
+                    android:textSize="8sp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    app:cornerRadius="6dp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/deleteCustomerButton"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@android:color/holo_red_dark"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/button_delete_customer"
                     android:text="🗑️"
                     android:textColor="@color/colorWhite"
-                    android:textSize="10sp" />
+                    android:textSize="12sp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    app:cornerRadius="6dp" />
 
             </LinearLayout>
         </LinearLayout>

@@ -64,7 +64,7 @@
             android:background="@android:color/transparent"
             android:contentDescription="حذف العنصر"
             android:src="@android:drawable/ic_delete"
-            android:tint="@android:color/holo_red_dark"
+            android:tint="@color/reportDanger"
             android:padding="4dp" />
 
     </LinearLayout>

@@ -181,7 +181,7 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
 
         // تعطيل الزر مؤقتاً لمنع الضغط المتكرر
         btnMyLocation.setEnabled(false);
-        btnMyLocation.setText("جاري التحديد...");
+                    btnMyLocation.setText(getString(R.string.getting_location_text));
 
         // أولاً: الحصول على آخر موقع معروف فوراً (سريع جداً)
         try {
@@ -375,7 +375,7 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
     
     private void resetLocationButton() {
         btnMyLocation.setEnabled(true);
-        btnMyLocation.setText("موقعي الحالي");
+                    btnMyLocation.setText(getString(R.string.my_current_location));
     }
 
     @Override
