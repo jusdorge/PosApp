@@ -97,22 +97,22 @@ public class AllInvoicesAdapter extends RecyclerView.Adapter<AllInvoicesAdapter.
         }
         
         public void bind(Invoice invoice) {
-            tvInvoiceNumber.setText("فاتورة #" + invoice.getDisplayNumber());
-            tvCustomerName.setText("العميل: " + (invoice.getCustomerName() != null ? invoice.getCustomerName() : "غير محدد"));
+            tvInvoiceNumber.setText(itemView.getContext().getString(R.string.invoice_hash, invoice.getDisplayNumber()));
+            tvCustomerName.setText(itemView.getContext().getString(R.string.customer_label, invoice.getCustomerName() != null ? invoice.getCustomerName() : itemView.getContext().getString(R.string.not_specified)));
             
             if (invoice.getDate() != null) {
-                tvInvoiceDate.setText("التاريخ: " + dateFormat.format(invoice.getDate().toDate()));
+                tvInvoiceDate.setText(itemView.getContext().getString(R.string.invoice_date_label, dateFormat.format(invoice.getDate().toDate())));
             } else {
-                tvInvoiceDate.setText("التاريخ: غير محدد");
+                tvInvoiceDate.setText(itemView.getContext().getString(R.string.invoice_date_label, itemView.getContext().getString(R.string.not_specified)));
             }
             
-            tvTotalAmount.setText("المبلغ: " + CurrencyUtils.formatCurrency(invoice.getTotalAmount()));
+            tvTotalAmount.setText(itemView.getContext().getString(R.string.total_amount_label, CurrencyUtils.formatCurrency(invoice.getTotalAmount())));
             
             if (invoice.isPaid()) {
-                tvPaymentStatus.setText("نقدي");
+                tvPaymentStatus.setText(itemView.getContext().getString(R.string.invoice_status_paid));
                 tvPaymentStatus.setBackgroundResource(R.drawable.payment_background);
             } else {
-                tvPaymentStatus.setText("آجل");
+                tvPaymentStatus.setText(itemView.getContext().getString(R.string.invoice_status_debt));
                 tvPaymentStatus.setBackgroundResource(R.drawable.debt_background);
             }
             

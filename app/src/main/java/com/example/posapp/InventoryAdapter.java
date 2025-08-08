@@ -73,13 +73,13 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
         void bind(Product product) {
             productNameTextView.setText(product.getName());
             categoryTextView.setText(product.getCategory());
-            quantityTextView.setText("الكمية: " + product.getQuantity());
-            minQuantityTextView.setText("الحد الأدنى: " + product.getMinQuantity());
-            costPriceTextView.setText("سعر التكلفة: " + CurrencyUtils.formatCurrency(product.getCostPrice()));
+            quantityTextView.setText(itemView.getContext().getString(R.string.product_quantity_label, product.getQuantity()));
+            minQuantityTextView.setText(itemView.getContext().getString(R.string.product_min_quantity_label, product.getMinQuantity()));
+            costPriceTextView.setText(itemView.getContext().getString(R.string.product_cost_price_label, CurrencyUtils.formatCurrency(product.getCostPrice())));
             
             // حساب قيمة المخزون
             double stockValue = product.getQuantity() * product.getCostPrice();
-            stockValueTextView.setText("قيمة المخزون: " + CurrencyUtils.formatCurrency(stockValue));
+            stockValueTextView.setText(itemView.getContext().getString(R.string.stock_value_label, CurrencyUtils.formatCurrency(stockValue)));
 
             // تعيين حالة المخزون
             if (product.isLowStock()) {

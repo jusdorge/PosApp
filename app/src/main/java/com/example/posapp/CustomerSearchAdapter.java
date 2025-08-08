@@ -66,7 +66,7 @@ public class CustomerSearchAdapter extends RecyclerView.Adapter<CustomerSearchAd
             double totalDebt = customer.getTotalDebt();
             if (totalDebt > 0) {
                 customerDebtTextView.setVisibility(View.VISIBLE);
-                customerDebtTextView.setText("دين: " + CurrencyUtils.formatCurrency(totalDebt));
+                customerDebtTextView.setText(itemView.getContext().getString(R.string.customer_debt_label, CurrencyUtils.formatCurrency(totalDebt)));
             } else {
                 customerDebtTextView.setVisibility(View.GONE);
             }

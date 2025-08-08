@@ -79,7 +79,7 @@ public class CustomerInvoicesAdapter extends RecyclerView.Adapter<CustomerInvoic
 
         void bind(Invoice invoice) {
             // تنسيق رقم الفاتورة
-            invoiceIdTextView.setText("فاتورة #" + invoice.getDisplayNumber());
+            invoiceIdTextView.setText(itemView.getContext().getString(R.string.invoice_hash, invoice.getDisplayNumber()));
             
             // تنسيق التاريخ
             Timestamp timestamp = invoice.getDate();
@@ -96,10 +96,10 @@ public class CustomerInvoicesAdapter extends RecyclerView.Adapter<CustomerInvoic
             
             // حالة الدفع
             if (invoice.isPaid()) {
-                invoiceStatusTextView.setText("مدفوعة");
+                invoiceStatusTextView.setText(itemView.getContext().getString(R.string.invoice_status_paid));
                 invoiceStatusTextView.setBackgroundResource(R.drawable.payment_background);
             } else {
-                invoiceStatusTextView.setText("غير مدفوعة");
+                invoiceStatusTextView.setText(itemView.getContext().getString(R.string.invoice_status_unpaid));
                 invoiceStatusTextView.setBackgroundResource(R.drawable.debt_background);
             }
         }

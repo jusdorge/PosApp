@@ -75,21 +75,21 @@ public class StockMovementsAdapter extends RecyclerView.Adapter<StockMovementsAd
             
             // Set movement type and icon
             if (movement.isIncoming()) {
-                movementTypeTextView.setText("دخول");
+                movementTypeTextView.setText(itemView.getContext().getString(R.string.movement_type_incoming));
                 movementTypeTextView.setTextColor(android.graphics.Color.GREEN);
                 movementTypeIcon.setImageResource(R.drawable.ic_menu_add);
                 movementTypeIcon.setColorFilter(android.graphics.Color.GREEN);
                 quantityTextView.setText("+" + movement.getQuantity());
                 quantityTextView.setTextColor(android.graphics.Color.GREEN);
             } else if (movement.isOutgoing()) {
-                movementTypeTextView.setText("خروج");
+                movementTypeTextView.setText(itemView.getContext().getString(R.string.movement_type_outgoing));
                 movementTypeTextView.setTextColor(android.graphics.Color.RED);
                 movementTypeIcon.setImageResource(R.drawable.ic_menu_remove);
                 movementTypeIcon.setColorFilter(android.graphics.Color.RED);
                 quantityTextView.setText("-" + movement.getQuantity());
                 quantityTextView.setTextColor(android.graphics.Color.RED);
             } else if (movement.isAdjustment()) {
-                movementTypeTextView.setText("تعديل");
+                movementTypeTextView.setText(itemView.getContext().getString(R.string.movement_type_adjustment));
                 movementTypeTextView.setTextColor(android.graphics.Color.BLUE);
                 movementTypeIcon.setImageResource(R.drawable.ic_settings);
                 movementTypeIcon.setColorFilter(android.graphics.Color.BLUE);

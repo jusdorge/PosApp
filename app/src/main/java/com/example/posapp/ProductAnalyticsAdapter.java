@@ -39,8 +39,8 @@ public class ProductAnalyticsAdapter extends RecyclerView.Adapter<ProductAnalyti
         
         // Set product data (all products in the list are sold products)
         holder.productNameTextView.setText(data.getProductName());
-        holder.quantityTextView.setText("الكمية: " + data.getQuantitySold());
-        holder.revenueTextView.setText("الإيرادات: " + CurrencyUtils.formatCurrency(data.getTotalRevenue()));
+        holder.quantityTextView.setText(holder.itemView.getContext().getString(R.string.quantity_sold_label, data.getQuantitySold()));
+        holder.revenueTextView.setText(holder.itemView.getContext().getString(R.string.revenue_label, CurrencyUtils.formatCurrency(data.getTotalRevenue())));
         
         // Calculate and set percentage
         double percentage = data.getPercentage(totalQuantity);
