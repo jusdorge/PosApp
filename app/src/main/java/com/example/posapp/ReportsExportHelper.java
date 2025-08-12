@@ -93,7 +93,7 @@ public class ReportsExportHelper {
             textContent.append(context.getString(R.string.report_best_customer_line, stats.bestCustomer, ReportsUtils.formatCurrency(stats.bestCustomerAmount))).append("\n\n");
 
             textContent.append(context.getString(R.string.report_performance_evaluation_header)).append("\n");
-            textContent.append(ReportsUtils.getReportSummary(stats.totalInvoices, stats.totalSales, stats.averageSale));
+            textContent.append(ReportsUtils.getReportSummary(context, stats.totalInvoices, stats.totalSales, stats.averageSale));
 
             textContent.append("\n===============================\n");
             textContent.append(context.getString(R.string.report_generated_by_app)).append("\n");
@@ -118,13 +118,13 @@ public class ReportsExportHelper {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, AppGlobals.getContext().getString(R.string.report_share_subject_with_name, file.getName()));
-        shareIntent.putExtra(Intent.EXTRA_TEXT, AppGlobals.getContext().getString(R.string.report_share_text));
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.report_share_subject_with_name, file.getName()));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.report_share_text));
 
         try {
-            context.startActivity(Intent.createChooser(shareIntent, AppGlobals.getContext().getString(R.string.share_report)));
+            context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_report)));
         } catch (Exception e) {
-            Toast.makeText(context, AppGlobals.getContext().getString(R.string.cannot_share_file), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.cannot_share_file), Toast.LENGTH_SHORT).show();
         }
     }
 

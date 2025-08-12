@@ -1,7 +1,7 @@
 <resources>
     <!-- TodayFragment strings -->
-    <string name="error_loading_invoices">Error loading invoices: %1$s</string>
-    <string name="invoice_summary_message">Customer: %1$s
+    <string name="error_loading_invoices">Error loading invoices: </string>
+    <string name="invoice_summary_message">Customer:
 Total: %2$s
 
 Choose an action:</string>
@@ -11,8 +11,8 @@ Choose an action:</string>
     <string name="add_products_option">Add Products</string>
     <string name="customer_location_option">📍 Customer Location</string>
     <string name="delete_invoice_option">Delete Invoice</string>
-    <string name="generic_error">Error: %1$s</string>
-    <string name="error_showing_options">Error showing options: %1$s</string>
+    <string name="generic_error">Error: </string>
+    <string name="error_showing_options">Error showing options: </string>
     <string name="create_new_invoice_title">Create New Invoice</string>
     <string name="how_to_add_product_message">How would you like to add a product?</string>
     <string name="go_to_counter">Go to Counter</string>
@@ -23,12 +23,12 @@ Choose an action:</string>
 Note: Any current invoice in the counter will be cleared.
 ⚠️ The original invoice will be updated, not a new one created.</string>
     <string name="load_label">Load</string>
-    <string name="invoice_loaded_for_edit">✅ Invoice loaded for edit - No.: %1$s</string>
+    <string name="invoice_loaded_for_edit">✅ Invoice loaded for edit - No.: </string>
     <string name="invoice_loaded_without_customer">✅ Invoice loaded for edit (without customer info)</string>
     <string name="delete_invoice_warning_title">⚠️ Delete Invoice</string>
     <string name="delete_invoice_confirm_message">Are you sure you want to permanently delete the invoice?
 
-📄 Invoice number: %1$s
+📄 Invoice number:
 👤 Customer: %2$s
 💰 Amount: %3$s
 
@@ -36,8 +36,8 @@ Note: Any current invoice in the counter will be cleared.
 The invoice and its contents will be permanently deleted from the system.</string>
     <string name="delete_permanently">🗑️ Delete Permanently</string>
     <string name="deleting_invoice">Deleting invoice...</string>
-    <string name="invoice_deleted_success">✅ Invoice %1$s deleted permanently</string>
-    <string name="failed_delete_invoice">❌ Failed to delete invoice: %1$s</string>
+    <string name="invoice_deleted_success">✅ Invoice  deleted permanently</string>
+    <string name="failed_delete_invoice">❌ Failed to delete invoice: </string>
     <string name="choose_date_to_load_invoices">Choose a date to load its invoices</string>
     <string name="loaded_invoices_for_date">✅ Loaded %1$d invoices for %2$s</string>
     <string name="invoice_data_unavailable">Invoice data unavailable</string>
@@ -48,20 +48,20 @@ The invoice and its contents will be permanently deleted from the system.</strin
 
 Would you like to grant the permission?</string>
     <string name="try_again_after_permission">After granting permission, please try again</string>
-    <string name="error_searching_customer_data">Error searching customer data: %1$s</string>
+    <string name="error_searching_customer_data">Error searching customer data: </string>
     <string name="export_success_title">Export successful</string>
-    <string name="file_saved_path_share_question">File saved at: %1$s\n\n%2$s\n\nWould you like to share it?</string>
+    <string name="file_saved_path_share_question">File saved at: \n\n%2$s\n\nWould you like to share it?</string>
     <string name="creating_template">Creating template...</string>
-    <string name="failed_create_template">Failed to create template: %1$s</string>
+    <string name="failed_create_template">Failed to create template: </string>
     <string name="template_created_title">Template created</string>
-    <string name="template_created_message">%1$s template created successfully!\n\n%2$s\n\n%3$s</string>
+    <string name="template_created_message"> template created successfully!\n\n%2$s\n\n%3$s</string>
     <string name="share_template">Share template</string>
     <string name="no_file_picker_app_found">No file picker app found</string>
     <string name="loading_customer_data">Loading customer data...</string>
-    <string name="customer_selected_toast">Customer selected: %1$s</string>
+    <string name="customer_selected_toast">Customer selected: </string>
     <string name="error_parsing_customer_data">Error parsing customer data</string>
     <string name="customer_not_found_database">Customer not found in database</string>
-    <string name="failed_load_customer_data">Failed to load customer data: %1$s</string>
+    <string name="failed_load_customer_data">Failed to load customer data: </string>
     <string name="guest_user_warning">You are using a guest account - limited view-only permissions</string>
     <string name="logout_title">Logout</string>
     <string name="logout_confirm_message">Are you sure you want to logout?</string>
@@ -85,16 +85,16 @@ Would you like to grant the permission?</string>
     <string name="accuracy_acceptable">Acceptable</string>
     <string name="current_location_found_accuracy_with_text">✅ Current location - Accuracy: %1$dm (%2$s)</string>
     <string name="improving_location_accuracy_current">🔄 Improving location accuracy... (Current: %1$dm)</string>
-    <string name="provider_enabled">✅ Service enabled: %1$s</string>
-    <string name="provider_disabled">⚠️ Service disabled: %1$s</string>
+    <string name="provider_enabled">✅ Service enabled: </string>
+    <string name="provider_disabled">⚠️ Service disabled: </string>
 
     <!-- QRCodePrintActivity -->
     <string name="qr_print_title">Print QR Code</string>
-    <string name="name_colon_value">Name: %1$s</string>
-    <string name="phone_colon_value">Phone: %1$s</string>
+    <string name="name_colon_value">Name: </string>
+    <string name="phone_colon_value">Phone: </string>
     <string name="total_debt_formatted">Total debt: %.2f DZD</string>
-    <string name="error_opening_printers">Error opening printers list: %1$s</string>
-    <string name="error_sharing_qr">Error sharing QR Code: %1$s</string>
+    <string name="error_opening_printers">Error opening printers list: </string>
+    <string name="error_sharing_qr">Error sharing QR Code: </string>
     <string name="bluetooth_not_supported">Bluetooth is not supported on this device</string>
     <string name="enable_bluetooth_first">Please enable Bluetooth first</string>
     <string name="no_permission_bluetooth_devices">No permission to access Bluetooth devices</string>
@@ -103,20 +103,20 @@ Would you like to grant the permission?</string>
     <string name="select_printer">Select printer</string>
     <string name="connecting_to_printer">Connecting to printer...</string>
     <string name="connected_printing">Connected, printing...</string>
-    <string name="failed_connect_printer">Failed to connect to printer: %1$s</string>
+    <string name="failed_connect_printer">Failed to connect to printer: </string>
     <string name="no_permission_connect_printer">No permission to connect to printer</string>
     <string name="qr_printed_success">QR Code printed successfully</string>
-    <string name="failed_print_qr">Failed to print QR Code: %1$s</string>
-    <string name="print_error_generic">Print error: %1$s</string>
+    <string name="failed_print_qr">Failed to print QR Code: </string>
+    <string name="print_error_generic">Print error: </string>
     <string name="qr_not_available">QR Code not available</string>
     <string name="failed_save_qr">Failed to save QR Code</string>
-    <string name="customer_qr_subject">Customer QR Code: %1$s</string>
-    <string name="customer_qr_share_text">Customer QR Code: %1$s
+    <string name="customer_qr_subject">Customer QR Code: </string>
+    <string name="customer_qr_share_text">Customer QR Code:
 Phone: %2$s
 Total debt: %3$s</string>
     <string name="share_qr_code">Share QR Code</string>
     <string name="no_apps_to_share">No apps available to share</string>
-    <string name="failed_share_qr">Failed to share QR Code: %1$s</string>
+    <string name="failed_share_qr">Failed to share QR Code: </string>
     <string name="share_customer_info">Share customer info</string>
     <string name="failed_share_customer_info">Failed to share customer info</string>
     <string name="error_missing_invoice_id">Error: invoice ID is missing</string>
@@ -154,47 +154,47 @@ Total debt: %3$s</string>
     <string name="print_normal">Normal print 📄</string>
     <string name="cannot_print_invoice_no_data">Cannot print invoice, data not available</string>
     <string name="creating_image_for_printing">Creating image for printing...</string>
-    <string name="failed_create_invoice_image">Failed to create invoice image: %1$s</string>
-    <string name="error_creating_image">Error creating image: %1$s</string>
+    <string name="failed_create_invoice_image">Failed to create invoice image: </string>
+    <string name="error_creating_image">Error creating image: </string>
     <string name="creating_compact_image_for_printing">Creating compact image for printing...</string>
-    <string name="failed_create_compact_image">Failed to create compact image: %1$s</string>
+    <string name="failed_create_compact_image">Failed to create compact image: </string>
     <string name="print_success_title">Printed successfully!</string>
     <string name="print_success_message">Invoice image printed in full Arabic text</string>
     <string name="print_failed_title">Printing failed</string>
     <string name="print_failed_message_with_error">An error occurred while printing the image:
 
-%1$s</string>
+</string>
     <string name="cannot_convert_invoice_no_data">Cannot convert invoice, data not available</string>
     <string name="converting_invoice_to_image">Converting invoice to image...</string>
-    <string name="failed_convert_invoice">Failed to convert invoice: %1$s</string>
-    <string name="error_converting">Conversion error: %1$s</string>
+    <string name="failed_convert_invoice">Failed to convert invoice: </string>
+    <string name="error_converting">Conversion error: </string>
     <string name="save_success_title">Saved successfully!</string>
     <string name="bmp_saved_message_with_path">Invoice saved as BMP image with full Arabic text
 
-Path: %1$s
+Path:
 
 What would you like to do?</string>
     <string name="share_image">Share image</string>
     <string name="view_file">View file</string>
-    <string name="no_app_to_view_image">No app to view image: %1$s</string>
+    <string name="no_app_to_view_image">No app to view image: </string>
     <string name="invoice_not_found">Invoice not found</string>
-    <string name="failed_load_invoice">Failed to load invoice: %1$s</string>
+    <string name="failed_load_invoice">Failed to load invoice: </string>
     <string name="invoice_print_success">Invoice printed successfully</string>
     <string name="location_permission_granted_message">✅ Location permission granted. You can now open navigation to the customer</string>
     <string name="location_permission_denied_message">Location permission denied. Only customer location will be shown</string>
-    <string name="login_init_error">Error initializing login screen: %1$s</string>
+    <string name="login_init_error">Error initializing login screen: </string>
     <string name="enter_email_and_password">Please enter email and password</string>
     <string name="logging_in">Logging in...</string>
-    <string name="login_failed_with_message">Login failed: %1$s</string>
+    <string name="login_failed_with_message">Login failed: </string>
     <string name="unknown_error">Unknown error</string>
-    <string name="google_login_failed">Google sign-in failed: %1$s</string>
-    <string name="auth_failed_with_message">Authentication failed: %1$s</string>
+    <string name="google_login_failed">Google sign-in failed: </string>
+    <string name="auth_failed_with_message">Authentication failed: </string>
     <string name="unauthorized_admin_login_denied">Unauthorized admin login attempt denied</string>
     <string name="searching_for_user">Searching for user...</string>
     <string name="user_found_but_processing_failed">User found but processing failed</string>
     <string name="search_error_title">Search error</string>
     <string name="search_error_message">Failed to search for user:
-%1$s
+
 
 What would you like to do?</string>
     <string name="retry">Retry</string>
@@ -211,19 +211,19 @@ Choose an option:</string>
 
 This account will be linked with full system admin privileges.</string>
     <string name="confirm_link">Confirm link</string>
-    <string name="welcome_system_admin">Welcome %1$s - System Admin</string>
+    <string name="welcome_system_admin">Welcome  - System Admin</string>
     <string name="system_admin_created_welcome">System admin account created successfully!
-Welcome %1$s</string>
+Welcome </string>
     <string name="guest_prefix">Guest - </string>
-    <string name="welcome_guest_temporary">Welcome %1$s (temporary account)</string>
+    <string name="welcome_guest_temporary">Welcome  (temporary account)</string>
     <string name="create_new_account_title">Create new account</string>
     <string name="create">Create</string>
     <string name="enter_full_name">Please enter full name</string>
     <string name="creating_account">Creating account...</string>
-    <string name="account_created_welcome">Account created successfully - Welcome %1$s</string>
-    <string name="error_creating_account">Error creating account: %1$s</string>
-    <string name="database_connection_error_with_msg">Database connection error: %1$s</string>
-    <string name="welcome_user">Welcome %1$s</string>
+    <string name="account_created_welcome">Account created successfully - Welcome </string>
+    <string name="error_creating_account">Error creating account: </string>
+    <string name="database_connection_error_with_msg">Database connection error: </string>
+    <string name="welcome_user">Welcome </string>
     <string name="user_processing_error_title">User processing error</string>
     <string name="user_processing_error_message">Found %1$d users with email %2$s but failed to process their data.
 
@@ -232,37 +232,37 @@ What would you like to do?</string>
     <string name="create_new">Create new</string>
     <string name="database_error_title">Database error</string>
     <string name="database_error_message_detailed">Failed to connect to database:
-%1$s
+
 
 Check internet connection and Firebase settings.</string>
     <string name="performing_forced_fix">Performing forced fix...</string>
-    <string name="failed_to_fix_with_msg">Failed to fix: %1$s</string>
-    <string name="welcome_user_fixed">Welcome %1$s (account fixed)</string>
-    <string name="search_user_error_with_msg">Error searching for user: %1$s</string>
-    <string name="user_data_fixed_welcome">User data fixed - Welcome %1$s</string>
+    <string name="failed_to_fix_with_msg">Failed to fix: </string>
+    <string name="welcome_user_fixed">Welcome  (account fixed)</string>
+    <string name="search_user_error_with_msg">Error searching for user: </string>
+    <string name="user_data_fixed_welcome">User data fixed - Welcome </string>
     <string name="user_data_error_contact_admin">User data error. Please contact system admin.</string>
     <string name="convert_to_system_admin_title">Convert to system admin</string>
     <string name="convert_to_admin_message">Do you want to convert this account to a system admin?
 
-Email: %1$s
+Email:
 
 ⚠️ This action grants full system privileges!</string>
     <string name="yes_create_admin">Yes, create admin</string>
     <string name="diagnosing">Diagnosing...</string>
-    <string name="diagnostic_error_with_msg">Diagnostic error: %1$s</string>
+    <string name="diagnostic_error_with_msg">Diagnostic error: </string>
     <string name="diagnostic_result_title">Diagnostic result</string>
-    <string name="diagnostic_result_message">%1$s
+    <string name="diagnostic_result_message">
 📋 Recommendation:
 %2$s</string>
     <string name="close">Close</string>
     <string name="firebase_info">Firebase info</string>
     <string name="fixing">Fixing...</string>
     <string name="fix_result_title">Fix result</string>
-    <string name="fix_failed_with_msg">Fix failed: %1$s</string>
+    <string name="fix_failed_with_msg">Fix failed: </string>
     <string name="report_summary_title">Report summary:</string>
     <string name="report_summary_invoices_count">• Invoices count: %1$d</string>
-    <string name="report_summary_total_sales">• Total sales: %1$s</string>
-    <string name="report_summary_avg_invoice">• Average invoice value: %1$s</string>
+    <string name="report_summary_total_sales">• Total sales: </string>
+    <string name="report_summary_avg_invoice">• Average invoice value: </string>
     <string name="report_summary_performance_prefix">• Performance:</string>
     <string name="report_performance_excellent">Excellent 🌟</string>
     <string name="report_performance_good">Good 👍</string>
@@ -272,22 +272,22 @@ Email: %1$s
     <string name="failed_to_save_image">Failed to save image</string>
     <string name="invoice_bmp_title_compact">Sales Invoice - Compact</string>
     <string name="invoice_bmp_title_normal">Sales Invoice</string>
-    <string name="invoice_label_number">Invoice No: %1$s</string>
-    <string name="invoice_label_date">Date: %1$s</string>
-    <string name="invoice_label_customer_name">Customer: %1$s</string>
-    <string name="invoice_label_customer_phone">Phone: %1$s</string>
-    <string name="invoice_label_payment_method">Payment method: %1$s</string>
+    <string name="invoice_label_number">Invoice No: </string>
+    <string name="invoice_label_date">Date: </string>
+    <string name="invoice_label_customer_name">Customer: </string>
+    <string name="invoice_label_customer_phone">Phone: </string>
+    <string name="invoice_label_payment_method">Payment method: </string>
     <string name="invoice_items_title_compact">Items (Top 8)</string>
     <string name="invoice_items_title">Invoice Items</string>
     <string name="product_not_specified">Product not specified</string>
     <string name="invoice_item_details_format">Qty: %1$d × %2$s = %3$s</string>
     <string name="invoice_more_items">... and %1$d more items</string>
     <string name="invoice_no_items">No items in this invoice</string>
-    <string name="invoice_total_label">Total: %1$s</string>
+    <string name="invoice_total_label">Total: </string>
     <string name="invoice_thanks_compact">Thank you</string>
     <string name="invoice_thanks_normal">Thank you for your business</string>
     <string name="share_invoice">Share invoice</string>
-    <string name="failed_share_file">Failed to share file: %1$s</string>
+    <string name="failed_share_file">Failed to share file: </string>
     <string name="report_file_prefix">report</string>
     <string name="report_title">POS Report</string>
     <string name="report_title_centered">        POS Report        </string>
@@ -303,22 +303,22 @@ Email: %1$s
     <string name="report_top_product_qty_label">Top product quantity</string>
     <string name="report_best_customer_label">Best customer</string>
     <string name="report_best_customer_amount_label">Best customer purchases</string>
-    <string name="report_saved_to">Report saved to: %1$s</string>
-    <string name="failed_to_save_report">Failed to save report: %1$s</string>
+    <string name="report_saved_to">Report saved to: </string>
+    <string name="failed_to_save_report">Failed to save report: </string>
     <string name="report_stats_section_header">--- General statistics ---</string>
     <string name="report_invoices_count_line">Invoices: %1$d</string>
-    <string name="report_total_sales_line">Total sales: %1$s</string>
-    <string name="report_total_profit_line">Total profit: %1$s</string>
-    <string name="report_avg_invoice_line">Average invoice: %1$s</string>
+    <string name="report_total_sales_line">Total sales: </string>
+    <string name="report_total_profit_line">Total profit: </string>
+    <string name="report_avg_invoice_line">Average invoice: </string>
     <string name="report_payment_methods_header">--- Payment methods ---</string>
-    <string name="report_cash_sales_line">Cash sales: %1$s (%2$s)</string>
-    <string name="report_credit_sales_line">Credit sales: %1$s (%2$s)</string>
+    <string name="report_cash_sales_line">Cash sales:  (%2$s)</string>
+    <string name="report_credit_sales_line">Credit sales:  (%2$s)</string>
     <string name="report_best_performance_header">--- Best performance ---</string>
-    <string name="report_best_product_line">Top product: %1$s (%2$d units)</string>
-    <string name="report_best_customer_line">Best customer: %1$s (%2$s)</string>
+    <string name="report_best_product_line">Top product:  (%2$d units)</string>
+    <string name="report_best_customer_line">Best customer:  (%2$s)</string>
     <string name="report_performance_evaluation_header">--- Performance evaluation ---</string>
     <string name="report_generated_by_app">This report was generated by the POS app</string>
-    <string name="report_share_subject_with_name">POS Report - %1$s</string>
+    <string name="report_share_subject_with_name">POS Report - </string>
     <string name="report_share_text">Sales report from the POS app</string>
     <string name="report_csv_header">Statement,Value</string>
     <string name="report_debt_payments_label">Debt payments</string>
@@ -332,13 +332,13 @@ Email: %1$s
     <string name="notifications_load_error">Failed to load notifications</string>
     <string name="low_stock_check">Low stock check</string>
     <string name="low_stock_alert_title">Alert: Low stock</string>
-    <string name="low_stock_alert_message">Product "%1$s" has low stock (%2$d remaining)</string>
+    <string name="low_stock_alert_message">Product "" has low stock (%2$d remaining)</string>
     <string name="create_low_stock_notification">Create low stock notification</string>
     <string name="no_notifications">No notifications</string>
     <string name="mark_as_read">Mark as read</string>
     <string name="error_reading_customer_id">Error reading customer ID</string>
     <string name="admins_already_exist_count">There are already %1$d system admins</string>
-    <string name="admin_check_error_with_msg">Admin check error: %1$s</string>
+    <string name="admin_check_error_with_msg">Admin check error: </string>
     <string name="default_admin_option">Create default admin (admin@posapp.com)</string>
     <string name="custom_admin_option">Create custom admin</string>
     <string name="create_system_admin_title">Create system admin</string>
@@ -358,7 +358,7 @@ Choose a creation method:</string>
     <string name="no_permission_view_operation_logs">You do not have permission to view operation logs</string>
     <string name="check_internet_try_again">Check your internet connection and try again</string>
     <string name="database_being_prepared_try_later">Database is being prepared - please try again later</string>
-    <string name="failed_load_operation_logs_with_error">Failed to load operation logs: %1$s</string>
+    <string name="failed_load_operation_logs_with_error">Failed to load operation logs: </string>
     <string name="failed_load_operation_logs_try_again">Failed to load operation logs - please try again</string>
     <string name="operation_logs_summary_format">Total: %1$d • Critical: %2$d • Today: %3$d • Shown: %4$d</string>
     <string name="export_feature_in_development">🚧 Export feature in development</string>
@@ -368,7 +368,7 @@ Choose a creation method:</string>
     <string name="clean_label">Clean</string>
     <string name="cleaning_old_logs">Cleaning old logs...</string>
     <string name="deleted_old_logs_success">✅ Deleted %1$d old logs</string>
-    <string name="failed_clean_old_logs">❌ Failed to clean logs: %1$s</string>
+    <string name="failed_clean_old_logs">❌ Failed to clean logs: </string>
     <string name="operation_details_header">🔍 Operation Details</string>
     <string name="operation_type_label">📋 Type: </string>
     <string name="entity_label">📦 Entity: </string>
@@ -381,12 +381,12 @@ Choose a creation method:</string>
     <string name="operation_details_title">Operation Details</string>
 
     <!-- QuickInvoiceDialog -->
-    <string name="failed_load_products">Failed to load products: %1$s</string>
-    <string name="added_product_success">✅ Added %1$s</string>
+    <string name="failed_load_products">Failed to load products: </string>
+    <string name="added_product_success">✅ Added </string>
     <string name="selected_products_count">Selected products: %1$d</string>
     <string name="select_at_least_one_product">Please select at least one product</string>
-    <string name="error_generating_invoice_number">Error generating invoice number: %1$s</string>
-    <string name="failed_save_invoice">Failed to save invoice: %1$s</string>
+    <string name="error_generating_invoice_number">Error generating invoice number: </string>
+    <string name="failed_save_invoice">Failed to save invoice: </string>
 
     <!-- NetworkErrorHandler -->
     <string name="unexpected_error">An unexpected error occurred</string>
@@ -398,20 +398,20 @@ Choose a creation method:</string>
     <string name="data_already_exists">Data already exists</string>
     <string name="resource_exhausted_try_later">Resource limit exceeded. Please try again later</string>
     <string name="no_internet_check_connection">No internet connection. Check WiFi or mobile data</string>
-    <string name="service_error_with_operation">Service error: %1$s</string>
+    <string name="service_error_with_operation">Service error: </string>
     <string name="network_error_check_connection">Network error. Check your internet connection</string>
-    <string name="error_in_operation">Error in %1$s</string>
-    <string name="retry_question_with_message">%1$s\n\nWould you like to retry?</string>
+    <string name="error_in_operation">Error in </string>
+    <string name="retry_question_with_message">\n\nWould you like to retry?</string>
     <string name="please_retry_operation">Please retry the operation</string>
-    <string name="data_error_missing_or_corrupt">Data error: %1$s is missing or corrupted</string>
+    <string name="data_error_missing_or_corrupt">Data error:  is missing or corrupted</string>
     <string name="data_error_title">Data Error</string>
-    <string name="data_error_message_with_support">%1$s\n\nPlease contact support if the issue persists.</string>
-    <string name="sync_failed_for_operation">Sync failed for %1$s</string>
+    <string name="data_error_message_with_support">\n\nPlease contact support if the issue persists.</string>
+    <string name="sync_failed_for_operation">Sync failed for </string>
     <string name="no_internet_suffix">No internet connection</string>
     <string name="server_error_suffix">Server error</string>
 
     <!-- ReportsFragment additions -->
-    <string name="report_for_day">Report for: %1$s</string>
+    <string name="report_for_day">Report for: </string>
     <string name="most_sold_category_title">Top selling category</string>
     <string name="total_receipts_title">Total receipts</string>
     <string name="tax_title">Tax</string>
@@ -427,14 +427,14 @@ Choose a creation method:</string>
     <string name="calculating_credit_prefix">📝 Calculating...</string>
     <string name="total_sales_calculating">Total sales: Calculating...</string>
     <string name="total_profit_calculating">Total profit: Calculating...</string>
-    <string name="top_product_with_count">%1$s : %2$d</string>
+    <string name="top_product_with_count"> : %2$d</string>
     <string name="other_products_with_hint">%1$d other products • tap for details 📊</string>
     <string name="zero_products_with_hint">0 products • tap for details 📊</string>
     <string name="load_error">Load error</string>
     <string name="zero_customers">0 customers</string>
     <string name="only_one_seller">Only one seller!</string>
     <string name="active_sellers_count">%1$d active sellers</string>
-    <string name="total_profit_label">Total profit: %1$s</string>
+    <string name="total_profit_label">Total profit: </string>
     <string name="performance_excellent">Excellent performance! 🎉</string>
     <string name="performance_very_good">Very good performance ✅</string>
     <string name="performance_good">Good performance 👍</string>
@@ -563,9 +563,9 @@ Choose a creation method:</string>
     <string name="cash_sales">Cash Sales</string>
     <string name="debt_payments">Debt Payments</string>
     <string name="cash_collection_summary">Cash Collection Summary</string>
-    <string name="cash_sales_format">💵 Cash Sales: %1$s</string>
-    <string name="debt_payments_format">💰 Debt Payments: %1$s</string>
-    <string name="total_cash_collected_format">💳 Total Cash Collected: %1$s</string>
+    <string name="cash_sales_format">💵 Cash Sales: </string>
+    <string name="debt_payments_format">💰 Debt Payments: </string>
+    <string name="total_cash_collected_format">💳 Total Cash Collected: </string>
     <string name="calculating_debt_payments">Calculating payments...</string>
     <string name="calculating_cash_collected">Calculating cash collected...</string>
     
@@ -632,9 +632,9 @@ Choose a creation method:</string>
     <!-- =============================== -->
     <!-- CUSTOMER MANAGEMENT -->
     <!-- =============================== -->
-    <string name="customer_name_label">Name: %1$s</string>
-    <string name="customer_phone_label">Phone: %1$s</string>
-    <string name="customer_debt_label">Debt: %1$s</string>
+    <string name="customer_name_label">Name: </string>
+    <string name="customer_phone_label">Phone: </string>
+    <string name="customer_debt_label">Debt: </string>
     <string name="customer_location_not_set">Not specified</string>
     <string name="update_location">Update Location</string>
     <string name="set_location">Set Location</string>
@@ -646,30 +646,30 @@ Choose a creation method:</string>
     <!-- =============================== -->
     <!-- INVOICE MANAGEMENT -->
     <!-- =============================== -->
-    <string name="invoice_number_label">Invoice Number: %1$s</string>
-    <string name="invoice_date_label">Date: %1$s</string>
-    <string name="customer_label">Customer: %1$s</string>
-    <string name="phone_label">Phone: %1$s</string>
-    <string name="total_amount_label">Total: %1$s</string>
-    <string name="payment_method_label">Payment Method: %1$s</string>
-    <string name="invoice_hash">Invoice #%1$s</string>
+    <string name="invoice_number_label">Invoice Number: </string>
+    <string name="invoice_date_label">Date: </string>
+    <string name="customer_label">Customer: </string>
+    <string name="phone_label">Phone: </string>
+    <string name="total_amount_label">Total: </string>
+    <string name="payment_method_label">Payment Method: </string>
+    <string name="invoice_hash">Invoice #</string>
     <string name="invoice_status_paid">Paid</string>
     <string name="invoice_status_unpaid">Unpaid</string>
     <string name="invoice_status_debt">Debt</string>
     <string name="invoice_count_label">Invoice Count: %1$d</string>
     <string name="invoice_count_zero">Invoice Count: 0</string>
-    <string name="total_sales_label">Total Sales: %1$s</string>
+    <string name="total_sales_label">Total Sales: </string>
     <string name="total_sales_zero">Total Sales: 0.00 DZ</string>
-    <string name="invoices_today">Invoices for %1$s</string>
+    <string name="invoices_today">Invoices for </string>
     
     <!-- =============================== -->
     <!-- PRODUCT MANAGEMENT -->
     <!-- =============================== -->
-    <string name="product_price_label">Price: %1$s</string>
+    <string name="product_price_label">Price: </string>
     <string name="product_quantity_label">Quantity: %1$d</string>
     <string name="product_min_quantity_label">Min Quantity: %1$d</string>
-    <string name="product_cost_price_label">Cost Price: %1$s</string>
-    <string name="stock_value_label">Stock Value: %1$s</string>
+    <string name="product_cost_price_label">Cost Price: </string>
+    <string name="stock_value_label">Stock Value: </string>
     <string name="current_quantity_label">Current Quantity: %1$d</string>
     <string name="total_products_label">Total Products: %1$d</string>
     <string name="low_stock_alert">Warning: %1$d products with low stock</string>
@@ -682,7 +682,7 @@ Choose a creation method:</string>
     <!-- =============================== -->
     <string name="user_status_active">Active</string>
     <string name="user_status_disabled">Disabled</string>
-    <string name="last_login_label">Last Login: %1$s</string>
+    <string name="last_login_label">Last Login: </string>
     <string name="never_logged_in">Never logged in</string>
     <string name="not_registered">Not registered</string>
     <string name="please_login">Please login</string>
@@ -690,7 +690,7 @@ Choose a creation method:</string>
     <!-- =============================== -->
     <!-- REPORTS & ANALYTICS -->
     <!-- =============================== -->
-    <string name="report_for_date">Report for: %1$s</string>
+    <string name="report_for_date">Report for: </string>
     <string name="most_sold_category">Most Sold Category</string>
     <string name="total_invoices_count">Total Invoice Count</string>
     <string name="taxes_label">Taxes</string>
@@ -709,7 +709,7 @@ Choose a creation method:</string>
     <string name="no_customers_found">No customers found</string>
     <string name="best_customer_today">Best customer today</string>
     <string name="quantity_sold_label">Quantity: %1$d</string>
-    <string name="revenue_label">Revenue: %1$s</string>
+    <string name="revenue_label">Revenue: </string>
     
     <!-- =============================== -->
     <!-- STOCK MOVEMENTS -->
@@ -717,8 +717,8 @@ Choose a creation method:</string>
     <string name="movement_type_incoming">Incoming</string>
     <string name="movement_type_outgoing">Outgoing</string>
     <string name="movement_type_adjustment">Adjustment</string>
-    <string name="date_from_label">From: %1$s</string>
-    <string name="date_to_label">To: %1$s</string>
+    <string name="date_from_label">From: </string>
+    <string name="date_to_label">To: </string>
     <string name="select_start_date">Select start date</string>
     <string name="select_end_date">Select end date</string>
     <string name="total_movements_label">Total Movements: %1$d</string>
@@ -740,7 +740,7 @@ Choose a creation method:</string>
     <!-- QUICK INVOICE -->
     <!-- =============================== -->
     <string name="selected_products_label">Selected Products: %1$d</string>
-    <string name="total_label">Total: %1$s</string>
+    <string name="total_label">Total: </string>
     <string name="creating_invoice">Creating...</string>
     <string name="create_invoice">Create Invoice</string>
     
@@ -748,7 +748,7 @@ Choose a creation method:</string>
     <!-- SAVING STATES -->
     <!-- =============================== -->
     <string name="saving_data">Saving...</string>
-    <string name="current_method_label">Current Method: %1$s</string>
+    <string name="current_method_label">Current Method: </string>
     <string name="edit_payment_method">💳 Edit Payment Method</string>
     <string name="select_new_method">Select new method:</string>
     <string name="edit_payment_note">💡 Note: Changing the payment method will affect sales reports</string>
@@ -876,30 +876,30 @@ Choose a creation method:</string>
   <!-- User management strings -->
   <string name="not_allowed_admin_privileges">❌ Not allowed: This user is not authorized for admin privileges</string>
   <string name="not_allowed_change_primary_admin_role">❌ Not allowed: Cannot change primary admin role</string>
-  <string name="error_loading_users">Error loading users: %1$s</string>
+  <string name="error_loading_users">Error loading users: </string>
   <string name="add_new_user">Add New User</string>
   <string name="please_enter_username">Please enter username</string>
   <string name="please_enter_valid_email">Please enter a valid email</string>
   <string name="please_enter_full_name">Please enter full name</string>
   <string name="please_select_user_role">Please select a user role</string>
   <string name="user_created_successfully">User created successfully</string>
-  <string name="error_creating_user">Error creating user: %1$s</string>
+  <string name="error_creating_user">Error creating user: </string>
   <string name="no_permission_manage_user">You do not have permission to manage this user</string>
   <string name="edit_data">Edit Data</string>
   <string name="change_role">Change Role</string>
   <string name="toggle_activate">Activate/Deactivate</string>
   <string name="delete_user">Delete User</string>
-  <string name="edit_user_title">Edit %1$s</string>
-  <string name="change_role_for_user">Change role for %1$s</string>
+  <string name="edit_user_title">Edit </string>
+  <string name="change_role_for_user">Change role for </string>
   <string name="no_permission_assign_role">You do not have permission to assign this role</string>
   <string name="activated">Activated</string>
   <string name="deactivated">Deactivated</string>
   <string name="user">user</string>
   <string name="not_allowed_delete_primary_admin">❌ Not allowed: Cannot delete the primary admin</string>
   <string name="confirm_delete">Confirm Delete</string>
-  <string name="confirm_delete_user">Are you sure you want to delete user: %1$s?</string>
+  <string name="confirm_delete_user">Are you sure you want to delete user: ?</string>
   <string name="user_deleted">User deleted</string>
-  <string name="error_deleting_user">Error deleting user: %1$s</string>
+  <string name="error_deleting_user">Error deleting user: </string>
   <string name="fix_all_users">Fix All Users</string>
   <string name="quick_diagnosis">Quick Diagnosis</string>
   <string name="login_test">Login Test</string>
@@ -914,11 +914,11 @@ Choose a creation method:</string>
   <string name="recommend_run_fix">💡 Recommended to run user fix.</string>
   <string name="all_users_good">✨ All users are in good condition!</string>
   <string name="diagnosis_result">Diagnosis Result</string>
-  <string name="diagnosis_failed">Diagnosis failed: %1$s</string>
+  <string name="diagnosis_failed">Diagnosis failed: </string>
   <string name="enter_email_for_test">Enter email for test</string>
   <string name="enter_email_to_test_login">Enter email to test login capability:</string>
   <string name="test_action">Test</string>
-  <string name="testing_email">Testing: %1$s</string>
+  <string name="testing_email">Testing: </string>
   <string name="failed_mark">❌ Failed</string>
   <string name="user_not_found_db">User not found in database</string>
   <string name="user_exists">✅ User exists</string>
@@ -930,34 +930,34 @@ Choose a creation method:</string>
   <string name="role_unspecified_label">⚠️ Role: Not specified</string>
   <string name="success_mark">✅ Success</string>
   <string name="needs_fix_mark">⚠️ Needs fix</string>
-  <string name="error_reading_user_data">Error reading user data: %1$s</string>
-  <string name="search_error">Search error: %1$s</string>
-  <string name="test_result_for_email">Test result for %1$s</string>
-  <string name="result_with_details">Result: %1$s\n\n%2$s</string>
+  <string name="error_reading_user_data">Error reading user data: </string>
+  <string name="search_error">Search error: </string>
+  <string name="test_result_for_email">Test result for </string>
+  <string name="result_with_details">Result: \n\n%2$s</string>
   <string name="fix_this_user">Fix this user</string>
-  <string name="downgraded_unauthorized_admin">Downgraded unauthorized admin: %1$s</string>
-  <string name="user_fixed">User fixed: %1$s</string>
-  <string name="role_changed_from_to"> (Role changed from %1$s to %2$s)</string>
+  <string name="downgraded_unauthorized_admin">Downgraded unauthorized admin: </string>
+  <string name="user_fixed">User fixed: </string>
+  <string name="role_changed_from_to"> (Role changed from  to %2$s)</string>
   <string name="fix_users_progress">Fixing users...</string>
   <string name="fixed_users_of_total">Fixed %1$d of %2$d users</string>
   <string name="no_users_to_fix">No users to fix</string>
   <string name="fix_users_report">Users Fix Report:\n\n• Total users: %1$d\n• Fixed: %2$d\n• Healthy: %3$d\n\nUsers can now log in successfully.</string>
   <string name="fixed_done">Fix completed!</string>
   <string name="user_no_fix_needed">User does not need fixing</string>
-  <string name="error_updating_user">Error updating user: %1$s</string>
+  <string name="error_updating_user">Error updating user: </string>
     <string name="customer_data_unavailable">Customer data unavailable</string>
     <string name="customer_location_not_set_system">Customer location is not set in the system</string>
     <string name="location_label">Location</string>
     <string name="opening_maps">Opening maps...</string>
-    <string name="open_location">Open %1$s</string>
-    <string name="open_location_in_browser">Open %1$s in browser</string>
+    <string name="open_location">Open </string>
+    <string name="open_location_in_browser">Open  in browser</string>
     <string name="cannot_open_maps">Cannot open maps</string>
-    <string name="open_route_to_name">Open route to %1$s</string>
-    <string name="open_location_in_maps_app">Open %1$s in maps app</string>
+    <string name="open_route_to_name">Open route to </string>
+    <string name="open_location_in_maps_app">Open  in maps app</string>
     <string name="could_not_open_maps_check_internet">Could not open maps. Check your internet connection</string>
     <string name="choose_maps_app">Choose maps app</string>
-    <string name="choose_app_to_open_location">Choose an app to open %1$s</string>
-    <string name="error_with_message">Error: %1$s</string>
+    <string name="choose_app_to_open_location">Choose an app to open </string>
+    <string name="error_with_message">Error: </string>
     <string name="test_customer_name">Test Customer</string>
     <string name="test_opening_maps">Testing opening maps...</string>
     <string name="bluetooth_permissions_required">bluetooth permission required</string>

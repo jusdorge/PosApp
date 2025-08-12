@@ -1,6 +1,7 @@
 package com.example.posapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -786,6 +787,7 @@ public class ReportsFragment extends Fragment {
     /**
      * تحديث واجهة المستخدم ببيانات النقود المحصلة
      */
+    @SuppressLint("StringFormatInvalid")
     private void updateCashCollectionUI(double cashSales, double debtPayments) {
         double totalCashCollected = cashSales + debtPayments;
         
@@ -898,6 +900,7 @@ public class ReportsFragment extends Fragment {
         }
     }
     
+    @SuppressLint("StringFormatInvalid")
     private void exportToText() {
         // فحص الأذونات أولاً
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) 

@@ -105,21 +105,21 @@ public class ReportsUtils {
         return chartLayout;
     }
 
-    public static String getReportSummary(int totalInvoices, double totalSales, double averageSale) {
+    public static String getReportSummary(android.content.Context context, int totalInvoices, double totalSales, double averageSale) {
         StringBuilder summary = new StringBuilder();
-        summary.append(AppGlobals.getContext().getString(R.string.report_summary_title)).append("\n");
-        summary.append(AppGlobals.getContext().getString(R.string.report_summary_invoices_count, totalInvoices)).append("\n");
-        summary.append(AppGlobals.getContext().getString(R.string.report_summary_total_sales, formatCurrency(totalSales))).append("\n");
-        summary.append(AppGlobals.getContext().getString(R.string.report_summary_avg_invoice, formatCurrency(averageSale))).append("\n");
+        summary.append(context.getString(R.string.report_summary_title)).append("\n");
+        summary.append(context.getString(R.string.report_summary_invoices_count, totalInvoices)).append("\n");
+        summary.append(context.getString(R.string.report_summary_total_sales, formatCurrency(totalSales))).append("\n");
+        summary.append(context.getString(R.string.report_summary_avg_invoice, formatCurrency(averageSale))).append("\n");
 
         if (totalInvoices > 0) {
-            summary.append(AppGlobals.getContext().getString(R.string.report_summary_performance_prefix)).append(" ");
+            summary.append(context.getString(R.string.report_summary_performance_prefix)).append(" ");
             if (averageSale > 100) {
-                summary.append(AppGlobals.getContext().getString(R.string.report_performance_excellent));
+                summary.append(context.getString(R.string.report_performance_excellent));
             } else if (averageSale > 50) {
-                summary.append(AppGlobals.getContext().getString(R.string.report_performance_good));
+                summary.append(context.getString(R.string.report_performance_good));
             } else {
-                summary.append(AppGlobals.getContext().getString(R.string.report_performance_needs_improvement));
+                summary.append(context.getString(R.string.report_performance_needs_improvement));
             }
         }
 
@@ -159,9 +159,9 @@ public class ReportsUtils {
             this.totalCash = 0.0;
             this.totalCredit = 0.0;
             this.averageSale = 0.0;
-            this.topProduct = AppGlobals.getContext().getString(R.string.not_specified);
+            this.topProduct = "غير محدد";
             this.topProductCount = 0;
-            this.bestCustomer = AppGlobals.getContext().getString(R.string.not_specified);
+            this.bestCustomer = "غير محدد";
             this.bestCustomerAmount = 0.0;
         }
 
