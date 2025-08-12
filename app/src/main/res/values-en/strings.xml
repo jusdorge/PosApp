@@ -119,6 +119,238 @@ Total debt: %3$s</string>
     <string name="failed_share_qr">Failed to share QR Code: %1$s</string>
     <string name="share_customer_info">Share customer info</string>
     <string name="failed_share_customer_info">Failed to share customer info</string>
+    <string name="error_missing_invoice_id">Error: invoice ID is missing</string>
+    <string name="print_invoice_title">Print Invoice</string>
+    <string name="printing_options_title">Printing options</string>
+    <string name="printing_options_message">Choose the appropriate printing type:
+
+📄 Text printing:
+• Fast and compatible with all printers
+• Converts Arabic text to Latin characters
+• Suitable for daily use
+
+🖼️ Image printing:
+• Preserves original Arabic text
+• High quality and clarity
+• May take longer</string>
+    <string name="print_text">Text print</string>
+    <string name="print_image">Image print</string>
+    <string name="image_printing_title">Arabic image printing</string>
+    <string name="image_printing_message">Choose the printing type:
+
+📄 Normal print:
+• Full Arabic text
+• QR Code with detailed info
+• High quality (longer time)
+
+⚡ Compact print (recommended):
+• Optimized Arabic text
+• Smaller size and faster
+• Suitable for thermal printers
+• Less memory consumption
+
+⏱️ Compact printing is faster and more stable</string>
+    <string name="print_compact">Compact print ⚡</string>
+    <string name="print_normal">Normal print 📄</string>
+    <string name="cannot_print_invoice_no_data">Cannot print invoice, data not available</string>
+    <string name="creating_image_for_printing">Creating image for printing...</string>
+    <string name="failed_create_invoice_image">Failed to create invoice image: %1$s</string>
+    <string name="error_creating_image">Error creating image: %1$s</string>
+    <string name="creating_compact_image_for_printing">Creating compact image for printing...</string>
+    <string name="failed_create_compact_image">Failed to create compact image: %1$s</string>
+    <string name="print_success_title">Printed successfully!</string>
+    <string name="print_success_message">Invoice image printed in full Arabic text</string>
+    <string name="print_failed_title">Printing failed</string>
+    <string name="print_failed_message_with_error">An error occurred while printing the image:
+
+%1$s</string>
+    <string name="cannot_convert_invoice_no_data">Cannot convert invoice, data not available</string>
+    <string name="converting_invoice_to_image">Converting invoice to image...</string>
+    <string name="failed_convert_invoice">Failed to convert invoice: %1$s</string>
+    <string name="error_converting">Conversion error: %1$s</string>
+    <string name="save_success_title">Saved successfully!</string>
+    <string name="bmp_saved_message_with_path">Invoice saved as BMP image with full Arabic text
+
+Path: %1$s
+
+What would you like to do?</string>
+    <string name="share_image">Share image</string>
+    <string name="view_file">View file</string>
+    <string name="no_app_to_view_image">No app to view image: %1$s</string>
+    <string name="invoice_not_found">Invoice not found</string>
+    <string name="failed_load_invoice">Failed to load invoice: %1$s</string>
+    <string name="invoice_print_success">Invoice printed successfully</string>
+    <string name="location_permission_granted_message">✅ Location permission granted. You can now open navigation to the customer</string>
+    <string name="location_permission_denied_message">Location permission denied. Only customer location will be shown</string>
+    <string name="login_init_error">Error initializing login screen: %1$s</string>
+    <string name="enter_email_and_password">Please enter email and password</string>
+    <string name="logging_in">Logging in...</string>
+    <string name="login_failed_with_message">Login failed: %1$s</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="google_login_failed">Google sign-in failed: %1$s</string>
+    <string name="auth_failed_with_message">Authentication failed: %1$s</string>
+    <string name="unauthorized_admin_login_denied">Unauthorized admin login attempt denied</string>
+    <string name="searching_for_user">Searching for user...</string>
+    <string name="user_found_but_processing_failed">User found but processing failed</string>
+    <string name="search_error_title">Search error</string>
+    <string name="search_error_message">Failed to search for user:
+%1$s
+
+What would you like to do?</string>
+    <string name="retry">Retry</string>
+    <string name="system_diagnostic">System diagnostic</string>
+    <string name="create_account">Create account</string>
+    <string name="unregistered_account_title">Unregistered account</string>
+    <string name="unregistered_account_message">This email is not registered in the system.
+
+Choose an option:</string>
+    <string name="login_as_guest">Login as guest</string>
+    <string name="system_admin_short">System admin</string>
+    <string name="setup_system_admin_title">System admin setup</string>
+    <string name="setup_system_admin_message">A login attempt with the default admin account was detected.
+
+This account will be linked with full system admin privileges.</string>
+    <string name="confirm_link">Confirm link</string>
+    <string name="welcome_system_admin">Welcome %1$s - System Admin</string>
+    <string name="system_admin_created_welcome">System admin account created successfully!
+Welcome %1$s</string>
+    <string name="guest_prefix">Guest - </string>
+    <string name="welcome_guest_temporary">Welcome %1$s (temporary account)</string>
+    <string name="create_new_account_title">Create new account</string>
+    <string name="create">Create</string>
+    <string name="enter_full_name">Please enter full name</string>
+    <string name="creating_account">Creating account...</string>
+    <string name="account_created_welcome">Account created successfully - Welcome %1$s</string>
+    <string name="error_creating_account">Error creating account: %1$s</string>
+    <string name="database_connection_error_with_msg">Database connection error: %1$s</string>
+    <string name="welcome_user">Welcome %1$s</string>
+    <string name="user_processing_error_title">User processing error</string>
+    <string name="user_processing_error_message">Found %1$d users with email %2$s but failed to process their data.
+
+What would you like to do?</string>
+    <string name="auto_fix">Auto fix</string>
+    <string name="create_new">Create new</string>
+    <string name="database_error_title">Database error</string>
+    <string name="database_error_message_detailed">Failed to connect to database:
+%1$s
+
+Check internet connection and Firebase settings.</string>
+    <string name="performing_forced_fix">Performing forced fix...</string>
+    <string name="failed_to_fix_with_msg">Failed to fix: %1$s</string>
+    <string name="welcome_user_fixed">Welcome %1$s (account fixed)</string>
+    <string name="search_user_error_with_msg">Error searching for user: %1$s</string>
+    <string name="user_data_fixed_welcome">User data fixed - Welcome %1$s</string>
+    <string name="user_data_error_contact_admin">User data error. Please contact system admin.</string>
+    <string name="convert_to_system_admin_title">Convert to system admin</string>
+    <string name="convert_to_admin_message">Do you want to convert this account to a system admin?
+
+Email: %1$s
+
+⚠️ This action grants full system privileges!</string>
+    <string name="yes_create_admin">Yes, create admin</string>
+    <string name="diagnosing">Diagnosing...</string>
+    <string name="diagnostic_error_with_msg">Diagnostic error: %1$s</string>
+    <string name="diagnostic_result_title">Diagnostic result</string>
+    <string name="diagnostic_result_message">%1$s
+📋 Recommendation:
+%2$s</string>
+    <string name="close">Close</string>
+    <string name="firebase_info">Firebase info</string>
+    <string name="fixing">Fixing...</string>
+    <string name="fix_result_title">Fix result</string>
+    <string name="fix_failed_with_msg">Fix failed: %1$s</string>
+    <string name="report_summary_title">Report summary:</string>
+    <string name="report_summary_invoices_count">• Invoices count: %1$d</string>
+    <string name="report_summary_total_sales">• Total sales: %1$s</string>
+    <string name="report_summary_avg_invoice">• Average invoice value: %1$s</string>
+    <string name="report_summary_performance_prefix">• Performance:</string>
+    <string name="report_performance_excellent">Excellent 🌟</string>
+    <string name="report_performance_good">Good 👍</string>
+    <string name="report_performance_needs_improvement">Needs improvement 📈</string>
+    <string name="file_name_invoice_prefix">Invoice</string>
+    <string name="file_name_compact_suffix">Compact</string>
+    <string name="failed_to_save_image">Failed to save image</string>
+    <string name="invoice_bmp_title_compact">Sales Invoice - Compact</string>
+    <string name="invoice_bmp_title_normal">Sales Invoice</string>
+    <string name="invoice_label_number">Invoice No: %1$s</string>
+    <string name="invoice_label_date">Date: %1$s</string>
+    <string name="invoice_label_customer_name">Customer: %1$s</string>
+    <string name="invoice_label_customer_phone">Phone: %1$s</string>
+    <string name="invoice_label_payment_method">Payment method: %1$s</string>
+    <string name="invoice_items_title_compact">Items (Top 8)</string>
+    <string name="invoice_items_title">Invoice Items</string>
+    <string name="product_not_specified">Product not specified</string>
+    <string name="invoice_item_details_format">Qty: %1$d × %2$s = %3$s</string>
+    <string name="invoice_more_items">... and %1$d more items</string>
+    <string name="invoice_no_items">No items in this invoice</string>
+    <string name="invoice_total_label">Total: %1$s</string>
+    <string name="invoice_thanks_compact">Thank you</string>
+    <string name="invoice_thanks_normal">Thank you for your business</string>
+    <string name="share_invoice">Share invoice</string>
+    <string name="failed_share_file">Failed to share file: %1$s</string>
+    <string name="report_file_prefix">report</string>
+    <string name="report_title">POS Report</string>
+    <string name="report_title_centered">        POS Report        </string>
+    <string name="report_date_label">Date</string>
+    <string name="report_created_at_label">Created at</string>
+    <string name="report_stats_section">Statistics</string>
+    <string name="report_invoices_count_label">Invoices</string>
+    <string name="report_total_sales_label">Total sales</string>
+    <string name="report_cash_sales_label">Cash sales</string>
+    <string name="report_credit_sales_label">Credit sales</string>
+    <string name="report_avg_invoice_label">Average invoice</string>
+    <string name="report_top_product_label">Top product</string>
+    <string name="report_top_product_qty_label">Top product quantity</string>
+    <string name="report_best_customer_label">Best customer</string>
+    <string name="report_best_customer_amount_label">Best customer purchases</string>
+    <string name="report_saved_to">Report saved to: %1$s</string>
+    <string name="failed_to_save_report">Failed to save report: %1$s</string>
+    <string name="report_stats_section_header">--- General statistics ---</string>
+    <string name="report_invoices_count_line">Invoices: %1$d</string>
+    <string name="report_total_sales_line">Total sales: %1$s</string>
+    <string name="report_total_profit_line">Total profit: %1$s</string>
+    <string name="report_avg_invoice_line">Average invoice: %1$s</string>
+    <string name="report_payment_methods_header">--- Payment methods ---</string>
+    <string name="report_cash_sales_line">Cash sales: %1$s (%2$s)</string>
+    <string name="report_credit_sales_line">Credit sales: %1$s (%2$s)</string>
+    <string name="report_best_performance_header">--- Best performance ---</string>
+    <string name="report_best_product_line">Top product: %1$s (%2$d units)</string>
+    <string name="report_best_customer_line">Best customer: %1$s (%2$s)</string>
+    <string name="report_performance_evaluation_header">--- Performance evaluation ---</string>
+    <string name="report_generated_by_app">This report was generated by the POS app</string>
+    <string name="report_share_subject_with_name">POS Report - %1$s</string>
+    <string name="report_share_text">Sales report from the POS app</string>
+    <string name="report_csv_header">Statement,Value</string>
+    <string name="report_debt_payments_label">Debt payments</string>
+    <string name="report_share_hashtags">#POS #DailyReport #Sales #CashCollected</string>
+    <string name="storage_permission_granted">✅ Storage permission granted</string>
+    <string name="storage_permission_denied_cannot_export">❌ Storage permission denied. You will not be able to export reports.</string>
+    <string name="share_report">Share report</string>
+    <string name="cannot_share_file">Cannot share file</string>
+    <string name="notification_new_count">%1$d new notifications</string>
+    <string name="notifications_none">No new notifications</string>
+    <string name="notifications_load_error">Failed to load notifications</string>
+    <string name="low_stock_check">Low stock check</string>
+    <string name="low_stock_alert_title">Alert: Low stock</string>
+    <string name="low_stock_alert_message">Product "%1$s" has low stock (%2$d remaining)</string>
+    <string name="create_low_stock_notification">Create low stock notification</string>
+    <string name="no_notifications">No notifications</string>
+    <string name="mark_as_read">Mark as read</string>
+    <string name="error_reading_customer_id">Error reading customer ID</string>
+    <string name="admins_already_exist_count">There are already %1$d system admins</string>
+    <string name="admin_check_error_with_msg">Admin check error: %1$s</string>
+    <string name="default_admin_option">Create default admin (admin@posapp.com)</string>
+    <string name="custom_admin_option">Create custom admin</string>
+    <string name="create_system_admin_title">Create system admin</string>
+    <string name="no_admins_found_message">No system admin found in the database.
+
+Choose a creation method:</string>
+    <string name="admin_email_hint">Admin email</string>
+    <string name="create_custom_admin_title">Create custom system admin</string>
+    <string name="fill_all_fields">Please fill all fields</string>
+    <string name="enter_valid_email">Please enter a valid email</string>
+    <string name="error_showing_language_dialog">Error showing language dialog</string>
+    <string name="error_showing_language_options">Error showing language options</string>
 
     <!-- OperationLogsActivity -->
     <string name="operation_logs_title">Operation Logs</string>
@@ -373,8 +605,6 @@ Total debt: %3$s</string>
     <string name="error">Error</string>
     <string name="success">Success</string>
     <string name="failed">Failed</string>
-    <string name="retry">Retry</string>
-    <string name="close">Close</string>
     <string name="open">Open</string>
     <string name="back">Back</string>
     <string name="next">Next</string>
@@ -611,7 +841,6 @@ Total debt: %3$s</string>
     <!-- EMPTY STATES -->
     <!-- =============================== -->
     <string name="no_invoices_today">No invoices for today</string>
-    <string name="no_notifications">No notifications</string>
     
     <!-- =============================== -->
     <!-- PERFORMANCE INDICATOR -->
@@ -733,6 +962,9 @@ Total debt: %3$s</string>
     <string name="test_opening_maps">Testing opening maps...</string>
     <string name="bluetooth_permissions_required">bluetooth permission required</string>
     <string name="add_quick_product">add quick product</string>
+    <string name="fixed_successfully">fixed successfully</string>
+    <string name="loading_notification">loading_notification</string>
+    <string name="loading_notifications">loading notifications</string>
 
 
 </resources>

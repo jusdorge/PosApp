@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             
         } catch (Exception e) {
             android.util.Log.e("MainActivity", "❌ Error in onCreate", e);
-            Toast.makeText(this, "خطأ في تهيئة التطبيق: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.app_init_error, e.getMessage()), Toast.LENGTH_LONG).show();
         }
     }
     
@@ -343,6 +343,7 @@ public class MainActivity extends AppCompatActivity {
             showAddCustomerDialog();
             return true;
         } else if (id == R.id.action_settings) {
+            showLanguageSelectionDialog();
             return true;
         } else if (id == R.id.action_manage_customers) {
             navigateToCustomersManagement();
@@ -381,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
             if (CounterFragment.activeInstance != null) {
                 TextView customerTextView = findViewById(R.id.invoiceCustomerTextView);
                 if (customerTextView != null) {
-                    customerTextView.setText("الزبون: " + customer.getName());
+                    customerTextView.setText(getString(R.string.customer_label, customer.getName()));
                 }
             }
             
@@ -399,15 +400,28 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * عرض حوار تغيير اللغة وتطبيقها
+     */
+    private void showLanguageSelectionDialog() {
+        LanguageSelectionDialog dialog = LanguageSelectionDialog.newInstance();
+        dialog.setOnLanguageSelectedListener(selectedLanguageCode -> {
+            // تم حفظ اللغة داخل الحوار بالفعل عبر LanguageManager
+            // أعد إنشاء النشاط لتطبيق موارد اللغة الجديدة
+            recreate();
+        });
+        dialog.show(getSupportFragmentManager(), "LanguageSelectionDialog");
+    }
+
     public void logoutUser() {
         // عرض حوار تأكيد تسجيل الخروج
         new android.app.AlertDialog.Builder(this)
-                .setTitle("تسجيل الخروج")
-                .setMessage("هل أنت متأكد من تسجيل الخروج؟")
-                .setPositiveButton("نعم", (dialog, which) -> {
+                .setTitle(getString(R.string.logout_title))
+                .setMessage(getString(R.string.logout_confirm_message))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
                     performLogout();
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
     
@@ -688,7 +702,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onNetworkAvailable() {
                     runOnUiThread(() -> {
                         android.util.Log.d("MainActivity", "🌐 Network is now available - Data will sync");
-                        showNetworkStatusMessage("✅ عاد الاتصال - جاري مزامنة البيانات", false);
+                        showNetworkStatusMessage(getString(R.string.network_reconnected), false);
                     });
                 }
                 
@@ -696,7 +710,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onNetworkLost() {
                     runOnUiThread(() -> {
                         android.util.Log.d("MainActivity", "🚫 Network lost - Working in offline mode");
-                        showNetworkStatusMessage("⚠️ لا يوجد اتصال - يعمل في الوضع المحلي", true);
+                        showNetworkStatusMessage(getString(R.string.network_lost), true);
                     });
                 }
             });
@@ -704,8 +718,8 @@ public class MainActivity extends AppCompatActivity {
             // عرض الحالة الأولية
             boolean isOnline = networkStatusManager.isOnline();
             String message = isOnline ? 
-                "🌐 متصل بالإنترنت" : 
-                "📱 يعمل في الوضع المحلي";
+                getString(R.string.network_online) : 
+                getString(R.string.working_offline);
             showNetworkStatusMessage(message, !isOnline);
             
         } catch (Exception e) {
@@ -759,7 +773,7 @@ public class MainActivity extends AppCompatActivity {
             
         } catch (Exception e) {
             android.util.Log.e("MainActivity", "❌ Error resetting fragments", e);
-            Toast.makeText(this, "خطأ في إعادة تحميل الشاشات - يرجى إعادة تشغيل التطبيق", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.error_reloading_screens), Toast.LENGTH_LONG).show();
         }
     }
     

@@ -1,5 +1,6 @@
 package com.example.posapp;
 
+import java.util.Locale;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,8 +72,8 @@ public class InvoicePrintItemAdapter extends RecyclerView.Adapter<InvoicePrintIt
             double total = quantity * price;
             
             quantityTextView.setText(String.valueOf(quantity));
-            priceTextView.setText(String.format("%.2f", price));
-            totalTextView.setText(String.format("%.2f", total));
+            priceTextView.setText(String.format(Locale.US, "%.2f", price));
+            totalTextView.setText(String.format(Locale.US, "%.2f", total));
         }
     }
 } 

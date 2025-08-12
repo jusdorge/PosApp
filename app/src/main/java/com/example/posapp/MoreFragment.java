@@ -555,15 +555,15 @@ public class MoreFragment extends Fragment {
      */
     private void performLogout() {
         new android.app.AlertDialog.Builder(getContext())
-                .setTitle("تسجيل الخروج")
-                .setMessage("هل أنت متأكد من تسجيل الخروج؟")
-                .setPositiveButton("نعم", (dialog, which) -> {
+                .setTitle(getString(R.string.logout_title))
+                .setMessage(getString(R.string.logout_confirm_message))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
                     // استدعاء MainActivity لتنفيذ تسجيل الخروج
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).logoutUser();
                     }
                 })
-                .setNegativeButton("لا", null)
+                .setNegativeButton(getString(R.string.no), null)
                 .show();
     }
     
@@ -578,15 +578,15 @@ public class MoreFragment extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int unreadCount = queryDocumentSnapshots.size();
                     if (unreadCount > 0) {
-                        notificationBadge.setText(unreadCount + " إشعار جديد");
+                        notificationBadge.setText(getString(R.string.notification_new_count, unreadCount));
                         notificationBadge.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                     } else {
-                        notificationBadge.setText("لا توجد إشعارات جديدة");
+                        notificationBadge.setText(getString(R.string.notifications_none));
                         notificationBadge.setTextColor(getResources().getColor(android.R.color.darker_gray));
                     }
                 })
                 .addOnFailureListener(e -> {
-                    notificationBadge.setText("خطأ في تحميل الإشعارات");
+                    notificationBadge.setText(getString(R.string.notifications_load_error));
                 });
         }
         
@@ -616,7 +616,7 @@ public class MoreFragment extends Fragment {
                 }
             })
             .addOnFailureListener(e -> {
-                NetworkErrorHandler.handleFirestoreError(getContext(), e, "فحص المخزون المنخفض");
+                NetworkErrorHandler.handleFirestoreError(getContext(), e, getString(R.string.low_stock_check));
             });
     }
     
@@ -648,8 +648,8 @@ public class MoreFragment extends Fragment {
         java.util.Map<String, Object> notification = new java.util.HashMap<>();
         notification.put("type", "low_stock");
         notification.put("productId", productId);
-        notification.put("title", "تنبيه: مخزون منخفض");
-        notification.put("message", "المنتج \"" + productName + "\" مخزونه منخفض (" + stock + " قطع متبقية)");
+        notification.put("title", getString(R.string.low_stock_alert_title));
+        notification.put("message", getString(R.string.low_stock_alert_message, productName, stock));
         notification.put("timestamp", com.google.firebase.Timestamp.now());
         notification.put("isRead", false);
         notification.put("priority", stock <= 2 ? "high" : "medium");
@@ -660,7 +660,7 @@ public class MoreFragment extends Fragment {
                 android.util.Log.d("MoreFragment", "Low stock notification created for: " + productName);
             })
             .addOnFailureListener(e -> {
-                NetworkErrorHandler.handleFirestoreError(getContext(), e, "إنشاء إشعار المخزون المنخفض");
+                NetworkErrorHandler.handleFirestoreError(getContext(), e, getString(R.string.create_low_stock_notification));
             });
     }
     
@@ -676,7 +676,7 @@ public class MoreFragment extends Fragment {
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 if (queryDocumentSnapshots.isEmpty()) {
-                    Toast.makeText(getContext(), "لا توجد إشعارات", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.no_notifications), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 
@@ -692,16 +692,16 @@ public class MoreFragment extends Fragment {
                 }
                 
                 new android.app.AlertDialog.Builder(getContext())
-                    .setTitle("الإشعارات")
+                    .setTitle(getString(R.string.notifications_title))
                     .setMessage(notifications.toString())
-                    .setPositiveButton("تمييز كمقروء", (dialog, which) -> {
+                    .setPositiveButton(getString(R.string.mark_as_read), (dialog, which) -> {
                         markAllNotificationsAsRead();
                     })
-                    .setNegativeButton("إغلاق", null)
+                    .setNegativeButton(getString(R.string.close), null)
                     .show();
             })
             .addOnFailureListener(e -> {
-                NetworkErrorHandler.handleFirestoreError(getContext(), e, "تحميل الإشعارات");
+                NetworkErrorHandler.handleFirestoreError(getContext(), e, getString(R.string.loading_notifications));
             });
     }
     
@@ -737,7 +737,7 @@ public class MoreFragment extends Fragment {
                 if (customerId != null && !customerId.trim().isEmpty()) {
                     loadCustomerById(customerId);
                 } else {
-                    Toast.makeText(getContext(), "خطأ في قراءة معرف العميل", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.error_reading_customer_id), Toast.LENGTH_SHORT).show();
                 }
             }
         } else if (requestCode == FILE_PICKER_REQUEST_CODE && resultCode == getActivity().RESULT_OK) {
@@ -822,8 +822,8 @@ public class MoreFragment extends Fragment {
             @Override
             public void onResult(boolean hasAdmin, int adminCount) {
                 if (hasAdmin) {
-                    Toast.makeText(getContext(), 
-                        "يوجد " + adminCount + " مدير نظام بالفعل", 
+                    Toast.makeText(getContext(),
+                        getString(R.string.admins_already_exist_count, adminCount),
                         Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -834,7 +834,7 @@ public class MoreFragment extends Fragment {
             
             @Override
             public void onError(Exception error) {
-                Toast.makeText(getContext(), "خطأ في فحص المديرين: " + error.getMessage(), 
+                Toast.makeText(getContext(), getString(R.string.admin_check_error_with_msg, error.getMessage()),
                         Toast.LENGTH_LONG).show();
             }
         });
@@ -845,13 +845,13 @@ public class MoreFragment extends Fragment {
      */
     private void showEmergencyAdminOptions() {
         String[] options = {
-            "إنشاء المدير الافتراضي (admin@posapp.com)",
-            "إنشاء مدير مخصص"
+            getString(R.string.default_admin_option),
+            getString(R.string.custom_admin_option)
         };
         
         new android.app.AlertDialog.Builder(getContext())
-                .setTitle("إنشاء مدير النظام")
-                .setMessage("لا يوجد أي مدير نظام في قاعدة البيانات\n\nاختر طريقة الإنشاء:")
+                .setTitle(getString(R.string.create_system_admin_title))
+                .setMessage(getString(R.string.no_admins_found_message))
                 .setItems(options, (dialog, which) -> {
                     switch (which) {
                         case 0:
@@ -864,7 +864,7 @@ public class MoreFragment extends Fragment {
                             break;
                     }
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
     
@@ -878,29 +878,29 @@ public class MoreFragment extends Fragment {
         android.widget.EditText phoneEdit = dialogView.findViewById(R.id.phoneEditText);
         
         // تغيير hint لحقل الهاتف ليصبح للبريد الإلكتروني
-        phoneEdit.setHint("البريد الإلكتروني للمدير");
+        phoneEdit.setHint(getString(R.string.admin_email_hint));
         phoneEdit.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         
         new android.app.AlertDialog.Builder(getContext())
-                .setTitle("إنشاء مدير نظام مخصص")
+                .setTitle(getString(R.string.create_custom_admin_title))
                 .setView(dialogView)
-                .setPositiveButton("إنشاء", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.create), (dialog, which) -> {
                     String fullName = fullNameEdit.getText().toString().trim();
                     String email = phoneEdit.getText().toString().trim();
                     
                     if (fullName.isEmpty() || email.isEmpty()) {
-                        Toast.makeText(getContext(), "يرجى ملء جميع الحقول", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     
                     if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                        Toast.makeText(getContext(), "يرجى إدخال بريد إلكتروني صحيح", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.enter_valid_email), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     
                     ManualAdminCreator.createEmergencyAdmin(getContext(), email, fullName);
                 })
-                .setNegativeButton("إلغاء", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 
@@ -951,8 +951,8 @@ public class MoreFragment extends Fragment {
         try {
             dialog.show(getParentFragmentManager(), "LanguageSelectionDialog");
         } catch (Exception e) {
-            android.util.Log.e("MoreFragment", "خطأ في عرض حوار اللغة", e);
-            Toast.makeText(getContext(), "خطأ في عرض خيارات اللغة", Toast.LENGTH_SHORT).show();
+            android.util.Log.e("MoreFragment", getString(R.string.error_showing_language_dialog), e);
+            Toast.makeText(getContext(), getString(R.string.error_showing_language_options), Toast.LENGTH_SHORT).show();
         }
     }
 }

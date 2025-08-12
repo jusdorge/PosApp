@@ -21,7 +21,7 @@ public class ReportsExportHelper {
         try {
             // Create filename with date
             SimpleDateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            String fileName = "report_" + fileFormat.format(reportDate) + ".csv";
+            String fileName = context.getString(R.string.report_file_prefix) + "_" + fileFormat.format(reportDate) + ".csv";
 
             // Get external storage directory
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
@@ -29,34 +29,34 @@ public class ReportsExportHelper {
 
             // Create CSV content
             StringBuilder csvContent = new StringBuilder();
-            csvContent.append("تقرير نقطة البيع\n");
-            csvContent.append("التاريخ,").append(ReportsUtils.formatDate(reportDate)).append("\n");
-            csvContent.append("وقت الإنشاء,").append(ReportsUtils.formatDateTime(new Date())).append("\n\n");
+            csvContent.append(context.getString(R.string.report_title)).append("\n");
+            csvContent.append(context.getString(R.string.report_date_label)).append(',').append(ReportsUtils.formatDate(reportDate)).append("\n");
+            csvContent.append(context.getString(R.string.report_created_at_label)).append(',').append(ReportsUtils.formatDateTime(new Date())).append("\n\n");
 
             // Add statistics
-            csvContent.append("الإحصائيات\n");
-            csvContent.append("عدد الفواتير,").append(stats.totalInvoices).append("\n");
-            csvContent.append("إجمالي المبيعات,").append(ReportsUtils.formatCurrency(stats.totalSales)).append("\n");
-            csvContent.append("المبيعات النقدية,").append(ReportsUtils.formatCurrency(stats.totalCash)).append("\n");
-            csvContent.append("المبيعات الآجلة,").append(ReportsUtils.formatCurrency(stats.totalCredit)).append("\n");
-            csvContent.append("متوسط الفاتورة,").append(ReportsUtils.formatCurrency(stats.averageSale)).append("\n");
-            csvContent.append("أفضل منتج,").append(stats.topProduct).append("\n");
-            csvContent.append("كمية أفضل منتج,").append(stats.topProductCount).append("\n");
-            csvContent.append("أفضل عميل,").append(stats.bestCustomer).append("\n");
-            csvContent.append("مشتريات أفضل عميل,").append(ReportsUtils.formatCurrency(stats.bestCustomerAmount)).append("\n");
+            csvContent.append(context.getString(R.string.report_stats_section)).append("\n");
+            csvContent.append(context.getString(R.string.report_invoices_count_label)).append(',').append(stats.totalInvoices).append("\n");
+            csvContent.append(context.getString(R.string.report_total_sales_label)).append(',').append(ReportsUtils.formatCurrency(stats.totalSales)).append("\n");
+            csvContent.append(context.getString(R.string.report_cash_sales_label)).append(',').append(ReportsUtils.formatCurrency(stats.totalCash)).append("\n");
+            csvContent.append(context.getString(R.string.report_credit_sales_label)).append(',').append(ReportsUtils.formatCurrency(stats.totalCredit)).append("\n");
+            csvContent.append(context.getString(R.string.report_avg_invoice_label)).append(',').append(ReportsUtils.formatCurrency(stats.averageSale)).append("\n");
+            csvContent.append(context.getString(R.string.report_top_product_label)).append(',').append(stats.topProduct).append("\n");
+            csvContent.append(context.getString(R.string.report_top_product_qty_label)).append(',').append(stats.topProductCount).append("\n");
+            csvContent.append(context.getString(R.string.report_best_customer_label)).append(',').append(stats.bestCustomer).append("\n");
+            csvContent.append(context.getString(R.string.report_best_customer_amount_label)).append(',').append(ReportsUtils.formatCurrency(stats.bestCustomerAmount)).append("\n");
 
             // Write to file
             FileWriter writer = new FileWriter(reportFile);
             writer.write(csvContent.toString());
             writer.close();
 
-            Toast.makeText(context, "تم حفظ التقرير في: " + reportFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getString(R.string.report_saved_to, reportFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
 
             // Share file
             shareFile(context, reportFile);
 
         } catch (IOException e) {
-            Toast.makeText(context, "فشل في حفظ التقرير: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.failed_to_save_report, e.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -64,7 +64,7 @@ public class ReportsExportHelper {
         try {
             // Create filename with date
             SimpleDateFormat fileFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            String fileName = "report_" + fileFormat.format(reportDate) + ".txt";
+            String fileName = context.getString(R.string.report_file_prefix) + "_" + fileFormat.format(reportDate) + ".txt";
 
             // Get external storage directory
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
@@ -73,32 +73,30 @@ public class ReportsExportHelper {
             // Create text content
             StringBuilder textContent = new StringBuilder();
             textContent.append("===============================\n");
-            textContent.append("        تقرير نقطة البيع        \n");
+            textContent.append(String.format(Locale.getDefault(), "%s\n", context.getString(R.string.report_title_centered)));
             textContent.append("===============================\n\n");
 
-            textContent.append("التاريخ: ").append(ReportsUtils.formatDate(reportDate)).append("\n");
-            textContent.append("وقت الإنشاء: ").append(ReportsUtils.formatDateTime(new Date())).append("\n\n");
+            textContent.append(context.getString(R.string.report_date_label)).append(' ').append(ReportsUtils.formatDate(reportDate)).append("\n");
+            textContent.append(context.getString(R.string.report_created_at_label)).append(' ').append(ReportsUtils.formatDateTime(new Date())).append("\n\n");
 
-            textContent.append("--- الإحصائيات العامة ---\n");
-            textContent.append("عدد الفواتير: ").append(stats.totalInvoices).append("\n");
-            textContent.append("إجمالي المبيعات: ").append(ReportsUtils.formatCurrency(stats.totalSales)).append("\n");
-            textContent.append("متوسط قيمة الفاتورة: ").append(ReportsUtils.formatCurrency(stats.averageSale)).append("\n\n");
+            textContent.append(context.getString(R.string.report_stats_section_header)).append("\n");
+            textContent.append(context.getString(R.string.report_invoices_count_line, stats.totalInvoices)).append("\n");
+            textContent.append(context.getString(R.string.report_total_sales_line, ReportsUtils.formatCurrency(stats.totalSales))).append("\n");
+            textContent.append(context.getString(R.string.report_avg_invoice_line, ReportsUtils.formatCurrency(stats.averageSale))).append("\n\n");
 
-            textContent.append("--- طرق الدفع ---\n");
-            textContent.append("المبيعات النقدية: ").append(ReportsUtils.formatCurrency(stats.totalCash));
-            textContent.append(" (").append(ReportsUtils.formatPercentage(stats.getCashPercentage())).append(")\n");
-            textContent.append("المبيعات الآجلة: ").append(ReportsUtils.formatCurrency(stats.totalCredit));
-            textContent.append(" (").append(ReportsUtils.formatPercentage(stats.getCreditPercentage())).append(")\n\n");
+            textContent.append(context.getString(R.string.report_payment_methods_header)).append("\n");
+            textContent.append(context.getString(R.string.report_cash_sales_line, ReportsUtils.formatCurrency(stats.totalCash), ReportsUtils.formatPercentage(stats.getCashPercentage()))).append("\n");
+            textContent.append(context.getString(R.string.report_credit_sales_line, ReportsUtils.formatCurrency(stats.totalCredit), ReportsUtils.formatPercentage(stats.getCreditPercentage()))).append("\n\n");
 
-            textContent.append("--- أفضل الأداء ---\n");
-            textContent.append("أفضل منتج: ").append(stats.topProduct).append(" (").append(stats.topProductCount).append(" وحدة)\n");
-            textContent.append("أفضل عميل: ").append(stats.bestCustomer).append(" (").append(ReportsUtils.formatCurrency(stats.bestCustomerAmount)).append(")\n\n");
+            textContent.append(context.getString(R.string.report_best_performance_header)).append("\n");
+            textContent.append(context.getString(R.string.report_best_product_line, stats.topProduct, stats.topProductCount)).append("\n");
+            textContent.append(context.getString(R.string.report_best_customer_line, stats.bestCustomer, ReportsUtils.formatCurrency(stats.bestCustomerAmount))).append("\n\n");
 
-            textContent.append("--- تقييم الأداء ---\n");
+            textContent.append(context.getString(R.string.report_performance_evaluation_header)).append("\n");
             textContent.append(ReportsUtils.getReportSummary(stats.totalInvoices, stats.totalSales, stats.averageSale));
 
             textContent.append("\n===============================\n");
-            textContent.append("تم إنشاء هذا التقرير بواسطة تطبيق نقطة البيع\n");
+            textContent.append(context.getString(R.string.report_generated_by_app)).append("\n");
             textContent.append("===============================");
 
             // Write to file
@@ -106,13 +104,13 @@ public class ReportsExportHelper {
             writer.write(textContent.toString());
             writer.close();
 
-            Toast.makeText(context, "تم حفظ التقرير في: " + reportFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getString(R.string.report_saved_to, reportFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
 
             // Share file
             shareFile(context, reportFile);
 
         } catch (IOException e) {
-            Toast.makeText(context, "فشل في حفظ التقرير: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.failed_to_save_report, e.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -120,13 +118,13 @@ public class ReportsExportHelper {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "تقرير نقطة البيع - " + file.getName());
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "تقرير مبيعات من تطبيق نقطة البيع");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, AppGlobals.getContext().getString(R.string.report_share_subject_with_name, file.getName()));
+        shareIntent.putExtra(Intent.EXTRA_TEXT, AppGlobals.getContext().getString(R.string.report_share_text));
 
         try {
-            context.startActivity(Intent.createChooser(shareIntent, "مشاركة التقرير"));
+            context.startActivity(Intent.createChooser(shareIntent, AppGlobals.getContext().getString(R.string.share_report)));
         } catch (Exception e) {
-            Toast.makeText(context, "لا يمكن مشاركة الملف", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, AppGlobals.getContext().getString(R.string.cannot_share_file), Toast.LENGTH_SHORT).show();
         }
     }
 

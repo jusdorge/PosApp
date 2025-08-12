@@ -277,7 +277,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
             // معلومات العميل
             outputStream.write(("Name: " + (customerName != null ? customerName : "N/A") + "\n").getBytes(encoding));
             outputStream.write(("Phone: " + (customerPhone != null ? customerPhone : "N/A") + "\n").getBytes(encoding));
-            outputStream.write((String.format("Debt: %.2f DZD\n", customerDebt)).getBytes(encoding));
+            outputStream.write((String.format(java.util.Locale.US, "Debt: %.2f DZD\n", customerDebt)).getBytes(encoding));
             
             outputStream.write("--------------------------------\n".getBytes(encoding));
             outputStream.write("QR Code:\n".getBytes(encoding));
@@ -398,7 +398,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
                     getString(R.string.customer_qr_share_text,
                         (customerName != null ? customerName : getString(R.string.not_specified)),
                         (customerPhone != null ? customerPhone : getString(R.string.not_specified)),
-                        String.format("%.2f دج", customerDebt)));
+                        String.format(java.util.Locale.US, "%.2f دج", customerDebt)));
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 
                 // التحقق من وجود تطبيقات للمشاركة
@@ -445,7 +445,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
             String qrData = "CUSTOMER_INFO\n" +
                     "Name: " + (customerName != null ? customerName : "N/A") + "\n" +
                     "Phone: " + (customerPhone != null ? customerPhone : "N/A") + "\n" +
-                    "Total_Debt: " + String.format("%.2f DZD", customerDebt);
+                    "Total_Debt: " + String.format(java.util.Locale.US, "%.2f DZD", customerDebt);
             
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
@@ -454,7 +454,7 @@ public class QRCodePrintActivity extends AppCompatActivity {
                 "معلومات العميل:\n" +
                 "الاسم: " + (customerName != null ? customerName : "غير محدد") + "\n" +
                 "الهاتف: " + (customerPhone != null ? customerPhone : "غير محدد") + "\n" +
-                "إجمالي الدين: " + String.format("%.2f دج", customerDebt) + "\n\n" +
+                "إجمالي الدين: " + String.format(java.util.Locale.US, "%.2f دج", customerDebt) + "\n\n" +
                 "QR Code Data:\n" + qrData);
             
             if (shareIntent.resolveActivity(getPackageManager()) != null) {

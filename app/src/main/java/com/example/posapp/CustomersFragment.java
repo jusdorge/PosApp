@@ -210,7 +210,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
         qrData.append("CUSTOMER_INFO\n");
         qrData.append("Name: ").append(customer.getName() != null ? customer.getName() : "N/A").append("\n");
         qrData.append("Phone: ").append(customer.getPhone() != null ? customer.getPhone() : "N/A").append("\n");
-        qrData.append("Total_Debt: ").append(String.format("%.2f DZD", customer.getTotalDebt())).append("\n");
+        qrData.append("Total_Debt: ").append(String.format(java.util.Locale.US, "%.2f DZD", customer.getTotalDebt())).append("\n");
         qrData.append("Customer_ID: ").append(customer.getId() != null ? customer.getId() : "N/A");
         
         return qrData.toString();
@@ -301,7 +301,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
                 shareIntent.putExtra(Intent.EXTRA_TEXT, 
                     "QR Code للعميل: " + customer.getName() + "\n" +
                     "الهاتف: " + (customer.getPhone() != null ? customer.getPhone() : "غير محدد") + "\n" +
-                    "إجمالي الدين: " + String.format("%.2f دج", customer.getTotalDebt()));
+                    "إجمالي الدين: " + String.format(java.util.Locale.US, "%.2f دج", customer.getTotalDebt()));
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 
                 // التحقق من وجود تطبيقات للمشاركة
@@ -371,7 +371,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
                 "معلومات العميل:\n" +
                 "الاسم: " + customer.getName() + "\n" +
                 "الهاتف: " + (customer.getPhone() != null ? customer.getPhone() : "غير محدد") + "\n" +
-                "إجمالي الدين: " + String.format("%.2f دج", customer.getTotalDebt()) + "\n\n" +
+                "إجمالي الدين: " + String.format(java.util.Locale.US, "%.2f دج", customer.getTotalDebt()) + "\n\n" +
                 "QR Code Data:\n" + qrData);
             
             if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {

@@ -44,7 +44,7 @@ public class ProductAnalyticsAdapter extends RecyclerView.Adapter<ProductAnalyti
         
         // Calculate and set percentage
         double percentage = data.getPercentage(totalQuantity);
-        holder.percentageTextView.setText(String.format("%.1f%%", percentage));
+        holder.percentageTextView.setText(String.format(java.util.Locale.US, "%.1f%%", percentage));
         
         // Set progress bar
         holder.progressBar.setProgress((int) percentage);

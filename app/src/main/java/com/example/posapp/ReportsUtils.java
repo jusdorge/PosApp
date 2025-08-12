@@ -50,11 +50,12 @@ public class ReportsUtils {
         yesterday.add(Calendar.DAY_OF_MONTH, -1);
 
         if (isSameDay(calendar, today)) {
-            return "اليوم";
+            return ArabicNumberUtils.convertToArabicNumbers(new SimpleDateFormat("EEEE", Locale.getDefault()).format(today.getTime()));
         } else if (isSameDay(calendar, yesterday)) {
-            return "أمس";
+            Calendar tmp = (Calendar) yesterday.clone();
+            return ArabicNumberUtils.convertToArabicNumbers(new SimpleDateFormat("EEEE", Locale.getDefault()).format(tmp.getTime()));
         } else {
-            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("ar"));
+            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
             String dayName = dayFormat.format(calendar.getTime());
             return ArabicNumberUtils.convertToArabicNumbers(dayName);
         }
@@ -106,19 +107,19 @@ public class ReportsUtils {
 
     public static String getReportSummary(int totalInvoices, double totalSales, double averageSale) {
         StringBuilder summary = new StringBuilder();
-        summary.append("ملخص التقرير:\n");
-        summary.append("• عدد الفواتير: ").append(totalInvoices).append("\n");
-        summary.append("• إجمالي المبيعات: ").append(formatCurrency(totalSales)).append("\n");
-        summary.append("• متوسط قيمة الفاتورة: ").append(formatCurrency(averageSale)).append("\n");
+        summary.append(AppGlobals.getContext().getString(R.string.report_summary_title)).append("\n");
+        summary.append(AppGlobals.getContext().getString(R.string.report_summary_invoices_count, totalInvoices)).append("\n");
+        summary.append(AppGlobals.getContext().getString(R.string.report_summary_total_sales, formatCurrency(totalSales))).append("\n");
+        summary.append(AppGlobals.getContext().getString(R.string.report_summary_avg_invoice, formatCurrency(averageSale))).append("\n");
 
         if (totalInvoices > 0) {
-            summary.append("• معدل الأداء: ");
+            summary.append(AppGlobals.getContext().getString(R.string.report_summary_performance_prefix)).append(" ");
             if (averageSale > 100) {
-                summary.append("ممتاز 🌟");
+                summary.append(AppGlobals.getContext().getString(R.string.report_performance_excellent));
             } else if (averageSale > 50) {
-                summary.append("جيد 👍");
+                summary.append(AppGlobals.getContext().getString(R.string.report_performance_good));
             } else {
-                summary.append("يحتاج تحسين 📈");
+                summary.append(AppGlobals.getContext().getString(R.string.report_performance_needs_improvement));
             }
         }
 
@@ -138,7 +139,7 @@ public class ReportsUtils {
     }
 
     public static String formatPercentage(double percentage) {
-        return String.format("%.1f%%", percentage);
+        return String.format(java.util.Locale.US, "%.1f%%", percentage);
     }
 
     public static class ReportStats {
@@ -158,9 +159,9 @@ public class ReportsUtils {
             this.totalCash = 0.0;
             this.totalCredit = 0.0;
             this.averageSale = 0.0;
-            this.topProduct = "غير محدد";
+            this.topProduct = AppGlobals.getContext().getString(R.string.not_specified);
             this.topProductCount = 0;
-            this.bestCustomer = "غير محدد";
+            this.bestCustomer = AppGlobals.getContext().getString(R.string.not_specified);
             this.bestCustomerAmount = 0.0;
         }
 

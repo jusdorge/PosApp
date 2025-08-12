@@ -63,9 +63,7 @@
     <string name="customer_not_found_database">العميل غير موجود في قاعدة البيانات</string>
     <string name="failed_load_customer_data">فشل في تحميل بيانات العميل: %1$s</string>
     <string name="guest_user_warning">أنت تستخدم حساب ضيف مؤقت - صلاحيات محدودة للعرض فقط</string>
-    <string name="logout_title">تسجيل الخروج</string>
-    <string name="logout_confirm_message">هل أنت متأكد من تسجيل الخروج؟</string>
-    <string name="notifications_title">الإشعارات</string>
+
     <string name="notifications_marked_read">تم تمييز الإشعارات كمقروءة</string>
 
     <!-- SelectCustomerLocationActivity -->
@@ -117,6 +115,239 @@
     <string name="failed_share_qr">فشل في مشاركة QR Code: %1$s</string>
     <string name="share_customer_info">مشاركة معلومات العميل</string>
     <string name="failed_share_customer_info">فشل في مشاركة معلومات العميل</string>
+    <string name="error_missing_invoice_id">خطأ: معرف الفاتورة غير موجود</string>
+    <string name="print_invoice_title">طباعة الفاتورة</string>
+    <string name="printing_options_title">خيارات الطباعة</string>
+    <string name="printing_options_message">اختر نوع الطباعة المناسب:
+
+📄 الطباعة النصية:
+• سريعة ومتوافقة مع جميع الطابعات
+• تحويل النصوص العربية لأحرف لاتينية
+• مناسبة للاستخدام اليومي
+
+🖼️ طباعة الصورة:
+• الحفاظ على النصوص العربية الأصلية
+• جودة عالية ووضوح تام
+• قد تستغرق وقتاً أطول</string>
+    <string name="print_text">طباعة نصية</string>
+    <string name="print_image">طباعة الصورة</string>
+    <string name="image_printing_title">طباعة الصورة العربية</string>
+    <string name="image_printing_message">اختر نوع الطباعة:
+
+📄 طباعة عادية:
+• نصوص عربية كاملة
+• QR Code مع تفاصيل شاملة
+• جودة عالية (وقت أطول)
+
+⚡ طباعة مضغوطة (موصى بها):
+• نصوص عربية محسنة
+• حجم أصغر وسرعة أكبر
+• مناسبة للطابعات الحرارية
+• أقل استهلاكاً للذاكرة
+
+⏱️ الطباعة المضغوطة أسرع وأكثر استقراراً</string>
+    <string name="print_compact">طباعة مضغوطة ⚡</string>
+    <string name="print_normal">طباعة عادية 📄</string>
+    <string name="cannot_print_invoice_no_data">لا يمكن طباعة الفاتورة، البيانات غير متوفرة</string>
+    <string name="creating_image_for_printing">جاري إنشاء الصورة للطباعة...</string>
+    <string name="failed_create_invoice_image">فشل في إنشاء صورة الفاتورة: %1$s</string>
+    <string name="error_creating_image">خطأ في إنشاء الصورة: %1$s</string>
+    <string name="creating_compact_image_for_printing">جاري إنشاء صورة مضغوطة للطباعة...</string>
+    <string name="failed_create_compact_image">فشل في إنشاء الصورة المضغوطة: %1$s</string>
+    <string name="print_success_title">تمت الطباعة بنجاح!</string>
+    <string name="print_success_message">تم طباعة فاتورة الصورة بالنصوص العربية الكاملة على الطابعة</string>
+    <string name="print_failed_title">فشل في الطباعة</string>
+    <string name="print_failed_message_with_error">حدث خطأ أثناء طباعة الصورة:
+
+%1$s</string>
+    <string name="cannot_convert_invoice_no_data">لا يمكن تحويل الفاتورة، البيانات غير متوفرة</string>
+    <string name="converting_invoice_to_image">جاري تحويل الفاتورة إلى صورة...</string>
+    <string name="failed_convert_invoice">فشل في تحويل الفاتورة: %1$s</string>
+    <string name="error_converting">خطأ في التحويل: %1$s</string>
+    <string name="save_success_title">تم الحفظ بنجاح!</string>
+    <string name="bmp_saved_message_with_path">تم حفظ الفاتورة كصورة BMP بالنصوص العربية الكاملة
+
+المسار: %1$s
+
+ماذا تريد أن تفعل؟</string>
+    <string name="share_image">مشاركة الصورة</string>
+    <string name="view_file">عرض الملف</string>
+    <string name="no_app_to_view_image">لا يوجد تطبيق لعرض الصورة: %1$s</string>
+    <string name="invoice_not_found">الفاتورة غير موجودة</string>
+    <string name="failed_load_invoice">فشل في تحميل الفاتورة: %1$s</string>
+    <string name="invoice_print_success">تم طباعة الفاتورة بنجاح</string>
+    <string name="location_permission_granted_message">✅ تم منح صلاحية الموقع. يمكنك الآن فتح المسار إلى العميل</string>
+    <string name="location_permission_denied_message">تم رفض صلاحية الموقع. سيتم عرض موقع العميل فقط</string>
+    <string name="login_init_error">خطأ في تهيئة شاشة تسجيل الدخول: %1$s</string>
+    <string name="enter_email_and_password">يرجى إدخال البريد الإلكتروني وكلمة المرور</string>
+    <string name="logging_in">جاري تسجيل الدخول...</string>
+    <string name="login_failed_with_message">فشل تسجيل الدخول: %1$s</string>
+    <string name="unknown_error">خطأ غير معروف</string>
+    <string name="google_login_failed">فشل تسجيل الدخول عبر Google: %1$s</string>
+    <string name="auth_failed_with_message">فشل المصادقة: %1$s</string>
+    <string name="unauthorized_admin_login_denied">تم رفض محاولة دخول غير مصرح بها كمدير</string>
+    <string name="searching_for_user">جاري البحث عن المستخدم...</string>
+    <string name="user_found_but_processing_failed">تم العثور على المستخدم ولكن فشل في معالجة البيانات</string>
+    <string name="search_error_title">خطأ في البحث</string>
+    <string name="search_error_message">فشل في البحث عن المستخدم:
+%1$s
+
+ماذا تريد أن تفعل؟</string>
+    <string name="system_diagnostic">تشخيص النظام</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="unregistered_account_title">حساب غير مسجل</string>
+    <string name="unregistered_account_message">هذا البريد الإلكتروني غير مسجل في النظام.
+
+اختر أحد الخيارات:</string>
+    <string name="login_as_guest">دخول كضيف</string>
+    <string name="system_admin_short">مدير نظام</string>
+    <string name="setup_system_admin_title">إعداد مدير النظام</string>
+    <string name="setup_system_admin_message">تم اكتشاف محاولة دخول بحساب المدير الافتراضي.
+
+سيتم ربط هذا الحساب بصلاحيات مدير النظام الكاملة.</string>
+    <string name="confirm_link">تأكيد الربط</string>
+    <string name="welcome_system_admin">مرحباً %1$s - مدير النظام</string>
+    <string name="system_admin_created_welcome">تم إنشاء حساب مدير النظام بنجاح!
+مرحباً %1$s</string>
+    <string name="guest_prefix">ضيف - </string>
+    <string name="welcome_guest_temporary">مرحباً %1$s (حساب مؤقت)</string>
+    <string name="create_new_account_title">إنشاء حساب جديد</string>
+    <string name="create">إنشاء</string>
+    <string name="enter_full_name">يرجى إدخال الاسم الكامل</string>
+    <string name="creating_account">جاري إنشاء الحساب...</string>
+    <string name="account_created_welcome">تم إنشاء الحساب بنجاح - مرحباً %1$s</string>
+    <string name="error_creating_account">خطأ في إنشاء الحساب: %1$s</string>
+    <string name="database_connection_error_with_msg">خطأ في الاتصال بقاعدة البيانات: %1$s</string>
+    <string name="welcome_user">مرحباً %1$s</string>
+    <string name="user_processing_error_title">خطأ في معالجة المستخدم</string>
+    <string name="user_processing_error_message">تم العثور على %1$d مستخدم بالبريد الإلكتروني %2$s ولكن فشل في معالجة بياناتهم.
+
+ماذا تريد أن تفعل؟</string>
+    <string name="auto_fix">إصلاح تلقائي</string>
+    <string name="create_new">إنشاء جديد</string>
+    <string name="database_error_title">خطأ في قاعدة البيانات</string>
+    <string name="database_error_message_detailed">فشل في الاتصال بقاعدة البيانات:
+%1$s
+
+تحقق من اتصال الإنترنت وإعدادات Firebase.</string>
+    <string name="performing_forced_fix">جاري الإصلاح القسري...</string>
+    <string name="failed_to_fix_with_msg">فشل في الإصلاح: %1$s</string>
+    <string name="welcome_user_fixed">مرحباً %1$s (تم إصلاح الحساب)</string>
+    <string name="search_user_error_with_msg">خطأ في البحث عن المستخدم: %1$s</string>
+    <string name="user_data_fixed_welcome">تم إصلاح بيانات المستخدم - مرحباً %1$s</string>
+    <string name="user_data_error_contact_admin">خطأ في بيانات المستخدم. يرجى التواصل مع مدير النظام.</string>
+    <string name="convert_to_system_admin_title">تحويل إلى مدير نظام</string>
+    <string name="convert_to_admin_message">هل تريد تحويل هذا الحساب إلى مدير نظام؟
+
+البريد: %1$s
+
+⚠️ هذا الإجراء يمنح صلاحيات كاملة على النظام!</string>
+    <string name="yes_create_admin">نعم، أنشئ مدير</string>
+    <string name="diagnosing">جاري التشخيص...</string>
+    <string name="diagnostic_error_with_msg">خطأ في التشخيص: %1$s</string>
+    <string name="diagnostic_result_title">نتيجة التشخيص</string>
+    <string name="diagnostic_result_message">%1$s
+📋 التوصية:
+%2$s</string>
+
+    <string name="firebase_info">معلومات Firebase</string>
+    <string name="fixing">جاري الإصلاح...</string>
+    <string name="fix_result_title">نتيجة الإصلاح</string>
+    <string name="fix_failed_with_msg">فشل الإصلاح: %1$s</string>
+    <string name="report_summary_title">ملخص التقرير:</string>
+    <string name="report_summary_invoices_count">• عدد الفواتير: %1$d</string>
+    <string name="report_summary_total_sales">• إجمالي المبيعات: %1$s</string>
+    <string name="report_summary_avg_invoice">• متوسط قيمة الفاتورة: %1$s</string>
+    <string name="report_summary_performance_prefix">• معدل الأداء:</string>
+    <string name="report_performance_excellent">ممتاز 🌟</string>
+    <string name="report_performance_good">جيد 👍</string>
+    <string name="report_performance_needs_improvement">يحتاج تحسين 📈</string>
+    <string name="file_name_invoice_prefix">فاتورة</string>
+    <string name="file_name_compact_suffix">مضغوطة</string>
+    <string name="failed_to_save_image">فشل في حفظ الصورة</string>
+    <string name="invoice_bmp_title_compact">فاتورة مبيعات - مضغوطة</string>
+    <string name="invoice_bmp_title_normal">فاتورة مبيعات</string>
+    <string name="invoice_label_number">رقم الفاتورة: %1$s</string>
+    <string name="invoice_label_date">التاريخ: %1$s</string>
+    <string name="invoice_label_customer_name">اسم العميل: %1$s</string>
+    <string name="invoice_label_customer_phone">هاتف العميل: %1$s</string>
+    <string name="invoice_label_payment_method">طريقة الدفع: %1$s</string>
+    <string name="invoice_items_title_compact">العناصر (أهم 8)</string>
+    <string name="invoice_items_title">عناصر الفاتورة</string>
+    <string name="product_not_specified">منتج غير محدد</string>
+    <string name="invoice_item_details_format">الكمية: %1$d × %2$s = %3$s</string>
+    <string name="invoice_more_items">... و %1$d عناصر أخرى</string>
+    <string name="invoice_no_items">لا توجد عناصر في هذه الفاتورة</string>
+    <string name="invoice_total_label">المجموع الكلي: %1$s</string>
+    <string name="invoice_thanks_compact">شكراً لكم</string>
+    <string name="invoice_thanks_normal">شكراً لتعاملكم معنا</string>
+    <string name="share_invoice">مشاركة الفاتورة</string>
+    <string name="failed_share_file">فشل في مشاركة الملف: %1$s</string>
+    <string name="report_file_prefix">report</string>
+    <string name="report_title">تقرير نقطة البيع</string>
+    <string name="report_title_centered">        تقرير نقطة البيع        </string>
+    <string name="report_date_label">التاريخ</string>
+    <string name="report_created_at_label">وقت الإنشاء</string>
+    <string name="report_stats_section">الإحصائيات</string>
+    <string name="report_invoices_count_label">عدد الفواتير</string>
+    <string name="report_total_sales_label">إجمالي المبيعات</string>
+    <string name="report_cash_sales_label">المبيعات النقدية</string>
+    <string name="report_credit_sales_label">المبيعات الآجلة</string>
+    <string name="report_avg_invoice_label">متوسط الفاتورة</string>
+    <string name="report_top_product_label">أفضل منتج</string>
+    <string name="report_top_product_qty_label">كمية أفضل منتج</string>
+    <string name="report_best_customer_label">أفضل عميل</string>
+    <string name="report_best_customer_amount_label">مشتريات أفضل عميل</string>
+    <string name="report_saved_to">تم حفظ التقرير في: %1$s</string>
+    <string name="failed_to_save_report">فشل في حفظ التقرير: %1$s</string>
+    <string name="report_stats_section_header">--- الإحصائيات العامة ---</string>
+    <string name="report_invoices_count_line">عدد الفواتير: %1$d</string>
+    <string name="report_total_sales_line">إجمالي المبيعات: %1$s</string>
+    <string name="report_total_profit_line">إجمالي الربح: %1$s</string>
+    <string name="report_avg_invoice_line">متوسط قيمة الفاتورة: %1$s</string>
+    <string name="report_payment_methods_header">--- طرق الدفع ---</string>
+    <string name="report_cash_sales_line">المبيعات النقدية: %1$s (%2$s)</string>
+    <string name="report_credit_sales_line">المبيعات الآجلة: %1$s (%2$s)</string>
+    <string name="report_best_performance_header">--- أفضل الأداء ---</string>
+    <string name="report_best_product_line">أفضل منتج: %1$s (%2$d وحدة)</string>
+    <string name="report_best_customer_line">أفضل عميل: %1$s (%2$s)</string>
+    <string name="report_performance_evaluation_header">--- تقييم الأداء ---</string>
+    <string name="report_generated_by_app">تم إنشاء هذا التقرير بواسطة تطبيق نقطة البيع</string>
+    <string name="report_share_subject_with_name">تقرير نقطة البيع - %1$s</string>
+    <string name="report_share_text">تقرير مبيعات من تطبيق نقطة البيع</string>
+    <string name="report_csv_header">البيان,القيمة</string>
+    <string name="report_debt_payments_label">المدفوعات من الديون</string>
+    <string name="report_share_hashtags">#نقطة_البيع #تقرير_يومي #مبيعات #النقود_المحصلة</string>
+    <string name="storage_permission_granted">✅ تم منح إذن التخزين</string>
+    <string name="storage_permission_denied_cannot_export">❌ تم رفض إذن التخزين. لن تتمكن من تصدير التقارير.</string>
+    <string name="share_report">مشاركة التقرير</string>
+    <string name="cannot_share_file">لا يمكن مشاركة الملف</string>
+    <string name="logout_title">تسجيل الخروج</string>
+    <string name="logout_confirm_message">هل أنت متأكد من تسجيل الخروج؟</string>
+    <string name="notification_new_count">%1$d إشعار جديد</string>
+    <string name="notifications_none">لا توجد إشعارات جديدة</string>
+    <string name="notifications_load_error">خطأ في تحميل الإشعارات</string>
+    <string name="low_stock_check">فحص المخزون المنخفض</string>
+    <string name="low_stock_alert_title">تنبيه: مخزون منخفض</string>
+    <string name="low_stock_alert_message">المنتج "%1$s" مخزونه منخفض (%2$d قطع متبقية)</string>
+    <string name="create_low_stock_notification">إنشاء إشعار المخزون المنخفض</string>
+    <string name="notifications_title">الإشعارات</string>
+    <string name="mark_as_read">تمييز كمقروء</string>
+    <string name="error_reading_customer_id">خطأ في قراءة معرف العميل</string>
+    <string name="admins_already_exist_count">يوجد %1$d مدير نظام بالفعل</string>
+    <string name="admin_check_error_with_msg">خطأ في فحص المديرين: %1$s</string>
+    <string name="default_admin_option">إنشاء المدير الافتراضي (admin@posapp.com)</string>
+    <string name="custom_admin_option">إنشاء مدير مخصص</string>
+    <string name="create_system_admin_title">إنشاء مدير النظام</string>
+    <string name="no_admins_found_message">لا يوجد أي مدير نظام في قاعدة البيانات
+
+اختر طريقة الإنشاء:</string>
+    <string name="admin_email_hint">البريد الإلكتروني للمدير</string>
+    <string name="create_custom_admin_title">إنشاء مدير نظام مخصص</string>
+    <string name="fill_all_fields">يرجى ملء جميع الحقول</string>
+    <string name="enter_valid_email">يرجى إدخال بريد إلكتروني صحيح</string>
+    <string name="error_showing_language_dialog">خطأ في عرض حوار اللغة</string>
+    <string name="error_showing_language_options">خطأ في عرض خيارات اللغة</string>
 
     <!-- OperationLogsActivity -->
     <string name="operation_logs_title">أرشيف العمليات</string>
@@ -738,5 +969,8 @@
     <string name="test_opening_maps">اختبار فتح الخرائط...</string>
     <string name="bluetooth_permissions_required">اذونات البلوتوث مطلوبة</string>
     <string name="add_quick_product">اضافة منتج بسرعة</string>
+    <string name="fixed_successfully">اصلحت بنجاح</string>
+    <string name="loading_notification">تحميل التحذيرات</string>
+    <string name="loading_notifications">تحميل التحذيرات</string>
 
 </resources>

@@ -69,7 +69,7 @@ public class InvoiceToBMPConverter {
      */
     public void convertInvoiceToBMP(Invoice invoice, boolean compactMode, ConvertCallback callback) {
         if (invoice == null) {
-            callback.onError("الفاتورة غير موجودة");
+            callback.onError(context.getString(R.string.invoice_not_found));
             return;
         }
         
@@ -78,20 +78,21 @@ public class InvoiceToBMPConverter {
             Bitmap invoiceBitmap = createInvoiceBitmap(invoice, compactMode);
             
             // حفظ الصورة
-            String fileName = "فاتورة_" + invoice.getDisplayNumber().replaceAll("[^a-zA-Z0-9]", "_") + "_" + 
-                            (compactMode ? "مضغوطة_" : "") +
+            String sanitizedNumber = invoice.getDisplayNumber().replaceAll("[^a-zA-Z0-9]", "_");
+            String fileName = context.getString(R.string.file_name_invoice_prefix) + "_" + sanitizedNumber + "_" +
+                            (compactMode ? context.getString(R.string.file_name_compact_suffix) + "_" : "") +
                             System.currentTimeMillis() + ".bmp";
             File savedFile = saveBitmapAsBMP(invoiceBitmap, fileName);
             
             if (savedFile != null) {
                 callback.onSuccess(savedFile, invoiceBitmap);
             } else {
-                callback.onError("فشل في حفظ الصورة");
+                callback.onError(context.getString(R.string.failed_to_save_image));
             }
             
         } catch (Exception e) {
             Log.e(TAG, "Error converting invoice to BMP", e);
-            callback.onError("خطأ في التحويل: " + e.getMessage());
+            callback.onError(context.getString(R.string.error_converting, e.getMessage()));
         }
     }
     
@@ -189,7 +190,8 @@ public class InvoiceToBMPConverter {
         currentY += TITLE_TEXT_SIZE;
         
         // رسم العنوان مع تحسين للعربية
-        String title = compactMode ? "فاتورة مبيعات - مضغوطة" : "فاتورة مبيعات";
+        String title = compactMode ? context.getString(R.string.invoice_bmp_title_compact)
+                                   : context.getString(R.string.invoice_bmp_title_normal);
         drawArabicText(canvas, title, IMAGE_WIDTH / 2, currentY, paint);
         currentY += LINE_SPACING * 2;
         
@@ -206,26 +208,26 @@ public class InvoiceToBMPConverter {
         // معلومات الفاتورة
         currentY += NORMAL_TEXT_SIZE;
         String invoiceNumber = invoice.getDisplayNumber();
-        drawArabicText(canvas, "رقم الفاتورة: " + invoiceNumber, rightMargin, currentY, paint);
+        drawArabicText(canvas, context.getString(R.string.invoice_label_number, invoiceNumber), rightMargin, currentY, paint);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
         if (invoice.getDate() != null) {
             String dateStr = ArabicNumberUtils.formatPrintDateWithArabicNumbers(invoice.getDate().toDate());
-            drawArabicText(canvas, "التاريخ: " + dateStr, rightMargin, currentY, paint);
+            drawArabicText(canvas, context.getString(R.string.invoice_label_date, dateStr), rightMargin, currentY, paint);
         }
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
-        String customerName = invoice.getCustomerName() != null ? invoice.getCustomerName() : "غير محدد";
-        drawArabicText(canvas, "اسم العميل: " + customerName, rightMargin, currentY, paint);
+        String customerName = invoice.getCustomerName() != null ? invoice.getCustomerName() : context.getString(R.string.not_specified);
+        drawArabicText(canvas, context.getString(R.string.invoice_label_customer_name, customerName), rightMargin, currentY, paint);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
-        String customerPhone = invoice.getCustomerPhone() != null ? invoice.getCustomerPhone() : "غير محدد";
-        drawArabicText(canvas, "هاتف العميل: " + customerPhone, rightMargin, currentY, paint);
+        String customerPhone = invoice.getCustomerPhone() != null ? invoice.getCustomerPhone() : context.getString(R.string.not_specified);
+        drawArabicText(canvas, context.getString(R.string.invoice_label_customer_phone, customerPhone), rightMargin, currentY, paint);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
         // استخدام النظام الجديد لطريقة الدفع
         PaymentMethod paymentMethod = invoice.getPaymentMethod();
-        drawArabicText(canvas, "طريقة الدفع: " + paymentMethod.getDisplayWithIcon(), rightMargin, currentY, paint);
+        drawArabicText(canvas, context.getString(R.string.invoice_label_payment_method, paymentMethod.getDisplayWithIcon()), rightMargin, currentY, paint);
         
         currentY += LINE_SPACING * 2;
         
@@ -237,7 +239,8 @@ public class InvoiceToBMPConverter {
         paint.setTextSize(HEADER_TEXT_SIZE);
         paint.setTypeface(Typeface.create(paint.getTypeface(), Typeface.BOLD));
         currentY += HEADER_TEXT_SIZE;
-        String itemsTitle = compactMode ? "العناصر (أهم 8)" : "عناصر الفاتورة";
+        String itemsTitle = compactMode ? context.getString(R.string.invoice_items_title_compact)
+                                        : context.getString(R.string.invoice_items_title);
         drawArabicText(canvas, itemsTitle, rightMargin, currentY, paint);
         currentY += LINE_SPACING;
         
@@ -253,7 +256,7 @@ public class InvoiceToBMPConverter {
                 currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
                 
                 // اسم المنتج مع الرقم التسلسلي
-                String productName = item.getProductName() != null ? item.getProductName() : "منتج غير محدد";
+                String productName = item.getProductName() != null ? item.getProductName() : context.getString(R.string.product_not_specified);
                 String productLine = itemNumber + ". " + productName;
                 drawArabicText(canvas, productLine, rightMargin, currentY, paint);
                 
@@ -262,9 +265,9 @@ public class InvoiceToBMPConverter {
                 paint.setTextSize(SMALL_TEXT_SIZE);
                 paint.setColor(Color.GRAY);
                 
-                String details = String.format(new Locale("ar", "SA"), 
-                    "الكمية: %d × %s = %s", 
-                    item.getQuantity(), 
+                String details = String.format(Locale.getDefault(),
+                    context.getString(R.string.invoice_item_details_format),
+                    item.getQuantity(),
                     CurrencyUtils.formatCurrency(item.getPrice()),
                     CurrencyUtils.formatCurrency(item.getQuantity() * item.getPrice()));
                 drawArabicText(canvas, details, rightMargin, currentY, paint);
@@ -282,7 +285,7 @@ public class InvoiceToBMPConverter {
                 currentY += SMALL_TEXT_SIZE + LINE_SPACING;
                 paint.setTextSize(SMALL_TEXT_SIZE);
                 paint.setColor(Color.GRAY);
-                drawArabicText(canvas, "... و " + (invoice.getItems().size() - 8) + " عناصر أخرى", 
+                drawArabicText(canvas, context.getString(R.string.invoice_more_items, (invoice.getItems().size() - 8)),
                               rightMargin, currentY, paint);
                 paint.setTextSize(NORMAL_TEXT_SIZE);
                 paint.setColor(Color.BLACK);
@@ -290,7 +293,7 @@ public class InvoiceToBMPConverter {
         } else {
             currentY += NORMAL_TEXT_SIZE;
             paint.setColor(Color.GRAY);
-            drawArabicText(canvas, "لا توجد عناصر في هذه الفاتورة", rightMargin, currentY, paint);
+            drawArabicText(canvas, context.getString(R.string.invoice_no_items), rightMargin, currentY, paint);
             paint.setColor(Color.BLACK);
         }
         
@@ -306,7 +309,7 @@ public class InvoiceToBMPConverter {
         paint.setColor(Color.parseColor("#2196F3")); // اللون الأزرق
         
         currentY += HEADER_TEXT_SIZE;
-        String totalText = "المجموع الكلي: " + CurrencyUtils.formatCurrency(invoice.getTotalAmount());
+        String totalText = context.getString(R.string.invoice_total_label, CurrencyUtils.formatCurrency(invoice.getTotalAmount()));
         drawArabicText(canvas, totalText, rightMargin, currentY, paint);
         
         currentY += LINE_SPACING * 2;
@@ -323,7 +326,8 @@ public class InvoiceToBMPConverter {
         paint.setTextAlign(Paint.Align.CENTER);
         
         currentY += NORMAL_TEXT_SIZE + LINE_SPACING;
-        String thankYouMessage = compactMode ? "شكراً لكم" : "شكراً لتعاملكم معنا";
+        String thankYouMessage = compactMode ? context.getString(R.string.invoice_thanks_compact)
+                                             : context.getString(R.string.invoice_thanks_normal);
         drawArabicText(canvas, thankYouMessage, IMAGE_WIDTH / 2, currentY, paint);
         
         return currentY;
@@ -516,14 +520,14 @@ public class InvoiceToBMPConverter {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("image/bmp");
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "فاتورة مبيعات");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.invoice_bmp_title_normal));
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             
-            context.startActivity(Intent.createChooser(shareIntent, "مشاركة الفاتورة"));
+            context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_invoice)));
             
         } catch (Exception e) {
             Log.e(TAG, "Error sharing BMP file", e);
-            Toast.makeText(context, "فشل في مشاركة الملف: " + e.getMessage(), 
+            Toast.makeText(context, context.getString(R.string.failed_share_file, e.getMessage()),
                          Toast.LENGTH_SHORT).show();
         }
     }

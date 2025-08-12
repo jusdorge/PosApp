@@ -88,14 +88,14 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
         // الحصول على معرف الفاتورة
         invoiceId = getIntent().getStringExtra(ARG_INVOICE_ID);
         if (invoiceId == null) {
-            Toast.makeText(this, "خطأ: معرف الفاتورة غير موجود", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_missing_invoice_id), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
         // إعداد شريط العنوان
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("طباعة الفاتورة");
+            getSupportActionBar().setTitle(getString(R.string.print_invoice_title));
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
@@ -205,23 +205,15 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
      */
     private void showPrintingOptions() {
         new android.app.AlertDialog.Builder(this)
-            .setTitle("خيارات الطباعة")
-            .setMessage("اختر نوع الطباعة المناسب:\n\n" +
-                       "📄 الطباعة النصية:\n" +
-                       "• سريعة ومتوافقة مع جميع الطابعات\n" +
-                       "• تحويل النصوص العربية لأحرف لاتينية\n" +
-                       "• مناسبة للاستخدام اليومي\n\n" +
-                       "🖼️ طباعة الصورة:\n" +
-                       "• الحفاظ على النصوص العربية الأصلية\n" +
-                       "• جودة عالية ووضوح تام\n" +
-                       "• قد تستغرق وقتاً أطول")
-            .setPositiveButton("طباعة نصية", (dialog, which) -> {
+            .setTitle(getString(R.string.printing_options_title))
+            .setMessage(getString(R.string.printing_options_message))
+            .setPositiveButton(getString(R.string.print_text), (dialog, which) -> {
                 showPrinterSelectionDialog();
             })
-            .setNeutralButton("طباعة الصورة", (dialog, which) -> {
+            .setNeutralButton(getString(R.string.print_image), (dialog, which) -> {
                 printInvoiceAsImage();
             })
-            .setNegativeButton("إلغاء", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .setIcon(android.R.drawable.ic_menu_info_details)
             .show();
     }
@@ -231,25 +223,15 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
      */
     private void showImagePrintingInfo() {
         new android.app.AlertDialog.Builder(this)
-            .setTitle("طباعة الصورة العربية")
-            .setMessage("اختر نوع الطباعة:\n\n" +
-                       "📄 **طباعة عادية:**\n" +
-                       "• نصوص عربية كاملة\n" +
-                       "• QR Code مع تفاصيل شاملة\n" +
-                       "• جودة عالية (وقت أطول)\n\n" +
-                       "⚡ **طباعة مضغوطة (موصى بها):**\n" +
-                       "• نصوص عربية محسنة\n" +
-                       "• حجم أصغر وسرعة أكبر\n" +
-                       "• مناسبة للطابعات الحرارية\n" +
-                       "• أقل استهلاكاً للذاكرة\n\n" +
-                       "⏱️ الطباعة المضغوطة أسرع وأكثر استقراراً")
-            .setPositiveButton("طباعة مضغوطة ⚡", (dialog, which) -> {
+            .setTitle(getString(R.string.image_printing_title))
+            .setMessage(getString(R.string.image_printing_message))
+            .setPositiveButton(getString(R.string.print_compact), (dialog, which) -> {
                 printInvoiceAsImageCompact();
             })
-            .setNeutralButton("طباعة عادية 📄", (dialog, which) -> {
+            .setNeutralButton(getString(R.string.print_normal), (dialog, which) -> {
                 printInvoiceAsImage();
             })
-            .setNegativeButton("إلغاء", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .setIcon(android.R.drawable.ic_menu_camera)
             .show();
     }
@@ -259,13 +241,13 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
      */
     private void printInvoiceAsImage() {
         if (currentInvoice == null) {
-            Toast.makeText(this, "لا يمكن طباعة الفاتورة، البيانات غير متوفرة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.cannot_print_invoice_no_data), Toast.LENGTH_SHORT).show();
             return;
         }
         
         // عرض progress dialog
         android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
-        progressDialog.setMessage("جاري إنشاء الصورة للطباعة...");
+        progressDialog.setMessage(getString(R.string.creating_image_for_printing));
         progressDialog.setCancelable(false);
         progressDialog.show();
         
@@ -288,8 +270,8 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
                     public void onError(String error) {
                         runOnUiThread(() -> {
                             progressDialog.dismiss();
-                            Toast.makeText(InvoicePrintActivity.this, 
-                                         "فشل في إنشاء صورة الفاتورة: " + error, 
+                            Toast.makeText(InvoicePrintActivity.this,
+                                         getString(R.string.failed_create_invoice_image, error),
                                          Toast.LENGTH_LONG).show();
                         });
                     }
@@ -298,8 +280,8 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     progressDialog.dismiss();
-                    Toast.makeText(InvoicePrintActivity.this, 
-                                 "خطأ في إنشاء الصورة: " + e.getMessage(), 
+                    Toast.makeText(InvoicePrintActivity.this,
+                                 getString(R.string.error_creating_image, e.getMessage()),
                                  Toast.LENGTH_LONG).show();
                 });
             }
@@ -311,13 +293,13 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
      */
     private void printInvoiceAsImageCompact() {
         if (currentInvoice == null) {
-            Toast.makeText(this, "لا يمكن طباعة الفاتورة، البيانات غير متوفرة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.cannot_print_invoice_no_data), Toast.LENGTH_SHORT).show();
             return;
         }
         
         // عرض progress dialog
         android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
-        progressDialog.setMessage("جاري إنشاء صورة مضغوطة للطباعة...");
+        progressDialog.setMessage(getString(R.string.creating_compact_image_for_printing));
         progressDialog.setCancelable(false);
         progressDialog.show();
         
@@ -341,8 +323,8 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
                     public void onError(String error) {
                         runOnUiThread(() -> {
                             progressDialog.dismiss();
-                            Toast.makeText(InvoicePrintActivity.this, 
-                                         "فشل في إنشاء الصورة المضغوطة: " + error, 
+                            Toast.makeText(InvoicePrintActivity.this,
+                                         getString(R.string.failed_create_compact_image, error),
                                          Toast.LENGTH_LONG).show();
                         });
                     }
@@ -351,8 +333,8 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     progressDialog.dismiss();
-                    Toast.makeText(InvoicePrintActivity.this, 
-                                 "خطأ في إنشاء الصورة: " + e.getMessage(), 
+                    Toast.makeText(InvoicePrintActivity.this,
+                                 getString(R.string.error_creating_image, e.getMessage()),
                                  Toast.LENGTH_LONG).show();
                 });
             }
@@ -383,10 +365,10 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             @Override
             public void onPrintSuccess() {
                 runOnUiThread(() -> {
-                    new android.app.AlertDialog.Builder(InvoicePrintActivity.this)
-                        .setTitle("تمت الطباعة بنجاح!")
-                        .setMessage("تم طباعة فاتورة الصورة بالنصوص العربية الكاملة على الطابعة")
-                        .setPositiveButton("حسناً", null)
+                new android.app.AlertDialog.Builder(InvoicePrintActivity.this)
+                        .setTitle(getString(R.string.print_success_title))
+                        .setMessage(getString(R.string.print_success_message))
+                        .setPositiveButton(getString(R.string.ok), null)
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .show();
                 });
@@ -395,11 +377,11 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             @Override
             public void onPrintError(String error) {
                 runOnUiThread(() -> {
-                    new android.app.AlertDialog.Builder(InvoicePrintActivity.this)
-                        .setTitle("فشل في الطباعة")
-                        .setMessage("حدث خطأ أثناء طباعة الصورة:\n\n" + error)
-                        .setPositiveButton("حسناً", null)
-                        .setNegativeButton("إعادة المحاولة", (dialog, which) -> printBitmapImage(bitmap))
+                new android.app.AlertDialog.Builder(InvoicePrintActivity.this)
+                    .setTitle(getString(R.string.print_failed_title))
+                    .setMessage(getString(R.string.print_failed_message_with_error, error))
+                    .setPositiveButton(getString(R.string.ok), null)
+                    .setNegativeButton(getString(R.string.retry), (dialog, which) -> printBitmapImage(bitmap))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
                 });
@@ -412,13 +394,13 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
      */
     private void convertInvoiceToBMP() {
         if (currentInvoice == null) {
-            Toast.makeText(this, "لا يمكن تحويل الفاتورة، البيانات غير متوفرة", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.cannot_convert_invoice_no_data), Toast.LENGTH_SHORT).show();
             return;
         }
         
         // عرض progress dialog
         android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
-        progressDialog.setMessage("جاري تحويل الفاتورة إلى صورة...");
+        progressDialog.setMessage(getString(R.string.converting_invoice_to_image));
         progressDialog.setCancelable(false);
         progressDialog.show();
         
@@ -440,8 +422,8 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
                     public void onError(String error) {
                         runOnUiThread(() -> {
                             progressDialog.dismiss();
-                            Toast.makeText(InvoicePrintActivity.this, 
-                                         "فشل في تحويل الفاتورة: " + error, 
+                            Toast.makeText(InvoicePrintActivity.this,
+                                         getString(R.string.failed_convert_invoice, error),
                                          Toast.LENGTH_LONG).show();
                         });
                     }
@@ -450,8 +432,8 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     progressDialog.dismiss();
-                    Toast.makeText(InvoicePrintActivity.this, 
-                                 "خطأ في التحويل: " + e.getMessage(), 
+                    Toast.makeText(InvoicePrintActivity.this,
+                                 getString(R.string.error_converting, e.getMessage()),
                                  Toast.LENGTH_LONG).show();
                 });
             }
@@ -463,15 +445,13 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
      */
     private void showBMPSaveSuccess(java.io.File bmpFile, android.graphics.Bitmap bitmap) {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("تم الحفظ بنجاح!")
-                .setMessage("تم حفظ الفاتورة كصورة BMP بالنصوص العربية الكاملة\n\n" +
-                           "المسار: " + bmpFile.getAbsolutePath() + "\n\n" +
-                           "ماذا تريد أن تفعل؟")
-                .setPositiveButton("مشاركة الصورة", (dialog, which) -> {
+                .setTitle(getString(R.string.save_success_title))
+                .setMessage(getString(R.string.bmp_saved_message_with_path, bmpFile.getAbsolutePath()))
+                .setPositiveButton(getString(R.string.share_image), (dialog, which) -> {
                     InvoiceToBMPConverter converter = new InvoiceToBMPConverter(this);
                     converter.shareBMPFile(bmpFile);
                 })
-                .setNeutralButton("عرض الملف", (dialog, which) -> {
+                .setNeutralButton(getString(R.string.view_file), (dialog, which) -> {
                     try {
                         Intent viewIntent = new Intent(Intent.ACTION_VIEW);
                         android.net.Uri fileUri = androidx.core.content.FileProvider.getUriForFile(
@@ -480,11 +460,11 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
                         viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(viewIntent);
                     } catch (Exception e) {
-                        Toast.makeText(this, "لا يوجد تطبيق لعرض الصورة: " + e.getMessage(), 
+                        Toast.makeText(this, getString(R.string.no_app_to_view_image, e.getMessage()),
                                      Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("حسناً", null)
+                .setNegativeButton(getString(R.string.ok), null)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .show();
     }
@@ -500,12 +480,12 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
                             displayInvoiceData();
                         }
                     } else {
-                        Toast.makeText(this, "الفاتورة غير موجودة", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.invoice_not_found), Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "فشل في تحميل الفاتورة: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.failed_load_invoice, e.getMessage()), Toast.LENGTH_SHORT).show();
                     finish();
                 });
     }
@@ -993,7 +973,7 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             }
             
             runOnUiThread(() -> {
-                Toast.makeText(this, "تم طباعة الفاتورة بنجاح", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.invoice_print_success), Toast.LENGTH_SHORT).show();
                 
                 // تسجيل عملية الطباعة في الأرشيف
                 OperationLogService operationLogService = OperationLogService.getInstance(this);
@@ -1118,13 +1098,13 @@ public class InvoicePrintActivity extends AppCompatActivity implements EditPayme
             if (allPermissionsGranted) {
                 showPrinterSelection();
             } else {
-                Toast.makeText(this, "يحتاج التطبيق لأذونات البلوتوث للطباعة", Toast.LENGTH_LONG).show();
+                 Toast.makeText(this, getString(R.string.bluetooth_permissions_required), Toast.LENGTH_LONG).show();
             }
         } else if (requestCode == LocationUtils.LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "✅ تم منح صلاحية الموقع. يمكنك الآن فتح المسار إلى العميل", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.location_permission_granted_message), Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "تم رفض صلاحية الموقع. سيتم عرض موقع العميل فقط", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.location_permission_denied_message), Toast.LENGTH_LONG).show();
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.posapp;
 
+import java.util.Locale;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,8 +95,8 @@ public class EditableInvoicePrintItemAdapter extends RecyclerView.Adapter<Editab
             double total = quantity * price;
             
             quantityTextView.setText(String.valueOf(quantity));
-            priceTextView.setText(String.format("%.2f", price));
-            totalTextView.setText(String.format("%.2f", total));
+            priceTextView.setText(String.format(java.util.Locale.US, "%.2f", price));
+            totalTextView.setText(String.format(java.util.Locale.US, "%.2f", total));
             
             // إظهار تلميح التعديل
             editHintTextView.setVisibility(View.VISIBLE);

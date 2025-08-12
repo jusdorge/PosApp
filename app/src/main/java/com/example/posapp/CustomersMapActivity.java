@@ -106,7 +106,7 @@ public class CustomersMapActivity extends AppCompatActivity {
                     }
                     
                     // عرض رسالة تشخيص
-                    String message = String.format("تم تحميل %d عميل، منهم %d لديهم مواقع محددة", 
+                    String message = String.format(java.util.Locale.US, "تم تحميل %d عميل، منهم %d لديهم مواقع محددة", 
                             totalCustomers, customersWithLocationCount);
                     Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                     
@@ -158,7 +158,7 @@ public class CustomersMapActivity extends AppCompatActivity {
             Marker marker = new Marker(mapView);
             marker.setPosition(position);
             marker.setTitle(customer.getName());
-            marker.setSnippet("الهاتف: " + customer.getPhone() + "\nالدين: " + String.format("%.2f دج", customer.getTotalDebt()));
+            marker.setSnippet("الهاتف: " + customer.getPhone() + "\nالدين: " + String.format(java.util.Locale.US, "%.2f دج", customer.getTotalDebt()));
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             
             // إضافة مستمع للنقر على الماركر

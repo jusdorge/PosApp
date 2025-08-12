@@ -149,7 +149,7 @@ public class EditCustomerDialog extends DialogFragment {
     
     private void updateLocationDisplay() {
         if (latitude != 0.0 && longitude != 0.0) {
-            locationTextView.setText(String.format("%.4f, %.4f", latitude, longitude));
+            locationTextView.setText(String.format(java.util.Locale.US, "%.4f, %.4f", latitude, longitude));
             showLocationButton.setEnabled(true);
             setLocationButton.setText(getString(R.string.update_location));
         } else {

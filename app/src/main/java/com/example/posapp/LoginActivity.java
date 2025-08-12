@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
             
         } catch (Exception e) {
             Log.e(TAG, "❌ Error in onCreate", e);
-            Toast.makeText(this, "خطأ في تهيئة شاشة تسجيل الدخول: " + e.getMessage(), 
+            Toast.makeText(this, getString(R.string.login_init_error, e.getMessage()),
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -114,12 +114,12 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString().trim();
         
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "يرجى إدخال البريد الإلكتروني وكلمة المرور", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.enter_email_and_password), Toast.LENGTH_SHORT).show();
             return;
         }
         
         Log.d(TAG, "Attempting email login for: " + email);
-        Toast.makeText(this, "جاري تسجيل الدخول...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.logging_in), Toast.LENGTH_SHORT).show();
         
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -131,8 +131,8 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     } else {
                         Log.w(TAG, "Email login failed", task.getException());
-                        Toast.makeText(this, "فشل تسجيل الدخول: " + 
-                                (task.getException() != null ? task.getException().getMessage() : "خطأ غير معروف"), 
+                        Toast.makeText(this, getString(R.string.login_failed_with_message,
+                                (task.getException() != null ? task.getException().getMessage() : getString(R.string.unknown_error))),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 Log.w(TAG, "Google sign in failed", e);
-                Toast.makeText(this, "فشل تسجيل الدخول عبر Google: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.google_login_failed, e.getMessage()), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -173,8 +173,8 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     } else {
                         Log.w(TAG, "Firebase auth with Google failed", task.getException());
-                        Toast.makeText(this, "فشل المصادقة: " + 
-                                (task.getException() != null ? task.getException().getMessage() : "خطأ غير معروف"), 
+                        Toast.makeText(this, getString(R.string.auth_failed_with_message,
+                                (task.getException() != null ? task.getException().getMessage() : getString(R.string.unknown_error))),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -218,7 +218,7 @@ public class LoginActivity extends AppCompatActivity {
                 Log.i(TAG, "User role downgraded to EMPLOYEE for security: " + email);
                 
                 // إشعار أمني
-                Toast.makeText(this, "تم رفض محاولة دخول غير مصرح بها كمدير", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.unauthorized_admin_login_denied), Toast.LENGTH_LONG).show();
                 
                 return false;
             } else {
@@ -288,7 +288,7 @@ public class LoginActivity extends AppCompatActivity {
      * تحميل بيانات المستخدم من Firestore - الدالة الأساسية
      */
     private void loadUserData(String email) {
-        Toast.makeText(this, "جاري البحث عن المستخدم...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.searching_for_user), Toast.LENGTH_SHORT).show();
         Log.d(TAG, "=== Starting user search for: " + email + " ===");
         
         // البحث الشامل بدون أي شروط إضافية
@@ -310,7 +310,7 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Database query failed for email: " + email, e);
-                    Toast.makeText(this, "خطأ في الاتصال بقاعدة البيانات: " + e.getMessage(), 
+                    Toast.makeText(this, getString(R.string.database_connection_error_with_msg, e.getMessage()),
                             Toast.LENGTH_LONG).show();
                     showDatabaseError(email, e);
                 });
@@ -331,11 +331,10 @@ public class LoginActivity extends AppCompatActivity {
             userSession.loginUser(user);
             
             // رسالة الترحيب
-            String welcome = "مرحباً " + user.getFullName();
+            String welcome = getString(R.string.welcome_user, user.getFullName());
             if (user.getRole() != null) {
                 welcome += " (" + user.getRole().getDisplayName() + ")";
             }
-            
             Toast.makeText(this, welcome, Toast.LENGTH_LONG).show();
             Log.d(TAG, "✓ User login successful: " + user.getEmail());
             
@@ -398,19 +397,17 @@ public class LoginActivity extends AppCompatActivity {
      * عرض خطأ معالجة المستخدم
      */
     private void showUserProcessingError(String email, int userCount) {
-        String message = "تم العثور على " + userCount + " مستخدم بالبريد الإلكتروني " + email + 
-                        " ولكن فشل في معالجة بياناتهم.\n\nماذا تريد أن تفعل؟";
-        
+        String message = getString(R.string.user_processing_error_message, userCount, email);
         new android.app.AlertDialog.Builder(this)
-                .setTitle("خطأ في معالجة المستخدم")
+                .setTitle(getString(R.string.user_processing_error_title))
                 .setMessage(message)
-                .setPositiveButton("إصلاح تلقائي", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.auto_fix), (dialog, which) -> {
                     forceFixUser(email);
                 })
-                .setNegativeButton("تشخيص النظام", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.system_diagnostic), (dialog, which) -> {
                     runDiagnostic();
                 })
-                .setNeutralButton("إنشاء جديد", (dialog, which) -> {
+                .setNeutralButton(getString(R.string.create_new), (dialog, which) -> {
                     createNewUserAccount(email);
                 })
                 .setCancelable(false)
@@ -422,15 +419,12 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void showDatabaseError(String email, Exception error) {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("خطأ في قاعدة البيانات")
-                .setMessage("فشل في الاتصال بقاعدة البيانات:\n" + error.getMessage() + 
-                           "\n\nتحقق من اتصال الإنترنت وإعدادات Firebase.")
-                .setPositiveButton("إعادة المحاولة", (dialog, which) -> {
+                .setTitle(getString(R.string.database_error_title))
+                .setMessage(getString(R.string.database_error_message_detailed, error.getMessage()))
+                .setPositiveButton(getString(R.string.retry), (dialog, which) -> {
                     loadUserData(email);
                 })
-                .setNegativeButton("تشخيص", (dialog, which) -> {
-                    runDiagnostic();
-                })
+                .setNegativeButton(getString(R.string.system_diagnostic), (dialog, which) -> runDiagnostic())
                 .show();
     }
     
@@ -438,7 +432,7 @@ public class LoginActivity extends AppCompatActivity {
      * إصلاح قسري للمستخدم
      */
     private void forceFixUser(String email) {
-        Toast.makeText(this, "جاري الإصلاح القسري...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.performing_forced_fix), Toast.LENGTH_SHORT).show();
         
         // إنشاء مستخدم جديد بالحد الأدنى من البيانات
         User newUser = new User();
@@ -458,7 +452,7 @@ public class LoginActivity extends AppCompatActivity {
                     performUserLogin(newUser);
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "فشل في الإصلاح: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.failed_to_fix_with_msg, e.getMessage()), Toast.LENGTH_LONG).show();
                 });
     }
     
@@ -508,7 +502,7 @@ public class LoginActivity extends AppCompatActivity {
         
         // إذا وصلنا هنا، فلم نتمكن من معالجة أي مستخدم
         Log.e(TAG, "Failed to process any of the found users");
-        Toast.makeText(this, "تم العثور على المستخدم ولكن فشل في معالجة البيانات", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.user_found_but_processing_failed), Toast.LENGTH_LONG).show();
         showUserNotFoundDialog(email);
     }
     
@@ -677,7 +671,7 @@ public class LoginActivity extends AppCompatActivity {
                                 
                                 // تسجيل دخول المستخدم
                                 userSession.loginUser(user);
-                                Toast.makeText(this, "مرحباً " + user.getFullName() + " (تم إصلاح الحساب)", Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, getString(R.string.welcome_user_fixed, user.getFullName()), Toast.LENGTH_LONG).show();
                                 startMainActivity();
                                 return;
                                 
@@ -696,7 +690,7 @@ public class LoginActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error in fallback user search", e);
-                    Toast.makeText(this, "خطأ في البحث عن المستخدم: " + e.getMessage(), 
+                    Toast.makeText(this, getString(R.string.search_user_error_with_msg, e.getMessage()),
                             Toast.LENGTH_LONG).show();
                     
                     // عرض خيارات المساعدة
@@ -731,7 +725,7 @@ public class LoginActivity extends AppCompatActivity {
             // تسجيل دخول المستخدم في الجلسة
             userSession.loginUser(user);
             
-            Toast.makeText(this, "مرحباً " + user.getFullName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.welcome_user, user.getFullName()), Toast.LENGTH_SHORT).show();
             startMainActivity();
             
         } catch (Exception e) {
@@ -747,15 +741,15 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void showSearchFailureDialog(String email, String error) {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("خطأ في البحث")
-                .setMessage("فشل في البحث عن المستخدم:\n" + error + "\n\nماذا تريد أن تفعل؟")
-                .setPositiveButton("إعادة المحاولة", (dialog, which) -> {
+                .setTitle(getString(R.string.search_error_title))
+                .setMessage(getString(R.string.search_error_message, error))
+                .setPositiveButton(getString(R.string.retry), (dialog, which) -> {
                     loadUserData(email);
                 })
-                .setNegativeButton("تشخيص النظام", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.system_diagnostic), (dialog, which) -> {
                     runDiagnostic();
                 })
-                .setNeutralButton("إنشاء حساب", (dialog, which) -> {
+                .setNeutralButton(getString(R.string.create_account), (dialog, which) -> {
                     createNewUserAccount(email);
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -773,15 +767,15 @@ public class LoginActivity extends AppCompatActivity {
         }
         
         new android.app.AlertDialog.Builder(this)
-                .setTitle("حساب غير مسجل")
-                .setMessage("هذا البريد الإلكتروني غير مسجل في النظام.\n\nاختر أحد الخيارات:")
-                .setPositiveButton("إنشاء حساب", (dialog, which) -> {
+                .setTitle(getString(R.string.unregistered_account_title))
+                .setMessage(getString(R.string.unregistered_account_message))
+                .setPositiveButton(getString(R.string.create_account), (dialog, which) -> {
                     createNewUserAccount(email);
                 })
-                .setNeutralButton("دخول كضيف", (dialog, which) -> {
+                .setNeutralButton(getString(R.string.login_as_guest), (dialog, which) -> {
                     createGuestAccount(email);
                 })
-                .setNegativeButton("مدير نظام", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.system_admin_short), (dialog, which) -> {
                     showCreateAdminDialog(email);
                 })
                 .setCancelable(false)
@@ -793,13 +787,12 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void showAdminSetupDialog(String email) {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("إعداد مدير النظام")
-                .setMessage("تم اكتشاف محاولة دخول بحساب المدير الافتراضي.\n\n" +
-                           "سيتم ربط هذا الحساب بصلاحيات مدير النظام الكاملة.")
-                .setPositiveButton("تأكيد الربط", (dialog, which) -> {
+                .setTitle(getString(R.string.setup_system_admin_title))
+                .setMessage(getString(R.string.setup_system_admin_message))
+                .setPositiveButton(getString(R.string.confirm_link), (dialog, which) -> {
                     linkAccountToAdminProfile(email);
                 })
-                .setNegativeButton("إلغاء", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
                     mAuth.signOut();
                     dialog.dismiss();
                 })
@@ -833,7 +826,7 @@ public class LoginActivity extends AppCompatActivity {
                         // تسجيل دخول المستخدم
                         userSession.loginUser(user);
                         
-                        Toast.makeText(this, "مرحباً " + user.getFullName() + " - مدير النظام", 
+                        Toast.makeText(this, getString(R.string.welcome_system_admin, user.getFullName()),
                                 Toast.LENGTH_LONG).show();
                         startMainActivity();
                         
@@ -871,8 +864,8 @@ public class LoginActivity extends AppCompatActivity {
                 // تسجيل دخول المدير الجديد
                 userSession.loginUser(adminUser);
                 
-                Toast.makeText(this, 
-                    "تم إنشاء حساب مدير النظام بنجاح!\nمرحباً " + adminUser.getFullName(), 
+                Toast.makeText(this,
+                    getString(R.string.system_admin_created_welcome, adminUser.getFullName()),
                     Toast.LENGTH_LONG).show();
                     
                 // إشعار في الـ logs
@@ -892,7 +885,7 @@ public class LoginActivity extends AppCompatActivity {
      * إنشاء حساب ضيف مؤقت
      */
     private void createGuestAccount(String email) {
-        String guestName = "ضيف - " + email.split("@")[0];
+        String guestName = getString(R.string.guest_prefix) + email.split("@")[0];
         
         User guestUser = new User(
             "guest_" + System.currentTimeMillis(), // username فريد
@@ -904,7 +897,7 @@ public class LoginActivity extends AppCompatActivity {
         // تسجيل دخول مؤقت بدون حفظ في قاعدة البيانات
         userSession.loginUser(guestUser);
         
-        Toast.makeText(this, "مرحباً " + guestName + " (حساب مؤقت)", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.welcome_guest_temporary, guestName), Toast.LENGTH_LONG).show();
         
         // إشعار المدير بوجود ضيف جديد
         notifyAdminOfNewGuest(email, guestName);
@@ -927,14 +920,14 @@ public class LoginActivity extends AppCompatActivity {
         fullNameEdit.setText(suggestedName);
         
         new android.app.AlertDialog.Builder(this)
-                .setTitle("إنشاء حساب جديد")
+                .setTitle(getString(R.string.create_new_account_title))
                 .setView(dialogView)
-                .setPositiveButton("إنشاء", (dialog, which) -> {
+                .setPositiveButton(getString(R.string.create), (dialog, which) -> {
                     String fullName = fullNameEdit.getText().toString().trim();
                     String phone = phoneEdit.getText().toString().trim();
                     
                     if (fullName.isEmpty()) {
-                        Toast.makeText(this, "يرجى إدخال الاسم الكامل", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.enter_full_name), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     
@@ -950,7 +943,7 @@ public class LoginActivity extends AppCompatActivity {
                     // حفظ في قاعدة البيانات
                     saveNewUserToDatabase(newUser);
                 })
-                .setNegativeButton("إلغاء", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
                     mAuth.signOut();
                     dialog.dismiss();
                 })
@@ -961,7 +954,7 @@ public class LoginActivity extends AppCompatActivity {
      * حفظ المستخدم الجديد في قاعدة البيانات
      */
     private void saveNewUserToDatabase(User user) {
-        Toast.makeText(this, "جاري إنشاء الحساب...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.creating_account), Toast.LENGTH_SHORT).show();
         
         db.collection("users")
                 .add(user)
@@ -974,13 +967,13 @@ public class LoginActivity extends AppCompatActivity {
                     // إشعار المدير بالمستخدم الجديد
                     notifyAdminOfNewUser(user);
                     
-                    Toast.makeText(this, "تم إنشاء الحساب بنجاح - مرحباً " + user.getFullName(), 
+                    Toast.makeText(this, getString(R.string.account_created_welcome, user.getFullName()),
                             Toast.LENGTH_LONG).show();
                     startMainActivity();
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error creating new user account", e);
-                    Toast.makeText(this, "خطأ في إنشاء الحساب: " + e.getMessage(), 
+                    Toast.makeText(this, getString(R.string.error_creating_account, e.getMessage()),
                             Toast.LENGTH_LONG).show();
                     mAuth.signOut();
                 });
@@ -1026,13 +1019,13 @@ public class LoginActivity extends AppCompatActivity {
             // تسجيل دخول المستخدم
             userSession.loginUser(user);
             
-            Toast.makeText(this, "تم إصلاح بيانات المستخدم - مرحباً " + user.getFullName(), 
+            Toast.makeText(this, getString(R.string.user_data_fixed_welcome, user.getFullName()),
                     Toast.LENGTH_LONG).show();
             startMainActivity();
             
         } catch (Exception e) {
             Log.e(TAG, "Failed to fix corrupted user data", e);
-            Toast.makeText(this, "خطأ في بيانات المستخدم. يرجى التواصل مع مدير النظام.", 
+            Toast.makeText(this, getString(R.string.user_data_error_contact_admin),
                     Toast.LENGTH_LONG).show();
             mAuth.signOut();
         }
@@ -1133,14 +1126,12 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void showCreateAdminDialog(String email) {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("تحويل إلى مدير نظام")
-                .setMessage("هل تريد تحويل هذا الحساب إلى مدير نظام؟\n\n" +
-                           "البريد: " + email + "\n\n" +
-                           "⚠️ هذا الإجراء يمنح صلاحيات كاملة على النظام!")
-                .setPositiveButton("نعم، أنشئ مدير", (dialog, which) -> {
+                .setTitle(getString(R.string.convert_to_system_admin_title))
+                .setMessage(getString(R.string.convert_to_admin_message, email))
+                .setPositiveButton(getString(R.string.yes_create_admin), (dialog, which) -> {
                     createNewAdminProfile(email);
                 })
-                .setNegativeButton("إلغاء", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
                     mAuth.signOut();
                     dialog.dismiss();
                 })
@@ -1152,7 +1143,7 @@ public class LoginActivity extends AppCompatActivity {
      * تشغيل أداة التشخيص
      */
     private void runDiagnostic() {
-        Toast.makeText(this, "جاري التشخيص...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.diagnosing), Toast.LENGTH_SHORT).show();
         
         FirebaseAuthDiagnostic.runDiagnostic(this, new FirebaseAuthDiagnostic.DiagnosticCallback() {
             @Override
@@ -1167,7 +1158,7 @@ public class LoginActivity extends AppCompatActivity {
             
             @Override
             public void onError(String error) {
-                Toast.makeText(LoginActivity.this, "خطأ في التشخيص: " + error, Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, getString(R.string.diagnostic_error_with_msg, error), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -1177,13 +1168,13 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void showDiagnosticResult(String diagnosis, String recommendation) {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("نتيجة التشخيص")
-                .setMessage(diagnosis + "\n📋 التوصية:\n" + recommendation)
-                .setPositiveButton("إصلاح تلقائي", (dialog, which) -> {
+                .setTitle(getString(R.string.diagnostic_result_title))
+                .setMessage(getString(R.string.diagnostic_result_message, diagnosis, recommendation))
+                .setPositiveButton(getString(R.string.auto_fix), (dialog, which) -> {
                     runQuickFix();
                 })
-                .setNegativeButton("إغلاق", null)
-                .setNeutralButton("معلومات Firebase", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.close), null)
+                .setNeutralButton(getString(R.string.firebase_info), (dialog, which) -> {
                     FirebaseAuthDiagnostic.showFirebaseInfo(this);
                 })
                 .show();
@@ -1193,30 +1184,30 @@ public class LoginActivity extends AppCompatActivity {
      * تشغيل الإصلاح السريع
      */
     private void runQuickFix() {
-        Toast.makeText(this, "جاري الإصلاح...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.fixing), Toast.LENGTH_SHORT).show();
         
         FirebaseAuthDiagnostic.quickFix(this, new FirebaseAuthDiagnostic.DiagnosticCallback() {
             @Override
             public void onResult(String diagnosis, String recommendation) {
                 new android.app.AlertDialog.Builder(LoginActivity.this)
-                        .setTitle("نتيجة الإصلاح")
+                        .setTitle(getString(R.string.fix_result_title))
                         .setMessage(diagnosis + "\n\n" + recommendation)
-                        .setPositiveButton("حسناً", null)
+                        .setPositiveButton(getString(R.string.ok), null)
                         .show();
             }
             
             @Override
             public void onFixed(String message) {
                 new android.app.AlertDialog.Builder(LoginActivity.this)
-                        .setTitle("تم الإصلاح!")
+                        .setTitle(getString(R.string.fixed_successfully))
                         .setMessage(message)
-                        .setPositiveButton("حسناً", null)
+                        .setPositiveButton(getString(R.string.ok), null)
                         .show();
             }
             
             @Override
             public void onError(String error) {
-                Toast.makeText(LoginActivity.this, "فشل الإصلاح: " + error, Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, getString(R.string.fix_failed_with_msg, error), Toast.LENGTH_LONG).show();
             }
         });
     }

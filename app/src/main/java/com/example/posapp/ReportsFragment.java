@@ -270,7 +270,7 @@ public class ReportsFragment extends Fragment {
         
         // إظهار رسائل التحميل
         agrodivValueTextView.setText(getString(R.string.loading_dots));
-        receiptsCountValueTextView.setText("...");
+        receiptsCountValueTextView.setText(getString(R.string.loading_dots));
         avgSalesValueTextView.setText(getString(R.string.calculating_dots));
         bestCustomerValueTextView.setText(getString(R.string.searching_dots));
         cashValueTextView.setText(getString(R.string.calculating_cash_prefix));
@@ -552,7 +552,7 @@ public class ReportsFragment extends Fragment {
             }
             
             // إنشاء متغير final للاستخدام في lambda
-            final String finalDisplayName = displayName != null ? displayName : "مستخدم غير معروف";
+            final String finalDisplayName = displayName != null ? displayName : getString(R.string.not_specified);
             
             sellerNameTextView.setText(finalDisplayName);
             
@@ -571,7 +571,7 @@ public class ReportsFragment extends Fragment {
                     reportData.put("activeUsers", activeUsersCount);
                 })
                 .addOnFailureListener(e -> {
-                    sellerDescTextView.setText("غير محدد");
+                    sellerDescTextView.setText(getString(R.string.not_specified));
                     reportData.put("activeUsers", 1);
                     reportData.put("sellerName", finalDisplayName);
                 });
@@ -851,27 +851,37 @@ public class ReportsFragment extends Fragment {
             }
             
             String dateStr = ArabicNumberUtils.formatShortDateWithArabicNumbers(selectedDate.getTime());
-            File csvFile = new File(exportDir, "تقرير_" + dateStr.replace("/", "_") + ".csv");
+            File csvFile = new File(exportDir, getString(R.string.report_file_prefix) + "_" + dateStr.replace("/", "_") + ".csv");
             
             FileWriter writer = new FileWriter(csvFile);
             
             // كتابة رأس الملف
-            writer.append("البيان,القيمة\n");
-            writer.append("التاريخ," + dateStr + "\n");
-            writer.append("إجمالي المبيعات," + reportData.get("totalSales") + "\n");
-            writer.append("إجمالي الربح," + reportData.get("totalProfit") + "\n");
-            writer.append("عدد الفواتير," + reportData.get("receiptsCount") + "\n");
-            writer.append("متوسط المبيعات," + reportData.get("avgSales") + "\n");
-            writer.append("أفضل منتج," + reportData.get("topProduct") + "\n");
-            writer.append("أفضل عميل," + reportData.get("bestCustomer") + "\n");
-            writer.append("المبيعات النقدية," + reportData.get("cashSales") + "\n");
-            writer.append("مبيعات الدين," + reportData.get("creditSales") + "\n");
-            writer.append("المدفوعات من الديون," + reportData.get("debtPaymentsAmount") + "\n");
-            writer.append("إجمالي النقود المحصلة," + reportData.get("totalCashCollected") + "\n");
+            writer.append(getString(R.string.report_csv_header)).append("\n");
+            writer.append(getString(R.string.report_date_label)).append(",").append(dateStr).append("\n");
+            writer.append(getString(R.string.report_total_sales_label)).append(",")
+                    .append(String.valueOf(reportData.get("totalSales"))).append("\n");
+            writer.append(getString(R.string.report_total_profit_label)).append(",")
+                    .append(String.valueOf(reportData.get("totalProfit"))).append("\n");
+            writer.append(getString(R.string.report_invoices_count_label)).append(",")
+                    .append(String.valueOf(reportData.get("receiptsCount"))).append("\n");
+            writer.append(getString(R.string.report_avg_invoice_label)).append(",")
+                    .append(String.valueOf(reportData.get("avgSales"))).append("\n");
+            writer.append(getString(R.string.report_top_product_label)).append(",")
+                    .append(String.valueOf(reportData.get("topProduct"))).append("\n");
+            writer.append(getString(R.string.report_best_customer_label)).append(",")
+                    .append(String.valueOf(reportData.get("bestCustomer"))).append("\n");
+            writer.append(getString(R.string.report_cash_sales_label)).append(",")
+                    .append(String.valueOf(reportData.get("cashSales"))).append("\n");
+            writer.append(getString(R.string.report_credit_sales_label)).append(",")
+                    .append(String.valueOf(reportData.get("creditSales"))).append("\n");
+            writer.append(getString(R.string.report_debt_payments_label)).append(",")
+                    .append(String.valueOf(reportData.get("debtPaymentsAmount"))).append("\n");
+            writer.append(getString(R.string.total_cash_collected)).append(",")
+                    .append(String.valueOf(reportData.get("totalCashCollected"))).append("\n");
             
             writer.close();
             
-            Toast.makeText(getContext(), "✅ تم تصدير التقرير إلى CSV بنجاح", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.export_success), Toast.LENGTH_SHORT).show();
             
             // فتح الملف
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -884,7 +894,7 @@ public class ReportsFragment extends Fragment {
             }
             
         } catch (IOException e) {
-            Toast.makeText(getContext(), "❌ خطأ في تصدير الملف: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.export_failed) + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
     
@@ -905,41 +915,49 @@ public class ReportsFragment extends Fragment {
             }
             
             String dateStr = ArabicNumberUtils.formatShortDateWithArabicNumbers(selectedDate.getTime());
-            File textFile = new File(exportDir, "تقرير_" + dateStr.replace("/", "_") + ".txt");
+            File textFile = new File(exportDir, getString(R.string.report_file_prefix) + "_" + dateStr.replace("/", "_") + ".txt");
             
             FileWriter writer = new FileWriter(textFile);
             
             // كتابة التقرير النصي
-            writer.append("====== تقرير نقطة البيع ======\n");
-            writer.append("التاريخ: " + dateStr + "\n");
+            writer.append("====== ").append(getString(R.string.report_title)).append(" ======\n");
+            writer.append(getString(R.string.report_date_label)).append(": ").append(dateStr).append("\n");
             writer.append("================================\n\n");
             
-            writer.append("📊 ملخص المبيعات:\n");
-            writer.append("• إجمالي المبيعات: " + reportData.get("totalSales") + "\n");
-            writer.append("• إجمالي الربح: " + reportData.get("totalProfit") + "\n");
-            writer.append("• عدد الفواتير: " + reportData.get("receiptsCount") + "\n");
-            writer.append("• متوسط قيمة الفاتورة: " + reportData.get("avgSales") + "\n\n");
+            writer.append(getString(R.string.report_stats_section_header)).append("\n");
+            writer.append(getString(R.string.report_total_sales_line, String.valueOf(reportData.get("totalSales")))).append("\n");
+            writer.append(getString(R.string.report_total_profit_line, String.valueOf(reportData.get("totalProfit")))).append("\n");
+            writer.append(getString(R.string.report_invoices_count_line, (int)(reportData.get("receiptsCount") != null ? Integer.parseInt(String.valueOf(reportData.get("receiptsCount"))) : 0))).append("\n");
+            writer.append(getString(R.string.report_avg_invoice_line, String.valueOf(reportData.get("avgSales")))).append("\n\n");
             
-            writer.append("🏆 أفضل الأداءات:\n");
-            writer.append("• أفضل منتج: " + reportData.get("topProduct") + "\n");
-            writer.append("• أفضل عميل: " + reportData.get("bestCustomer") + "\n\n");
+            writer.append(getString(R.string.report_best_performance_header)).append("\n");
+            writer.append("• ").append(getString(R.string.report_top_product_label)).append(": ")
+                  .append(String.valueOf(reportData.get("topProduct"))).append("\n");
+            writer.append("• ").append(getString(R.string.report_best_customer_label)).append(": ")
+                  .append(String.valueOf(reportData.get("bestCustomer"))).append("\n\n");
             
-            writer.append("💰 طرق الدفع:\n");
-            writer.append("• المبيعات النقدية: " + reportData.get("cashSales") + "\n");
-            writer.append("• مبيعات الدين: " + reportData.get("creditSales") + "\n\n");
+            writer.append(getString(R.string.report_payment_methods_header)).append("\n");
+            writer.append("• ").append(getString(R.string.report_cash_sales_label)).append(": ")
+                  .append(String.valueOf(reportData.get("cashSales"))).append("\n");
+            writer.append("• ").append(getString(R.string.report_credit_sales_label)).append(": ")
+                  .append(String.valueOf(reportData.get("creditSales"))).append("\n\n");
             
-            writer.append("💳 النقود المحصلة:\n");
-            writer.append("• المبيعات النقدية: " + reportData.get("cashSalesAmount") + "\n");
-            writer.append("• المدفوعات من الديون: " + reportData.get("debtPaymentsAmount") + "\n");
-            writer.append("• إجمالي النقود المحصلة: " + reportData.get("totalCashCollected") + "\n\n");
+            writer.append(getString(R.string.cash_collection_summary)).append("\n");
+            writer.append("• ").append(getString(R.string.cash_sales)).append(": ")
+                  .append(String.valueOf(reportData.get("cashSalesAmount"))).append("\n");
+            writer.append("• ").append(getString(R.string.debt_payments)).append(": ")
+                  .append(String.valueOf(reportData.get("debtPaymentsAmount"))).append("\n");
+            writer.append("• ").append(getString(R.string.total_cash_collected)).append(": ")
+                  .append(String.valueOf(reportData.get("totalCashCollected"))).append("\n\n");
             
             writer.append("================================\n");
-            writer.append("تم إنشاء هذا التقرير بواسطة تطبيق نقطة البيع\n");
-            writer.append("التوقيت: " + ArabicNumberUtils.formatDateTimeWithArabicNumbers(new Date()) + "\n");
+            writer.append(getString(R.string.report_generated_by_app)).append("\n");
+            writer.append(getString(R.string.report_created_at_label)).append(": ")
+                  .append(ArabicNumberUtils.formatDateTimeWithArabicNumbers(new Date())).append("\n");
             
             writer.close();
             
-            Toast.makeText(getContext(), "✅ تم تصدير التقرير النصي بنجاح", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.export_success), Toast.LENGTH_SHORT).show();
             
             // فتح الملف
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -952,41 +970,42 @@ public class ReportsFragment extends Fragment {
             }
             
         } catch (IOException e) {
-            Toast.makeText(getContext(), "❌ خطأ في تصدير الملف: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.export_failed) + ": " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
     
     private void shareReport() {
         String dateStr = ArabicNumberUtils.formatShortDateWithArabicNumbers(selectedDate.getTime());
-        
         StringBuilder shareText = new StringBuilder();
-        shareText.append("📊 تقرير نقطة البيع - ").append(dateStr).append("\n");
+        shareText.append(getString(R.string.report_title)).append(" - ").append(dateStr).append("\n");
         shareText.append("═══════════════════════════════\n\n");
-        
-        shareText.append("💰 إجمالي المبيعات: ").append(reportData.get("totalSales")).append("\n");
-        shareText.append("📈 إجمالي الربح: ").append(reportData.get("totalProfit")).append("\n");
-        shareText.append("📄 عدد الفواتير: ").append(reportData.get("receiptsCount")).append("\n");
-        shareText.append("⭐ متوسط الفاتورة: ").append(reportData.get("avgSales")).append("\n\n");
-        
-        shareText.append("🏆 أفضل منتج: ").append(reportData.get("topProduct")).append("\n");
-        shareText.append("👤 أفضل عميل: ").append(reportData.get("bestCustomer")).append("\n\n");
-        
-        shareText.append("💵 المبيعات النقدية: ").append(reportData.get("cashSales")).append("\n");
-        shareText.append("📝 مبيعات الدين: ").append(reportData.get("creditSales")).append("\n\n");
-        
-        shareText.append("💳 النقود المحصلة:\n");
-        shareText.append("• مبيعات نقدية: ").append(reportData.get("cashSalesAmount")).append("\n");
-        shareText.append("• مدفوعات الديون: ").append(reportData.get("debtPaymentsAmount")).append("\n");
-        shareText.append("• الإجمالي: ").append(reportData.get("totalCashCollected")).append("\n\n");
-        
-        shareText.append("#نقطة_البيع #تقرير_يومي #مبيعات #النقود_المحصلة");
-        
+        shareText.append(getString(R.string.report_total_sales_line, String.valueOf(reportData.get("totalSales")))).append("\n");
+        shareText.append(getString(R.string.report_total_profit_line, String.valueOf(reportData.get("totalProfit")))).append("\n");
+        shareText.append(getString(R.string.report_invoices_count_line, (int)(reportData.get("receiptsCount") != null ? Integer.parseInt(String.valueOf(reportData.get("receiptsCount"))) : 0))).append("\n");
+        shareText.append(getString(R.string.report_avg_invoice_line, String.valueOf(reportData.get("avgSales")))).append("\n\n");
+        shareText.append(getString(R.string.report_top_product_label)).append(": ")
+                .append(String.valueOf(reportData.get("topProduct"))).append("\n");
+        shareText.append(getString(R.string.report_best_customer_label)).append(": ")
+                .append(String.valueOf(reportData.get("bestCustomer"))).append("\n\n");
+        shareText.append(getString(R.string.report_cash_sales_label)).append(": ")
+                .append(String.valueOf(reportData.get("cashSales"))).append("\n");
+        shareText.append(getString(R.string.report_credit_sales_label)).append(": ")
+                .append(String.valueOf(reportData.get("creditSales"))).append("\n\n");
+        shareText.append(getString(R.string.cash_collection_summary)).append("\n");
+        shareText.append("• ").append(getString(R.string.cash_sales)).append(": ")
+                .append(String.valueOf(reportData.get("cashSalesAmount"))).append("\n");
+        shareText.append("• ").append(getString(R.string.debt_payments)).append(": ")
+                .append(String.valueOf(reportData.get("debtPaymentsAmount"))).append("\n");
+        shareText.append("• ").append(getString(R.string.total_cash_collected)).append(": ")
+                .append(String.valueOf(reportData.get("totalCashCollected"))).append("\n\n");
+        shareText.append(getString(R.string.report_share_hashtags));
+
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareText.toString());
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "تقرير نقطة البيع - " + dateStr);
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.report_share_subject_with_name, dateStr));
         
-        startActivity(Intent.createChooser(shareIntent, "مشاركة التقرير"));
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_report)));
     }
     
     private void updatePerformanceIndicator(double totalSales, double totalProfit, int receiptsCount) {
@@ -1045,9 +1064,9 @@ public class ReportsFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "✅ تم منح إذن التخزين", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.storage_permission_granted), Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getContext(), "❌ تم رفض إذن التخزين. لن تتمكن من تصدير التقارير.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.storage_permission_denied_cannot_export), Toast.LENGTH_LONG).show();
             }
         }
     }

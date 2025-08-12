@@ -1,5 +1,7 @@
 package com.example.posapp;
 
+import java.util.Locale;
+
 /**
  * فئة مساعدة لتنسيق العملة الجزائرية (الدينار الجزائري)
  */
@@ -16,7 +18,7 @@ public class CurrencyUtils {
      * @return النص المُنسق مثل "150.50 دج"
      */
     public static String formatCurrency(double amount) {
-        return String.format("%.2f %s", amount, CURRENCY_SYMBOL);
+        return String.format(Locale.US, "%.2f %s", amount, CURRENCY_SYMBOL);
     }
     
     /**
@@ -25,7 +27,7 @@ public class CurrencyUtils {
      * @return النص المُنسق مثل "1,250.50 دج"
      */
     public static String formatCurrencyWithCommas(double amount) {
-        return String.format("%,.2f %s", amount, CURRENCY_SYMBOL);
+        return String.format(Locale.US, "%,.2f %s", amount, CURRENCY_SYMBOL);
     }
     
     /**
@@ -34,7 +36,7 @@ public class CurrencyUtils {
      * @return النص المُنسق مثل "150.50دج"
      */
     public static String formatCurrencyForReports(double amount) {
-        return String.format("%.2f%s", amount, CURRENCY_SYMBOL);
+        return String.format(Locale.US, "%.2f%s", amount, CURRENCY_SYMBOL);
     }
     
     /**
@@ -43,7 +45,7 @@ public class CurrencyUtils {
      * @return النص المُنسق مثل "DZ150.50"
      */
     public static String formatWithInternationalCode(double amount) {
-        return String.format("DZ%.2f", amount);
+        return String.format(Locale.US, "DZ%.2f", amount);
     }
     
     /**
@@ -73,9 +75,9 @@ public class CurrencyUtils {
      */
     public static String formatShortCurrency(double amount) {
         if (amount >= 1_000_000) {
-            return String.format("%.1fم %s", amount / 1_000_000, CURRENCY_SYMBOL);
+            return String.format(Locale.US, "%.1fم %s", amount / 1_000_000, CURRENCY_SYMBOL);
         } else if (amount >= 1_000) {
-            return String.format("%.1fك %s", amount / 1_000, CURRENCY_SYMBOL);
+            return String.format(Locale.US, "%.1fك %s", amount / 1_000, CURRENCY_SYMBOL);
         } else {
             return formatCurrency(amount);
         }

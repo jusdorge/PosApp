@@ -81,7 +81,7 @@ public class AddPaymentDialog extends DialogFragment {
         cancelPaymentButton = view.findViewById(R.id.cancelPaymentButton);
         
         if (customer != null) {
-            customerInfoTextView.setText(String.format("%s - إجمالي الدين: %.2f دج", 
+            customerInfoTextView.setText(String.format(java.util.Locale.US, "%s - إجمالي الدين: %.2f دج", 
                     customer.getName(), customer.getTotalDebt()));
         }
         
