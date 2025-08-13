@@ -380,9 +380,9 @@ public class MainActivity extends AppCompatActivity {
             
             // تحديث اسم العميل في واجهة CounterFragment إذا كانت نشطة
             if (CounterFragment.activeInstance != null) {
-                TextView customerTextView = findViewById(R.id.invoiceCustomerTextView);
+                TextView customerTextView = findViewById(R.id.invoiceCustomerValueTextView);
                 if (customerTextView != null) {
-                    customerTextView.setText(getString(R.string.customer_label, customer.getName()));
+                    customerTextView.setText(customer.getName());
                 }
             }
             

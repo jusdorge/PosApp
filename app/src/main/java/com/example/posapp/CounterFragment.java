@@ -25,7 +25,7 @@ import java.util.List;
 public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoiceItemDeleteListener, EditInvoiceItemDialog.OnItemUpdatedListener {
     private static final int QR_SCANNER_REQUEST_CODE = 1001;
     
-    private static TextView invoiceCustomerTextView;
+    private static TextView invoiceCustomerValueTextView;
     private RecyclerView invoiceItemsRecyclerView;
     private TextView totalPriceTextView;
     private Button checkoutButton;
@@ -58,9 +58,9 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         checkoutButton = view.findViewById(R.id.checkoutButton);
         scanQRButton = view.findViewById(R.id.scanQRButton);
         clearCustomerButton = view.findViewById(R.id.clearCustomerButton);
-        invoiceCustomerTextView = view.findViewById(R.id.invoiceCustomerTextView);
+        invoiceCustomerValueTextView = view.findViewById(R.id.invoiceCustomerValueTextView);
         if (currentCustomer != null) {
-            invoiceCustomerTextView.setText("الزبون: " + currentCustomer.getName());
+            invoiceCustomerValueTextView.setText(currentCustomer.getName());
             clearCustomerButton.setVisibility(View.VISIBLE);
         } else {
             clearCustomerButton.setVisibility(View.GONE);
@@ -146,14 +146,14 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         updateCounterBadge();
         
         // تحديث عرض العميل وزر الحذف
-        if (invoiceCustomerTextView != null) {
+        if (invoiceCustomerValueTextView != null) {
             if (currentCustomer != null) {
-                invoiceCustomerTextView.setText("الزبون: " + currentCustomer.getName());
+                invoiceCustomerValueTextView.setText(currentCustomer.getName());
                 if (clearCustomerButton != null) {
                     clearCustomerButton.setVisibility(View.VISIBLE);
                 }
             } else {
-                invoiceCustomerTextView.setText("الزبون: مجهول");
+                invoiceCustomerValueTextView.setText("مجهول");
                 if (clearCustomerButton != null) {
                     clearCustomerButton.setVisibility(View.GONE);
                 }
@@ -230,14 +230,14 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
         currentCustomer = customer;
         
         // تحديث TextView وزر الحذف إذا كان Fragment نشطًا
-        if (activeInstance != null && invoiceCustomerTextView != null) {
+        if (activeInstance != null && invoiceCustomerValueTextView != null) {
             if (customer != null) {
-                invoiceCustomerTextView.setText("الزبون: " + customer.getName());
+                invoiceCustomerValueTextView.setText(customer.getName());
                 if (clearCustomerButton != null) {
                     clearCustomerButton.setVisibility(View.VISIBLE);
                 }
             } else {
-                invoiceCustomerTextView.setText("الزبون: مجهول");
+                invoiceCustomerValueTextView.setText("مجهول");
                 if (clearCustomerButton != null) {
                     clearCustomerButton.setVisibility(View.GONE);
                 }
@@ -304,8 +304,8 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
 
     public static void clearCustomer() {
         currentCustomer = null;
-        if (activeInstance != null && invoiceCustomerTextView != null) {
-            invoiceCustomerTextView.setText("الزبون: مجهول");
+        if (activeInstance != null && invoiceCustomerValueTextView != null) {
+            invoiceCustomerValueTextView.setText("مجهول");
             if (clearCustomerButton != null) {
                 clearCustomerButton.setVisibility(View.GONE);
             }

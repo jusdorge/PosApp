@@ -37,13 +37,25 @@
         android:padding="5dp">
 
         <TextView
-            android:id="@+id/invoiceCustomerTextView"
+            android:id="@+id/customerLabelTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:gravity="start"
             android:text="@string/customer_label"
+            android:textColor="@color/colorWhite"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/invoiceCustomerValueTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="end"
+            android:text="مجهول"
             android:textColor="@color/colorWhite"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -93,8 +105,10 @@
             android:padding="4dp">
             <TextView
                 android:id="@+id/totalPriceTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
                 android:text="@string/total_label"
                 android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
@@ -103,6 +117,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:gravity="start"
                 android:text="@string/total_label"
                 android:textSize="18sp"
                 android:textStyle="bold" />
