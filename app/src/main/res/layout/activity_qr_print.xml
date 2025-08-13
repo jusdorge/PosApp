@@ -84,7 +84,7 @@
             android:text="طباعة"
             android:textColor="@color/colorWhite"
             android:backgroundTint="@color/colorPrimary"
-            android:drawableLeft="@android:drawable/ic_menu_edit"
+            android:drawableStart="@android:drawable/ic_menu_edit"
             android:drawableTint="@color/colorWhite" />
 
         <Button
@@ -97,7 +97,7 @@
             android:text="مشاركة"
             android:textColor="@color/colorWhite"
             android:backgroundTint="@color/colorAccent"
-            android:drawableLeft="@android:drawable/ic_menu_share"
+            android:drawableStart="@android:drawable/ic_menu_share"
             android:drawableTint="@color/colorWhite" />
 
         <Button
@@ -109,7 +109,7 @@
             android:text="إغلاق"
             android:textColor="@color/colorWhite"
             android:backgroundTint="@android:color/darker_gray"
-            android:drawableLeft="@android:drawable/ic_menu_close_clear_cancel"
+            android:drawableStart="@android:drawable/ic_menu_close_clear_cancel"
             android:drawableTint="@color/colorWhite" />
 
     </LinearLayout>
