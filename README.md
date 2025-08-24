@@ -84,3 +84,7 @@
 ## الترخيص
 
 هذا المشروع مرخص تحت [رخصة MIT](LICENSE).
+
+## Documentation
+
+See detailed API docs and usage in `docs/README.md`.
