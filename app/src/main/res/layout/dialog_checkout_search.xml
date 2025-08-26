@@ -115,19 +115,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginBottom="16dp">
-
-            <RadioButton
-                android:id="@+id/cashRadioButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="نقداً"
-                android:checked="true" />
-
-            <RadioButton
-                android:id="@+id/creditRadioButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ديناً" />
         </RadioGroup>
 
         <!-- المجموع -->
@@ -173,7 +160,6 @@
                 android:text="إلغاء"
                 android:textColor="@color/colorWhite"
                 android:backgroundTint="@color/colorPrimary" />
-                />
 
             <Button
                 android:id="@+id/confirmButton"

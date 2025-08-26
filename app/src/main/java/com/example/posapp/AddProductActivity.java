@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.os.Handler;
+import android.os.Looper;
 import androidx.appcompat.app.AlertDialog;
 
 import androidx.activity.EdgeToEdge;
@@ -24,6 +26,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.example.posapp.model.Product;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageException;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +40,11 @@ import java.util.UUID;
 
 public class AddProductActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
-    private String imageUrl; // رابط الصورة
+    private String imageUrl; // رابط الصورة (download URL)
+    private Uri selectedImageUri; // URI المحلي للصورة المختارة
+    private FirebaseStorage storage;
+    private StorageReference storageRef;
+    private FirebaseAuth auth;
     private FirebaseFirestore db;
     private EditText productNameInput, productCategoryInput, productBarcodeInput,
                      productSellingPriceInput, productCostPriceInput,
@@ -63,6 +76,21 @@ public class AddProductActivity extends AppCompatActivity {
 
         // تهيئة Firestore
         db = FirebaseFirestore.getInstance();
+        // تهيئة Firebase Storage مع التأكد من استخدام الحاوية الصحيحة
+        try {
+            String bucket = getString(getResources().getIdentifier("google_storage_bucket", "string", getPackageName()));
+            if (bucket != null && !bucket.trim().isEmpty()) {
+                storage = FirebaseStorage.getInstance("gs://" + bucket);
+            } else {
+                storage = FirebaseStorage.getInstance();
+            }
+        } catch (Exception e) {
+            storage = FirebaseStorage.getInstance();
+        }
+        storageRef = storage.getReference();
+        Log.d("AddProduct", "Using storage bucket: " + storageRef.toString());
+        // تهيئة المصادقة
+        auth = FirebaseAuth.getInstance();
 
         // ربط العناصر الجديدة
         productNameInput = findViewById(R.id.productNameInput);
@@ -108,18 +136,24 @@ public class AddProductActivity extends AppCompatActivity {
     }
 
     private void openImageChooser() {
-        Intent intent = new Intent();
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "اختر صورة"), PICK_IMAGE_REQUEST);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri imageUri = data.getData();
-            imageUrl = imageUri.toString(); // حفظ رابط الصورة
+            selectedImageUri = data.getData();
+            try {
+                final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                getContentResolver().takePersistableUriPermission(selectedImageUri, takeFlags);
+            } catch (Exception ignored) {}
+            Toast.makeText(this, "تم اختيار الصورة", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -138,32 +172,132 @@ public class AddProductActivity extends AppCompatActivity {
                 return;
             }
 
-            Product product = new Product(
-                UUID.randomUUID().toString(),
-                name,
-                category,
-                sellingPrice,
-                costPrice,
-                quantity,
-                minQuantity,
-                barcode,
-                imageUrl
-            );
+            String productId = UUID.randomUUID().toString();
 
-            db.collection("products")
-                .document(product.getId())
-                .set(product)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "تمت إضافة المنتج بنجاح", Toast.LENGTH_SHORT).show();
-                    clearInputs();
-                    loadProducts(); // Reload products after adding
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "فشل في إضافة المنتج", Toast.LENGTH_SHORT).show();
-                });
+            if (selectedImageUri != null) {
+                ensureAuthAndUpload(productId, name, category, sellingPrice, costPrice, quantity, minQuantity, barcode, selectedImageUri);
+            } else {
+                // بدون صورة
+                saveProductToFirestore(new Product(
+                    productId,
+                    name,
+                    category,
+                    sellingPrice,
+                    costPrice,
+                    quantity,
+                    minQuantity,
+                    barcode,
+                    ""
+                ));
+            }
         } catch (NumberFormatException e) {
             Toast.makeText(this, "يرجى إدخال قيم صحيحة للأرقام", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void ensureAuthAndUpload(String productId,
+                                     String name,
+                                     String category,
+                                     double sellingPrice,
+                                     double costPrice,
+                                     int quantity,
+                                     int minQuantity,
+                                     String barcode,
+                                     Uri imageUri) {
+        if (auth.getCurrentUser() != null) {
+            uploadImageAndSaveProduct(productId, name, category, sellingPrice, costPrice, quantity, minQuantity, barcode, imageUri);
+        } else {
+            auth.signInAnonymously()
+                .addOnSuccessListener(result -> uploadImageAndSaveProduct(productId, name, category, sellingPrice, costPrice, quantity, minQuantity, barcode, imageUri))
+                .addOnFailureListener(e -> Toast.makeText(this, "فشل تسجيل الدخول للمصادقة: " + e.getMessage(), Toast.LENGTH_LONG).show());
+        }
+    }
+
+    private void uploadImageAndSaveProduct(String productId,
+                                           String name,
+                                           String category,
+                                           double sellingPrice,
+                                           double costPrice,
+                                           int quantity,
+                                           int minQuantity,
+                                           String barcode,
+                                           Uri imageUri) {
+        Toast.makeText(this, "جارٍ رفع الصورة...", Toast.LENGTH_SHORT).show();
+        StorageReference imageRef = storageRef.child("product_images/" + productId + ".jpg");
+        StorageMetadata metadata = new StorageMetadata.Builder()
+            .setContentType("image/jpeg")
+            .build();
+        UploadTask uploadTask = imageRef.putFile(imageUri, metadata);
+        uploadTask
+            .addOnSuccessListener(taskSnapshot -> {
+                Log.d("AddProduct", "Upload success to: " + imageRef.getPath());
+                fetchDownloadUrlAndSave(imageRef, productId, name, category, sellingPrice, costPrice, quantity, minQuantity, barcode, 1);
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(this, "فشل رفع الصورة: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("AddProduct", "Upload failed at: " + imageRef.getPath(), e);
+            });
+    }
+
+    private void fetchDownloadUrlAndSave(StorageReference imageRef,
+                                         String productId,
+                                         String name,
+                                         String category,
+                                         double sellingPrice,
+                                         double costPrice,
+                                         int quantity,
+                                         int minQuantity,
+                                         String barcode,
+                                         int attempt) {
+        imageRef.getDownloadUrl()
+            .addOnSuccessListener(uri -> {
+                String downloadUrl = uri.toString();
+                Product product = new Product(
+                    productId,
+                    name,
+                    category,
+                    sellingPrice,
+                    costPrice,
+                    quantity,
+                    minQuantity,
+                    barcode,
+                    downloadUrl
+                );
+                saveProductToFirestore(product);
+            })
+            .addOnFailureListener(e -> {
+                if (e instanceof StorageException) {
+                    int errorCode = ((StorageException) e).getErrorCode();
+                    if (errorCode == StorageException.ERROR_OBJECT_NOT_FOUND && attempt <= 2) {
+                        // أعد المحاولة بعد تأخير بسيط
+                        new Handler(Looper.getMainLooper()).postDelayed(() ->
+                            fetchDownloadUrlAndSave(imageRef, productId, name, category, sellingPrice, costPrice, quantity, minQuantity, barcode, attempt + 1),
+                            800
+                        );
+                        return;
+                    } else if (errorCode == StorageException.ERROR_NOT_AUTHORIZED || errorCode == StorageException.ERROR_NOT_AUTHENTICATED) {
+                        Toast.makeText(this, "قواعد التخزين تمنع الوصول لرابط الصورة. فعّل القراءة للمستخدم المصادق.", Toast.LENGTH_LONG).show();
+                        Log.e("AddProduct", "Storage rules blocking read for path: " + imageRef.getPath(), e);
+                        return;
+                    }
+                }
+                Toast.makeText(this, "فشل الحصول على رابط الصورة: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("AddProduct", "getDownloadUrl failed for: " + imageRef.getPath(), e);
+            });
+    }
+
+    private void saveProductToFirestore(Product product) {
+        db.collection("products")
+            .document(product.getId())
+            .set(product)
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(this, "تمت إضافة المنتج بنجاح", Toast.LENGTH_SHORT).show();
+                clearInputs();
+                loadProducts(); // Reload products after adding
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(this, "فشل في إضافة المنتج: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            });
     }
 
     private void clearInputs() {
@@ -237,5 +371,6 @@ public class AddProductActivity extends AppCompatActivity {
         productQuantityInput.setText("");
         productMinQuantityInput.setText("");
         imageUrl = "";
+        selectedImageUri = null;
     }
 } 
