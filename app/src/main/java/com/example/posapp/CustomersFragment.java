@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Button;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -49,6 +50,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
     private CustomerAdapter customerAdapter;
     private List<Customer> customerList;
     private FirebaseFirestore db;
+    private Button shareAllQRCodesButton;
 
     @Nullable
     @Override
@@ -59,6 +61,7 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
         searchCustomerEditText = view.findViewById(R.id.searchCustomerEditText);
         addCustomerButton = view.findViewById(R.id.addCustomerButton);
         emptyCustomersTextView = view.findViewById(R.id.emptyCustomersTextView);
+        shareAllQRCodesButton = view.findViewById(R.id.shareAllQRCodesButton);
 
         // إعداد قائمة الزبائن
         customerList = new ArrayList<>();
@@ -97,6 +100,11 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
         // زر إضافة زبون جديد
         addCustomerButton.setOnClickListener(v -> {
             showAddCustomerDialog();
+        });
+
+        // زر مشاركة كل رموز العملاء
+        shareAllQRCodesButton.setOnClickListener(v -> {
+            shareAllCustomersQRCodes();
         });
 
         return view;
@@ -382,6 +390,63 @@ public class CustomersFragment extends Fragment implements CustomerAdapter.OnCus
             
         } catch (Exception e) {
             Toast.makeText(getContext(), "فشل في مشاركة معلومات العميل", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void shareAllCustomersQRCodes() {
+        try {
+            if (customerList == null || customerList.isEmpty()) {
+                Toast.makeText(getContext(), getString(R.string.no_customers_to_share), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Toast.makeText(getContext(), getString(R.string.preparing_files), Toast.LENGTH_SHORT).show();
+
+            // مجلد مؤقت لحفظ الصور
+            java.io.File cacheDir = new java.io.File(getContext().getCacheDir(), "qr_all");
+            if (!cacheDir.exists()) cacheDir.mkdirs();
+
+            java.util.ArrayList<android.net.Uri> uris = new java.util.ArrayList<>();
+
+            for (Customer customer : customerList) {
+                String data = generateCustomerQRData(customer);
+                Bitmap bitmap = generateQRCode(data);
+                if (bitmap == null) continue;
+
+                String safeName = customer.getName() != null ? customer.getName().replaceAll("[^a-zA-Z0-9_\\-]", "_") : "customer";
+                java.io.File outFile = new java.io.File(cacheDir, "qr_" + safeName + "_" + customer.getId() + ".png");
+                java.io.FileOutputStream fos = new java.io.FileOutputStream(outFile);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                fos.flush();
+                fos.close();
+
+                android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(
+                        getContext(),
+                        "com.example.posapp.fileprovider",
+                        outFile);
+                uris.add(uri);
+            }
+
+            if (uris.isEmpty()) {
+                Toast.makeText(getContext(), getString(R.string.no_customers_to_share), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // مشاركة متعددة الصور
+            Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+            shareIntent.setType("image/png");
+            shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_all_customers_qr));
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_all_customers_qr)));
+            } else {
+                Toast.makeText(getContext(), getString(R.string.no_apps_to_share), Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            Toast.makeText(getContext(), getString(R.string.failed_share_qr, e.getMessage()), Toast.LENGTH_SHORT).show();
         }
     }
     

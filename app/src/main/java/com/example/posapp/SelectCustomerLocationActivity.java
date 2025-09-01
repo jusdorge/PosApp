@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -45,6 +46,9 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
     private LocationCallback locationCallback;
     private Button btnMyLocation;
     private Button btnSaveLocation;
+    private Button btnApplyCoordinates;
+    private EditText latInput;
+    private EditText lngInput;
     private Handler locationHandler;
     private Runnable locationTimeout;
 
@@ -135,17 +139,21 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
             mapView.getOverlays().add(0, eventsOverlay);
         }
 
-        // إعداد الأزرار
+        // إعداد الأزرار والحقل اليدوي
         setupButtons(viewOnly);
     }
 
     private void setupButtons(boolean viewOnly) {
         btnMyLocation = findViewById(R.id.btn_my_location);
         btnSaveLocation = findViewById(R.id.btn_save_location);
+        btnApplyCoordinates = findViewById(R.id.btn_apply_coordinates);
+        latInput = findViewById(R.id.lat_input);
+        lngInput = findViewById(R.id.lng_input);
 
         if (viewOnly) {
             btnSaveLocation.setVisibility(View.GONE);
             btnMyLocation.setVisibility(View.GONE);
+            if (btnApplyCoordinates != null) btnApplyCoordinates.setVisibility(View.GONE);
         } else {
             // زر الموقع الحالي
             btnMyLocation.setOnClickListener(v -> getCurrentLocation());
@@ -162,6 +170,49 @@ public class SelectCustomerLocationActivity extends AppCompatActivity implements
                     Toast.makeText(SelectCustomerLocationActivity.this, getString(R.string.please_select_location_on_map), Toast.LENGTH_SHORT).show();
                 }
             });
+
+            if (btnApplyCoordinates != null) {
+                btnApplyCoordinates.setOnClickListener(v -> applyManualCoordinates());
+            }
+        }
+    }
+
+    private void applyManualCoordinates() {
+        if (latInput == null || lngInput == null) return;
+        String latStr = latInput.getText().toString().trim();
+        String lngStr = lngInput.getText().toString().trim();
+        if (latStr.isEmpty() || lngStr.isEmpty()) {
+            Toast.makeText(this, "الرجاء إدخال الإحداثيات أولاً", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            double lat = Double.parseDouble(latStr);
+            double lng = Double.parseDouble(lngStr);
+            if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                Toast.makeText(this, "إحداثيات غير صالحة", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            GeoPoint point = new GeoPoint(lat, lng);
+            // إزالة الماركر السابق إن وجد
+            if (selectedMarker != null) {
+                mapView.getOverlays().remove(selectedMarker);
+            }
+            selectedMarker = new Marker(mapView);
+            selectedMarker.setPosition(point);
+            selectedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            selectedMarker.setTitle(getString(R.string.map_customer_location_title));
+            mapView.getOverlays().add(selectedMarker);
+            selectedGeoPoint = point;
+
+            // تحريك الخريطة
+            IMapController controller = mapView.getController();
+            controller.setCenter(point);
+            controller.setZoom(18.0);
+            mapView.invalidate();
+
+            Toast.makeText(this, "تم تعيين الإحداثيات على الخريطة", Toast.LENGTH_SHORT).show();
+        } catch (NumberFormatException ex) {
+            Toast.makeText(this, "صيغة أرقام غير صحيحة", Toast.LENGTH_SHORT).show();
         }
     }
 

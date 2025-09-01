@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +29,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.Query;
+import com.example.posapp.service.CustomerVisitService;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -94,6 +97,11 @@ public class ReportsFragment extends Fragment {
     private TextView cashSalesAmountTextView;
     private TextView debtPaymentsAmountTextView;
     private TextView totalCashCollectedTextView;
+    // Visits
+    private TextView totalVisitsTextView;
+    private TextView uniqueVisitedCustomersTextView;
+    private Spinner sellerFilterSpinner;
+    private String selectedSellerId; // null => all sellers
     
     // Cached data for reports
     private Map<String, Object> reportData;
@@ -112,6 +120,11 @@ public class ReportsFragment extends Fragment {
         initializeViews(view);
         setupDateControls();
         setupExportButtons();
+
+        // Initialize report data cache
+        reportData = new HashMap<>();
+        // setup seller filter
+        setupSellerFilter();
 
         // Load initial data for today
         loadReportsData();
@@ -184,9 +197,55 @@ public class ReportsFragment extends Fragment {
         cashSalesAmountTextView = view.findViewById(R.id.cashSalesAmountTextView);
         debtPaymentsAmountTextView = view.findViewById(R.id.debtPaymentsAmountTextView);
         totalCashCollectedTextView = view.findViewById(R.id.totalCashCollectedTextView);
-        
-        // Initialize report data cache
-        reportData = new HashMap<>();
+
+        // Visits views
+        totalVisitsTextView = view.findViewById(R.id.totalVisitsTextView);
+        uniqueVisitedCustomersTextView = view.findViewById(R.id.uniqueVisitedCustomersTextView);
+        sellerFilterSpinner = view.findViewById(R.id.sellerFilterSpinner);
+    }
+
+    private void setupSellerFilter() {
+        if (sellerFilterSpinner == null) return;
+        // حمل قائمة البائعين النشطين
+        db.collection("users")
+                .whereEqualTo("isActive", true)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    java.util.List<String> sellerNames = new java.util.ArrayList<>();
+                    java.util.List<String> sellerIds = new java.util.ArrayList<>();
+                    sellerNames.add(getString(R.string.all_sellers_option));
+                    sellerIds.add(null);
+
+                    for (QueryDocumentSnapshot doc : snapshot) {
+                        String id = doc.getId();
+                        String name = doc.getString("fullName");
+                        if (name == null || name.trim().isEmpty()) {
+                            String email = doc.getString("email");
+                            if (email != null && email.contains("@")) name = email.substring(0, email.indexOf("@"));
+                        }
+                        if (name == null) name = getString(R.string.not_specified);
+                        sellerNames.add(name);
+                        sellerIds.add(id);
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, sellerNames);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    sellerFilterSpinner.setAdapter(adapter);
+
+                    sellerFilterSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                            selectedSellerId = sellerIds.get(position);
+                            // إعادة تحميل بيانات الزيارات فقط
+                            loadCustomerVisits();
+                        }
+
+                        @Override
+                        public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                            // لا شيء
+                        }
+                    });
+                });
     }
 
     private void setupDateControls() {
@@ -256,6 +315,7 @@ public class ReportsFragment extends Fragment {
         loadSellerInfo();
         loadTotalSalesAndProfit();
         loadCashCollectionData();
+        loadCustomerVisits();
         
         // إخفاء مؤشرات التحميل بعد 3 ثواني
         if (getView() != null) {
@@ -292,6 +352,12 @@ public class ReportsFragment extends Fragment {
         if (totalCashCollectedTextView != null) {
             totalCashCollectedTextView.setText(getString(R.string.calculating_cash_collected));
         }
+        if (totalVisitsTextView != null) {
+            totalVisitsTextView.setText(getString(R.string.calculating_visits));
+        }
+        if (uniqueVisitedCustomersTextView != null) {
+            uniqueVisitedCustomersTextView.setText(getString(R.string.calculating_unique_customers));
+        }
     }
     
     private void hideLoadingIndicators() {
@@ -318,6 +384,41 @@ public class ReportsFragment extends Fragment {
                 new Timestamp(startCal.getTime()),
                 new Timestamp(endCal.getTime())
         };
+    }
+
+    /**
+     * تحميل عدد زيارات العملاء لليوم المحدد
+     */
+    private void loadCustomerVisits() {
+        Timestamp[] dateRange = getDateRange();
+        String sellerId = selectedSellerId; // nullable => all sellers
+
+        CustomerVisitService.getInstance(getContext())
+                .getVisitsCountForDay(dateRange[0], dateRange[1], sellerId)
+                .thenAccept(counts -> {
+                    if (getActivity() == null) return;
+                    getActivity().runOnUiThread(() -> {
+                        int total = counts.getOrDefault("total", 0);
+                        int unique = counts.getOrDefault("uniqueCustomers", 0);
+                        if (totalVisitsTextView != null) {
+                            totalVisitsTextView.setText(getString(R.string.total_visits_format, total));
+                        }
+                        if (uniqueVisitedCustomersTextView != null) {
+                            uniqueVisitedCustomersTextView.setText(getString(R.string.unique_customers_visited_format, unique));
+                        }
+                        reportData.put("totalVisits", total);
+                        reportData.put("uniqueVisitedCustomers", unique);
+                    });
+                })
+                .exceptionally(e -> {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            if (totalVisitsTextView != null) totalVisitsTextView.setText(getString(R.string.total_visits_format, 0));
+                            if (uniqueVisitedCustomersTextView != null) uniqueVisitedCustomersTextView.setText(getString(R.string.unique_customers_visited_format, 0));
+                        });
+                    }
+                    return null;
+                });
     }
 
     private void loadTopCategory() {
@@ -880,6 +981,11 @@ public class ReportsFragment extends Fragment {
                     .append(String.valueOf(reportData.get("debtPaymentsAmount"))).append("\n");
             writer.append(getString(R.string.total_cash_collected)).append(",")
                     .append(String.valueOf(reportData.get("totalCashCollected"))).append("\n");
+            // Visits
+            writer.append(getString(R.string.report_total_visits_label)).append(",")
+                    .append(String.valueOf(reportData.get("totalVisits"))).append("\n");
+            writer.append(getString(R.string.report_unique_customers_visited_label)).append(",")
+                    .append(String.valueOf(reportData.get("uniqueVisitedCustomers"))).append("\n");
             
             writer.close();
             
@@ -952,6 +1058,13 @@ public class ReportsFragment extends Fragment {
                   .append(String.valueOf(reportData.get("debtPaymentsAmount"))).append("\n");
             writer.append("• ").append(getString(R.string.total_cash_collected)).append(": ")
                   .append(String.valueOf(reportData.get("totalCashCollected"))).append("\n\n");
+
+            // Visits section
+            writer.append(getString(R.string.visits_summary_title)).append("\n");
+            writer.append("• ").append(getString(R.string.report_total_visits_label)).append(": ")
+                  .append(String.valueOf(reportData.get("totalVisits"))).append("\n");
+            writer.append("• ").append(getString(R.string.report_unique_customers_visited_label)).append(": ")
+                  .append(String.valueOf(reportData.get("uniqueVisitedCustomers"))).append("\n\n");
             
             writer.append("================================\n");
             writer.append(getString(R.string.report_generated_by_app)).append("\n");
@@ -1001,6 +1114,12 @@ public class ReportsFragment extends Fragment {
                 .append(String.valueOf(reportData.get("debtPaymentsAmount"))).append("\n");
         shareText.append("• ").append(getString(R.string.total_cash_collected)).append(": ")
                 .append(String.valueOf(reportData.get("totalCashCollected"))).append("\n\n");
+        // Visits
+        shareText.append(getString(R.string.visits_summary_title)).append("\n");
+        shareText.append("• ").append(getString(R.string.report_total_visits_label)).append(": ")
+                .append(String.valueOf(reportData.get("totalVisits"))).append("\n");
+        shareText.append("• ").append(getString(R.string.report_unique_customers_visited_label)).append(": ")
+                .append(String.valueOf(reportData.get("uniqueVisitedCustomers"))).append("\n\n");
         shareText.append(getString(R.string.report_share_hashtags));
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);

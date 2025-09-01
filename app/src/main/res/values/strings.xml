@@ -318,6 +318,8 @@
     <string name="report_csv_header">البيان,القيمة</string>
     <string name="report_debt_payments_label">المدفوعات من الديون</string>
     <string name="report_share_hashtags">#نقطة_البيع #تقرير_يومي #مبيعات #النقود_المحصلة</string>
+    <string name="report_total_visits_label">عدد الزيارات</string>
+    <string name="report_unique_customers_visited_label">عدد العملاء المميزين</string>
     <string name="storage_permission_granted">✅ تم منح إذن التخزين</string>
     <string name="storage_permission_denied_cannot_export">❌ تم رفض إذن التخزين. لن تتمكن من تصدير التقارير.</string>
     <string name="share_report">مشاركة التقرير</string>
@@ -568,6 +570,15 @@
     <string name="total_cash_collected_format">💳 إجمالي النقود المحصلة: </string>
     <string name="calculating_debt_payments">جاري حساب المدفوعات...</string>
     <string name="calculating_cash_collected">جاري حساب النقود المحصلة...</string>
+
+    <!-- Customer Visits -->
+    <string name="visits_summary_title">زيارات العملاء</string>
+    <string name="total_visits_format">عدد الزيارات: %1$d</string>
+    <string name="unique_customers_visited_format">عملاء مميزون: %1$d</string>
+    <string name="calculating_visits">جاري حساب الزيارات...</string>
+    <string name="calculating_unique_customers">جاري حساب العملاء المميزين...</string>
+    <string name="filter_by_seller">تصفية حسب البائع:</string>
+    <string name="all_sellers_option">كل البائعين</string>
     
     <!-- =============================== -->
     <!-- COUNTER & BADGE -->
@@ -809,6 +820,12 @@
     <string name="export_report">تصدير التقرير</string>
     <string name="text">نص</string>
     <string name="share">مشاركة</string>
+    <string name="share_all_customers_qr">مشاركة كل رموز العملاء</string>
+    <string name="sharing_all_customers_qr">جاري تجهيز ومشاركة رموز العملاء...</string>
+    <string name="no_customers_to_share">لا يوجد عملاء للمشاركة</string>
+    <string name="share_as_zip">مشاركة كملف ZIP</string>
+    <string name="share_as_images">مشاركة كصور متعددة</string>
+    <string name="preparing_files">جاري تحضير الملفات...</string>
     <string name="yesterday">أمس</string>
 
     <string name="choose_date">اختر تاريخ</string>

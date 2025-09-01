@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.posapp.model.Customer;
 import com.example.posapp.model.InvoiceItem;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.posapp.service.CustomerVisitService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -324,6 +325,10 @@ public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoic
                         if (customer != null) {
                             customer.setId(documentSnapshot.getId());
                             setCustomer(customer);
+                            // تسجيل زيارة العميل عند نجاح التحميل عبر المسح
+                            try {
+                                CustomerVisitService.getInstance(getContext()).logVisit(customer, "scan");
+                            } catch (Exception ignore) {}
                             Toast.makeText(getContext(), "تم اختيار العميل: " + customer.getName(), Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(getContext(), "خطأ في تحليل بيانات العميل", Toast.LENGTH_SHORT).show();

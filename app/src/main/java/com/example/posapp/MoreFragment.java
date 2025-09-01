@@ -19,6 +19,7 @@ import com.example.posapp.model.Customer;
 import com.example.posapp.model.Permission;
 import com.example.posapp.model.Resource;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.posapp.service.CustomerVisitService;
 
 import java.io.File;
 
@@ -792,6 +793,10 @@ public class MoreFragment extends Fragment {
                             
                             // تعيين العميل في CounterFragment والانتقال إليه
                             CounterFragment.setCustomer(customer);
+                            // تسجيل زيارة العميل عند نجاح التحميل عبر المسح
+                            try {
+                                CustomerVisitService.getInstance(getContext()).logVisit(customer, "scan");
+                            } catch (Exception ignore) {}
                             
                             // الانتقال إلى CounterFragment
                             if (getActivity() instanceof MainActivity) {

@@ -47,6 +47,15 @@
             android:backgroundTint="@color/colorAccent"
             android:text="@string/add_customer"
             android:textColor="@color/colorWhite" />
+
+        <Button
+            android:id="@+id/shareAllQRCodesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="@color/chartBlue"
+            android:text="@string/share_all_customers_qr"
+            android:textColor="@color/colorWhite" />
     </LinearLayout>
 
     <!-- Container للقوائم لتجنب التداخل -->
