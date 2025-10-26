@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- RTL Configuration for Arabic -->
+    <bool name="is_rtl">true</bool>
+    
+    <!-- Text Direction Configuration -->
+    <item name="text_direction" type="integer">2</item> <!-- RTL -->
+    
+    <!-- Layout Direction -->
+    <item name="layout_direction" type="integer">1</item> <!-- RTL -->
+    
+</resources>

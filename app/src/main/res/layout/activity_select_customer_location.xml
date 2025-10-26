@@ -3,60 +3,95 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
+    <org.osmdroid.views.MapView
         android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/button_container" />
 
-    <!-- زر الموقع الحالي -->
-    <Button
-        android:id="@+id/btn_current_location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="موقعي الحالي"
-        android:drawableStart="@android:drawable/ic_menu_mylocation"
-        android:drawablePadding="8dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/colorWhite"
-        android:textColor="@color/colorPrimary"
-        android:elevation="4dp" />
-
-    <!-- مؤشر التحميل -->
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
-
-    <!-- زر حفظ الموقع -->
-    <Button
-        android:id="@+id/btn_save_location"
+    <!-- إدخال الإحداثيات يدوياً -->
+    <LinearLayout
+        android:id="@+id/manual_input_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="حفظ الموقع"
+        android:layout_above="@id/button_container"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:elevation="6dp"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/lat_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="خط العرض (lat)"
+                android:inputType="numberDecimal|numberSigned"
+                android:layout_marginEnd="8dp" />
+
+            <EditText
+                android:id="@+id/lng_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="خط الطول (lng)"
+                android:inputType="numberDecimal|numberSigned" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_apply_coordinates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="تعيين الإحداثيات على الخريطة"
+            android:layout_marginTop="8dp"
+            android:background="@color/colorAccent"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <!-- حاوية الأزرار في الأسفل -->
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:textColor="@color/colorWhite"
-        android:enabled="false"
-        android:elevation="4dp" />
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:elevation="8dp"
+        android:padding="16dp"
+        android:gravity="center">
 
-    <!-- رسالة توضيحية -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="انقر على الخريطة لتحديد موقع العميل"
-        android:textAlignment="center"
-        android:background="#99000000"
-        android:textColor="@color/colorWhite"
-        android:padding="8dp"
-        android:layout_above="@id/btn_save_location"
-        android:layout_marginBottom="16dp" />
+        <Button
+            android:id="@+id/btn_my_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:drawableTop="@drawable/ic_my_location"
+            android:drawableTint="@android:color/white"
+            android:padding="12dp"
+            android:text="@string/my_location"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btn_save_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:drawableTop="@drawable/ic_save"
+            android:drawableTint="@android:color/white"
+            android:padding="12dp"
+            android:text="@string/saveLocation"
+            android:textColor="@android:color/white"
+            android:visibility="visible" />
+
+    </LinearLayout>
 
 </RelativeLayout>

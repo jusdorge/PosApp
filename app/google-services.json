@@ -1,37 +1,27 @@
 {
   "project_info": {
-    "project_number": "584734497865",
-    "firebase_url": "https://shop-64a8b-default-rtdb.firebaseio.com",
-    "project_id": "shop-64a8b",
-    "storage_bucket": "shop-64a8b.firebasestorage.app"
+    "project_number": "420286289734",
+    "firebase_url": "https://posappai-default-rtdb.firebaseio.com",
+    "project_id": "posappai",
+    "storage_bucket": "posappai.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:584734497865:android:14aa8e8fd334578ba8b398",
+        "mobilesdk_app_id": "1:420286289734:android:809b9faf905d8131a1b747",
         "android_client_info": {
-          "package_name": "com.example.posapp"
+          "package_name": "com.example.islamicquiz"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBVcYwuG2EZ80M61e2W3jke80QB_TWmrns"
+          "current_key": "AIzaSyBNMe7Sqiaj2Ae5P1Hmm0zA1ZVXgIkeG0k"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

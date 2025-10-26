@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- رأس الفاتورة -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="فاتورة مبيعات"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- معلومات الفاتورة -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/search_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/invoiceNumberTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="رقم الفاتورة: "
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/invoiceDateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="التاريخ: "
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/customerNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="العميل: "
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/customerPhoneTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="الهاتف: "
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/paymentMethodTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="طريقة الدفع: "
+                android:textSize="16sp"
+                android:textStyle="bold" />
+                
+            <!-- زر تعديل طريقة الدفع -->
+            <Button
+                android:id="@+id/editPaymentMethodButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💳 تعديل طريقة الدفع"
+                android:textSize="14sp"
+                android:background="@color/reportInfo"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="8dp"
+                android:padding="8dp" />
+        </LinearLayout>
+
+        <!-- عناصر الفاتورة -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="عناصر الفاتورة"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/itemsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <!-- المجموع الكلي -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimary"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/totalAmountTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="المجموع: 0.00 دج"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorWhite"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- أزرار العمليات -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="24dp"
+            android:gravity="center">
+
+            <!-- الصف الأول من الأزرار -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/printButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="طباعة نصية"
+                    android:background="@drawable/button_background"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@android:drawable/ic_menu_send"
+                    android:drawablePadding="8dp" />
+
+                <Button
+                    android:id="@+id/printImageButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="طباعة الصورة"
+                    android:background="@drawable/button_background"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@android:drawable/ic_menu_gallery"
+                    android:drawablePadding="8dp" />
+
+            </LinearLayout>
+
+            <!-- الصف الثاني من الأزرار -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/editButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="@string/edit_invoice"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@drawable/ic_edit"
+                    android:drawablePadding="8dp" />
+
+                <Button
+                    android:id="@+id/saveAsBMPButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="حفظ كصورة"
+                    android:background="@drawable/button_background"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@android:drawable/ic_menu_camera"
+                    android:drawablePadding="8dp" />
+
+            </LinearLayout>
+
+            <!-- الصف الثالث من الأزرار -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/shareButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="مشاركة"
+                    android:background="@drawable/button_background"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@android:drawable/ic_menu_share"
+                    android:drawablePadding="8dp" />
+
+                <Button
+                    android:id="@+id/openMapButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="📍 موقع العميل"
+                    android:background="@color/colorPrimary"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@android:drawable/ic_dialog_map"
+                    android:drawablePadding="8dp" />
+
+                <Button
+                    android:id="@+id/closeButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    android:text="إغلاق"
+                    android:background="@color/colorAccent"
+                    android:textColor="@android:color/white"
+                    android:drawableTop="@android:drawable/ic_menu_close_clear_cancel"
+                    android:drawablePadding="8dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView> 

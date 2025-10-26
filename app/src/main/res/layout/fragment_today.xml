@@ -9,59 +9,137 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/todayDateTextView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text="فواتير اليوم"
+            android:text="@string/todays_invoices"
             android:textColor="@color/colorWhite"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/addNewInvoiceButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@color/colorAccent"
+            android:drawableStart="@android:drawable/ic_input_add"
+            android:drawablePadding="4dp"
+            android:text="@string/new_invoice"
+            android:textColor="@color/colorWhite"
+            android:textSize="12sp"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="12dp"
         android:background="@color/colorAccent">
 
-        <TextView
-            android:id="@+id/totalSalesTextView"
-            android:layout_width="0dp"
+        <!-- الصف الأول: إجمالي المبيعات وعدد الفواتير -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="إجمالي المبيعات: 0.00 ريال"
-            android:textColor="@color/colorWhite"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
-        <TextView
-            android:id="@+id/invoiceCountTextView"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/totalSalesTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/total_sales_zero"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/invoiceCountTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/invoice_count_zero"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- الصف الثاني: تفصيل النقدية والدين -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="عدد الفواتير: 0"
-            android:textColor="@color/colorWhite"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/cashSalesTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/cash_sales_format"
+                android:textColor="@color/colorWhite"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/creditSalesTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/debt_payments_format"
+                android:textColor="@color/colorWhite"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/invoicesRecyclerView"
+    <!-- Container للقوائم لتجنب التداخل -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
 
-    <TextView
-        android:id="@+id/emptyInvoicesTextView"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/invoicesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/emptyInvoicesTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_invoices_today"
+            android:textSize="18sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- زر تحميل فواتير تاريخ آخر -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="لا توجد فواتير لهذا اليوم"
-        android:textSize="18sp"
-        android:visibility="gone" />
+        android:layout_height="wrap_content"
+        android:background="@color/colorBackground"
+        android:padding="8dp">
+
+        <Button
+            android:id="@+id/loadOtherDateButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_border"
+            android:drawableLeft="@android:drawable/ic_menu_recent_history"
+            android:drawablePadding="8dp"
+            android:gravity="center"
+            android:text="@string/load_other_date_invoices"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- العنوان -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="إضافة منتجات للفاتورة"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- معلومات الفاتورة الأصلية -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="معلومات الفاتورة:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/invoiceInfoTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="فاتورة: AM001\nالعميل: أحمد محمد\nالمجموع الحالي: 250.00 دج\nعدد المنتجات: 3"
+        android:textSize="14sp"
+        android:textColor="@color/colorText"
+        android:background="@color/reportBackgroundLight"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- حقل البحث -->
+    <EditText
+        android:id="@+id/searchProductEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="البحث في المنتجات..."
+        android:drawableLeft="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_background"
+        android:layout_marginBottom="12dp" />
+
+    <!-- قائمة المنتجات -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="اختر المنتجات الجديدة:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="8dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/productsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:layout_weight="1"
+        android:background="@color/colorBackground" />
+
+    <!-- ملخص المنتجات الجديدة -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/colorAccent"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:id="@+id/selectedProductsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="المنتجات الجديدة: 0"
+            android:textColor="@color/colorWhite"
+            android:textSize="14sp"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/additionalAmountTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="مبلغ إضافي: 0.00 دج"
+            android:textColor="@color/colorWhite"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/newTotalTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="المجموع الجديد: 0.00 دج"
+            android:textColor="@color/colorWhite"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- أزرار التحكم -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="إلغاء"
+            android:background="@color/colorGray"
+            android:textColor="@color/colorWhite"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/addProductsButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="إضافة المنتجات"
+            android:background="@color/statusPaid"
+            android:textColor="@color/colorWhite"
+            android:enabled="false" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -9,14 +9,14 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.posapp" />
-                  <option name="mobileSdkAppId" value="1:584734497865:android:14aa8e8fd334578ba8b398" />
-                  <option name="projectId" value="shop-64a8b" />
-                  <option name="projectNumber" value="584734497865" />
+                  <option name="appId" value="com.example.islamicquiz" />
+                  <option name="mobileSdkAppId" value="1:420286289734:android:809b9faf905d8131a1b747" />
+                  <option name="projectId" value="posappai" />
+                  <option name="projectNumber" value="420286289734" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
-              <option name="timeIntervalDays" value="ONE_DAY" />
+              <option name="timeIntervalDays" value="THIRTY_DAYS" />
               <option name="visibilityType" value="ALL" />
             </InsightsFilterSettings>
           </value>

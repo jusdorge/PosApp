@@ -2,24 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.posapp.MainActivity">
+    tools:context="com.example.islamicquiz.MainActivity">
 
     <item
         android:id="@+id/action_home"
         android:icon="@drawable/ic_counter"
-        android:title="الرئيسية"
+        android:title="@string/home"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_manage_customers"
         android:icon="@drawable/ic_customers"
-        android:title="إدارة الزبائن"
+        android:title="@string/customers_management"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_manage_products"
         android:icon="@drawable/ic_products"
-        android:title="إدارة المنتجات"
+        android:title="@string/products_management"
         app:showAsAction="never" />
 
     <item
@@ -32,6 +32,6 @@
     <item
         android:id="@+id/action_logout"
         android:icon="@drawable/ic_logout"
-        android:title="تسجيل الخروج"
+        android:title="@string/logout"
         app:showAsAction="never" />
 </menu>

@@ -1,6 +1,6 @@
 <resources>
     <!-- نمط أساسي بألوان Facebook -->
-    <style name="AppTheme.Facebook" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Facebook" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>

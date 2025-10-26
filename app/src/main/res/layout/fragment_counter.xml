@@ -9,17 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:padding="0dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="نقطة البيع"
-            android:textColor="@color/colorWhite"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:padding="0dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +24,7 @@
             android:background="@color/colorPrimary"
             android:gravity="center"
             android:padding="0dp"
-            android:text="الفاتورة الحالية"
+            android:text="@string/current_invoice"
             android:textColor="@color/colorWhite"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -46,18 +36,53 @@
         android:orientation="horizontal"
         android:padding="5dp">
 
-            <TextView
-                android:id="@+id/invoiceCustomerTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:background="@color/colorPrimary"
+        <TextView
+            android:id="@+id/customerLabelTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="start"
+            android:text="@string/customer_label"
+            android:textColor="@color/colorWhite"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-                android:text="الزبون:مجهول"
-                android:layout_weight="1"
+        <TextView
+            android:id="@+id/invoiceCustomerValueTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="end"
+            android:text="مجهول"
+            android:textColor="@color/colorWhite"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/clearCustomerButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:background="@color/reportDanger"
+                android:text="×"
                 android:textColor="@color/colorWhite"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/scanQRButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="@color/colorAccent"
+                android:drawableStart="@android:drawable/ic_menu_camera"
+                android:drawablePadding="4dp"
+                android:text="QR"
+                android:textColor="@color/colorWhite"
+                android:textSize="12sp" />
     </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/invoiceItemsRecyclerView"
@@ -79,18 +104,21 @@
             android:orientation="horizontal"
             android:padding="4dp">
             <TextView
-                android:id="@+id/totalPriceTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" 0.00 دج"
-                android:textColor="@color/colorPrimary"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="المجموع:"
+                android:gravity="start"
+                android:text="@string/total_label"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/totalPriceTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="@string/total_label"
+                android:textColor="@color/colorPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -102,7 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@color/colorPrimary"
-            android:text="الدفع"
+            android:text="@string/checkout"
             android:textColor="@color/colorWhite" />
     </LinearLayout>
 </LinearLayout> 

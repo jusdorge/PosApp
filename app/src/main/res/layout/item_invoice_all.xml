@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- الصف الأول: رقم الفاتورة وحالة الدفع -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvInvoiceNumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/example_invoice_number"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/tvPaymentStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/invoice_status_paid"
+                android:textColor="@color/colorWhite"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:padding="6dp"
+                android:background="@drawable/payment_background" />
+
+        </LinearLayout>
+
+        <!-- الصف الثاني: اسم العميل وعدد العناصر -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvCustomerName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/example_customer_name"
+                android:textSize="14sp"
+                android:textColor="@color/colorText" />
+
+            <TextView
+                android:id="@+id/tvItemsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/counter_items_count"
+                android:textSize="12sp"
+                android:textColor="@color/colorSecondaryText"
+                android:background="@color/colorBackground"
+                android:padding="4dp" />
+
+        </LinearLayout>
+
+        <!-- الصف الثالث: التاريخ والمبلغ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvInvoiceDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:text="@string/example_invoice_date"
+                android:textSize="12sp"
+                android:textColor="@color/colorSecondaryText" />
+
+            <TextView
+                android:id="@+id/tvTotalAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="@string/example_invoice_amount"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/reportSuccess" />
+
+        </LinearLayout>
+
+        <!-- أزرار العمليات -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="#E0E0E0" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="4dp">
+
+            <!-- زر الطباعة -->
+            <Button
+                android:id="@+id/printInvoiceButton"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/button_border"
+                android:text="🖨️"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:padding="4dp" />
+
+            <!-- زر تحميل في الكاونتر -->
+            <Button
+                android:id="@+id/loadInCounterButton"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/button_border"
+                android:text="📥"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:padding="4dp" />
+
+            <!-- زر إضافة منتجات -->
+            <Button
+                android:id="@+id/addProductsButton"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/button_border"
+                android:text="➕"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:padding="4dp" />
+
+            <!-- زر موقع العميل -->
+            <Button
+                android:id="@+id/customerLocationButton"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/button_border"
+                android:text="📍"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:padding="4dp" />
+
+            <!-- زر الحذف -->
+            <Button
+                android:id="@+id/deleteInvoiceButton"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/button_border"
+                android:text="🗑️"
+                android:textColor="@color/reportDanger"
+                android:textSize="16sp"
+                android:padding="4dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView> 

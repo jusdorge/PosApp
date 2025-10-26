@@ -1,0 +1,900 @@
+<resources>
+    <!-- TodayFragment strings -->
+    <string name="error_loading_invoices">حدث خطأ أثناء تحميل الفواتير: %1$s</string>
+    <string name="invoice_summary_message">العميل: %1$s
+المجموع: %2$s
+
+اختر العملية:</string>
+    <string name="print_action">طباعة</string>
+    <string name="load_in_counter">تحميل في الكاونتر</string>
+    <string name="more_options_action">المزيد من الخيارات</string>
+    <string name="add_products_option">إضافة منتجات</string>
+    <string name="customer_location_option">📍 موقع العميل</string>
+    <string name="delete_invoice_option">حذف الفاتورة</string>
+    <string name="generic_error">خطأ: %1$s</string>
+    <string name="error_showing_options">خطأ في عرض الخيارات: %1$s</string>
+    <string name="create_new_invoice_title">إنشاء فاتورة جديدة</string>
+    <string name="how_to_add_product_message">كيف تريد إضافة منتج جديد؟</string>
+    <string name="go_to_counter">الذهاب للكاونتر</string>
+    <string name="invoice_created_success">🆕 تم إنشاء فاتورة جديدة في الكاونتر</string>
+    <string name="load_in_counter_title">تحميل في الكاونتر</string>
+    <string name="load_in_counter_warning">سيتم تحميل هذه الفاتورة في الكاونتر للتعديل.
+
+ملاحظة: أي فاتورة حالية في الكاونتر ستُمسح.
+⚠️ سيتم تحديث الفاتورة الأصلية وليس إنشاء فاتورة جديدة.</string>
+    <string name="load_label">تحميل</string>
+    <string name="invoice_loaded_for_edit">✅ تم تحميل الفاتورة للتعديل - رقم: %1$s</string>
+    <string name="invoice_loaded_without_customer">✅ تم تحميل الفاتورة للتعديل (بدون معلومات العميل)</string>
+    <string name="delete_invoice_warning_title">⚠️ حذف فاتورة</string>
+    <string name="delete_invoice_confirm_message">هل أنت متأكد من حذف الفاتورة نهائياً؟
+
+📄 رقم الفاتورة: %1$s
+👤 العميل: %2$s
+💰 المبلغ: %3$s
+
+⚠️ تحذير: هذه العملية لا يمكن التراجع عنها!
+سيتم حذف الفاتورة ومحتوياتها نهائياً من النظام.</string>
+    <string name="delete_permanently">🗑️ حذف نهائي</string>
+    <string name="deleting_invoice">جاري حذف الفاتورة...</string>
+    <string name="invoice_deleted_success">✅ تم حذف الفاتورة %1$s نهائياً</string>
+    <string name="failed_delete_invoice">❌ فشل في حذف الفاتورة: %1$s</string>
+    <string name="choose_date_to_load_invoices">اختر التاريخ لعرض فواتيره</string>
+    <string name="loaded_invoices_for_date">✅ تم تحميل %1$d فاتورة لتاريخ %2$s</string>
+    <string name="invoice_data_unavailable">بيانات الفاتورة غير متوفرة</string>
+    <string name="invoice_missing_customer_data">هذه الفاتورة لا تحتوي على بيانات عميل محددة</string>
+    <string name="customer_not_found_system">لم يتم العثور على بيانات العميل في النظام</string>
+    <string name="location_permissions_title">صلاحيات الموقع</string>
+    <string name="location_permission_request_message">يحتاج التطبيق لصلاحية الوصول للموقع لإظهار المسار إلى العميل.
+
+هل تريد منح الصلاحية؟</string>
+    <string name="try_again_after_permission">بعد منح الصلاحية، جرب مرة أخرى</string>
+    <string name="error_searching_customer_data">خطأ في البحث عن بيانات العميل: %1$s</string>
+    <string name="export_success_title">نجح التصدير</string>
+    <string name="file_saved_path_share_question">تم حفظ الملف في: %1$s\n\n%2$s\n\nهل تريد مشاركته؟</string>
+    <string name="creating_template">جاري إنشاء القالب...</string>
+    <string name="failed_create_template">فشل في إنشاء القالب: %1$s</string>
+    <string name="template_created_title">تم إنشاء القالب</string>
+    <string name="template_created_message">تم إنشاء قالب %1$s بنجاح!\n\n%2$s\n\n%3$s</string>
+    <string name="share_template">مشاركة القالب</string>
+    <string name="no_file_picker_app_found">لم يتم العثور على تطبيق لاختيار الملفات</string>
+    <string name="loading_customer_data">جاري تحميل بيانات العميل...</string>
+    <string name="customer_selected_toast">تم اختيار العميل: %1$s</string>
+    <string name="error_parsing_customer_data">خطأ في تحليل بيانات العميل</string>
+    <string name="customer_not_found_database">العميل غير موجود في قاعدة البيانات</string>
+    <string name="failed_load_customer_data">فشل في تحميل بيانات العميل: %1$s</string>
+    <string name="guest_user_warning">أنت تستخدم حساب ضيف مؤقت - صلاحيات محدودة للعرض فقط</string>
+    <string name="logout_title">تسجيل الخروج</string>
+    <string name="logout_confirm_message">هل أنت متأكد من تسجيل الخروج؟</string>
+    <string name="notifications_title">الإشعارات</string>
+    <string name="notifications_marked_read">تم تمييز الإشعارات كمقروءة</string>
+
+    <!-- SelectCustomerLocationActivity -->
+    <string name="map_customer_location_title">موقع العميل</string>
+    <string name="please_select_location_on_map">يرجى تحديد الموقع على الخريطة</string>
+    <string name="found_recent_location_improving_accuracy">⚡ تم العثور على موقع حديث، جاري تحسين الدقة...</string>
+    <string name="determining_current_location">🔍 جاري تحديد الموقع الحالي...</string>
+    <string name="location_services_access_error">❌ خطأ في الوصول لخدمات الموقع</string>
+    <string name="location_search_timeout">⏰ انتهت مهلة البحث عن الموقع. يرجى المحاولة مرة أخرى.</string>
+    <string name="current_location_title_with_accuracy">موقعي الحالي (دقة: %1$dم)</string>
+    <string name="current_location_found_accuracy_meters">✅ تم تحديد موقعك الحالي (دقة: %1$d متر)</string>
+    <string name="accuracy_excellent">ممتازة</string>
+    <string name="accuracy_very_good">جيدة جداً</string>
+    <string name="accuracy_good">جيدة</string>
+    <string name="accuracy_acceptable">مقبولة</string>
+    <string name="current_location_found_accuracy_with_text">✅ تم تحديد موقعك الحالي - الدقة: %1$dم (%2$s)</string>
+    <string name="improving_location_accuracy_current">🔄 جاري تحسين دقة الموقع... (حالياً: %1$dم)</string>
+    <string name="provider_enabled">✅ تم تفعيل خدمة %1$s</string>
+    <string name="provider_disabled">⚠️ تم إيقاف خدمة %1$s</string>
+
+    <!-- QRCodePrintActivity -->
+    <string name="qr_print_title">طباعة QR Code</string>
+    <string name="name_colon_value">الاسم: %1$s</string>
+    <string name="phone_colon_value">الهاتف: %1$s</string>
+    <string name="total_debt_formatted">إجمالي الدين: %.2f دج</string>
+    <string name="error_opening_printers">خطأ في فتح قائمة الطابعات: %1$s</string>
+    <string name="error_sharing_qr">خطأ في مشاركة QR Code: %1$s</string>
+    <string name="bluetooth_not_supported">البلوتوث غير مدعوم على هذا الجهاز</string>
+    <string name="enable_bluetooth_first">يرجى تفعيل البلوتوث أولاً</string>
+    <string name="no_permission_bluetooth_devices">ليس لديك صلاحية للوصول لأجهزة البلوتوث</string>
+    <string name="no_paired_bluetooth_devices">لا توجد أجهزة بلوتوث مقترنة</string>
+    <string name="no_permission_device_info">ليس لديك صلاحية للوصول لمعلومات الجهاز</string>
+    <string name="select_printer">اختر الطابعة</string>
+    <string name="connecting_to_printer">جاري الاتصال بالطابعة...</string>
+    <string name="connected_printing">تم الاتصال، جاري الطباعة...</string>
+    <string name="failed_connect_printer">فشل في الاتصال بالطابعة: %1$s</string>
+    <string name="no_permission_connect_printer">ليس لديك صلاحية للاتصال بالطابعة</string>
+    <string name="qr_printed_success">تم طباعة QR Code بنجاح</string>
+    <string name="failed_print_qr">فشل في طباعة QR Code: %1$s</string>
+    <string name="print_error_generic">خطأ في الطباعة: %1$s</string>
+    <string name="qr_not_available">QR Code غير متوفر</string>
+    <string name="failed_save_qr">فشل في حفظ QR Code</string>
+    <string name="customer_qr_subject">QR Code للعميل: %1$s</string>
+    <string name="customer_qr_share_text">QR Code للعميل: %1$s
+الهاتف: %2$s
+إجمالي الدين: %3$s</string>
+    <string name="share_qr_code">مشاركة QR Code</string>
+    <string name="no_apps_to_share">لا توجد تطبيقات للمشاركة</string>
+    <string name="failed_share_qr">فشل في مشاركة QR Code: %1$s</string>
+    <string name="share_customer_info">مشاركة معلومات العميل</string>
+    <string name="failed_share_customer_info">فشل في مشاركة معلومات العميل</string>
+    <string name="error_missing_invoice_id">خطأ: معرف الفاتورة غير موجود</string>
+    <string name="print_invoice_title">طباعة الفاتورة</string>
+    <string name="printing_options_title">خيارات الطباعة</string>
+    <string name="printing_options_message">اختر نوع الطباعة المناسب:
+
+📄 الطباعة النصية:
+• سريعة ومتوافقة مع جميع الطابعات
+• تحويل النصوص العربية لأحرف لاتينية
+• مناسبة للاستخدام اليومي
+
+🖼️ طباعة الصورة:
+• الحفاظ على النصوص العربية الأصلية
+• جودة عالية ووضوح تام
+• قد تستغرق وقتاً أطول</string>
+    <string name="print_text">طباعة نصية</string>
+    <string name="print_image">طباعة الصورة</string>
+    <string name="image_printing_title">طباعة الصورة العربية</string>
+    <string name="image_printing_message">اختر نوع الطباعة:
+
+📄 طباعة عادية:
+• نصوص عربية كاملة
+• QR Code مع تفاصيل شاملة
+• جودة عالية (وقت أطول)
+
+⚡ طباعة مضغوطة (موصى بها):
+• نصوص عربية محسنة
+• حجم أصغر وسرعة أكبر
+• مناسبة للطابعات الحرارية
+• أقل استهلاكاً للذاكرة
+
+⏱️ الطباعة المضغوطة أسرع وأكثر استقراراً</string>
+    <string name="print_compact">طباعة مضغوطة ⚡</string>
+    <string name="print_normal">طباعة عادية 📄</string>
+    <string name="cannot_print_invoice_no_data">لا يمكن طباعة الفاتورة، البيانات غير متوفرة</string>
+    <string name="creating_image_for_printing">جاري إنشاء الصورة للطباعة...</string>
+    <string name="failed_create_invoice_image">فشل في إنشاء صورة الفاتورة: %1$s</string>
+    <string name="error_creating_image">خطأ في إنشاء الصورة: %1$s</string>
+    <string name="creating_compact_image_for_printing">جاري إنشاء صورة مضغوطة للطباعة...</string>
+    <string name="failed_create_compact_image">فشل في إنشاء الصورة المضغوطة: %1$s</string>
+    <string name="print_success_title">تمت الطباعة بنجاح!</string>
+    <string name="print_success_message">تم طباعة فاتورة الصورة بالنصوص العربية الكاملة على الطابعة</string>
+    <string name="print_failed_title">فشل في الطباعة</string>
+    <string name="print_failed_message_with_error">حدث خطأ أثناء طباعة الصورة:
+
+%1$s</string>
+    <string name="cannot_convert_invoice_no_data">لا يمكن تحويل الفاتورة، البيانات غير متوفرة</string>
+    <string name="converting_invoice_to_image">جاري تحويل الفاتورة إلى صورة...</string>
+    <string name="failed_convert_invoice">فشل في تحويل الفاتورة: %1$s</string>
+    <string name="error_converting">خطأ في التحويل: %1$s</string>
+    <string name="save_success_title">تم الحفظ بنجاح!</string>
+    <string name="bmp_saved_message_with_path">تم حفظ الفاتورة كصورة BMP بالنصوص العربية الكاملة
+
+المسار: %1$s
+
+ماذا تريد أن تفعل؟</string>
+    <string name="share_image">مشاركة الصورة</string>
+    <string name="view_file">عرض الملف</string>
+    <string name="no_app_to_view_image">لا يوجد تطبيق لعرض الصورة: %1$s</string>
+    <string name="invoice_not_found">الفاتورة غير موجودة</string>
+    <string name="failed_load_invoice">فشل في تحميل الفاتورة: %1$s</string>
+    <string name="invoice_print_success">تم طباعة الفاتورة بنجاح</string>
+    <string name="location_permission_granted_message">✅ تم منح صلاحية الموقع. يمكنك الآن فتح المسار إلى العميل</string>
+    <string name="location_permission_denied_message">تم رفض صلاحية الموقع. سيتم عرض موقع العميل فقط</string>
+    <string name="login_init_error">خطأ في تهيئة شاشة تسجيل الدخول: %1$s</string>
+    <string name="enter_email_and_password">يرجى إدخال البريد الإلكتروني وكلمة المرور</string>
+    <string name="logging_in">جاري تسجيل الدخول...</string>
+    <string name="login_failed_with_message">فشل تسجيل الدخول: %1$s</string>
+    <string name="unknown_error">خطأ غير معروف</string>
+    <string name="google_login_failed">فشل تسجيل الدخول عبر Google: %1$s</string>
+    <string name="auth_failed_with_message">فشل المصادقة: %1$s</string>
+    <string name="unauthorized_admin_login_denied">تم رفض محاولة دخول غير مصرح بها كمدير</string>
+    <string name="searching_for_user">جاري البحث عن المستخدم...</string>
+    <string name="user_found_but_processing_failed">تم العثور على المستخدم ولكن فشل في معالجة البيانات</string>
+    <string name="search_error_title">خطأ في البحث</string>
+    <string name="search_error_message">فشل في البحث عن المستخدم:
+%1$s
+
+ماذا تريد أن تفعل؟</string>
+    <string name="system_diagnostic">تشخيص النظام</string>
+    <string name="create_account">إنشاء حساب</string>
+    <string name="unregistered_account_title">حساب غير مسجل</string>
+    <string name="unregistered_account_message">هذا البريد الإلكتروني غير مسجل في النظام.
+
+اختر أحد الخيارات:</string>
+    <string name="login_as_guest">دخول كضيف</string>
+    <string name="system_admin_short">مدير نظام</string>
+    <string name="setup_system_admin_title">إعداد مدير النظام</string>
+    <string name="setup_system_admin_message">تم اكتشاف محاولة دخول بحساب المدير الافتراضي.
+
+سيتم ربط هذا الحساب بصلاحيات مدير النظام الكاملة.</string>
+    <string name="confirm_link">تأكيد الربط</string>
+    <string name="welcome_system_admin">مرحباً %1$s - مدير النظام</string>
+    <string name="system_admin_created_welcome">تم إنشاء حساب مدير النظام بنجاح!
+مرحباً %1$s</string>
+    <string name="guest_prefix">ضيف - </string>
+    <string name="welcome_guest_temporary">مرحباً %1$s (حساب مؤقت)</string>
+    <string name="create_new_account_title">إنشاء حساب جديد</string>
+    <string name="create">إنشاء</string>
+    <string name="enter_full_name">يرجى إدخال الاسم الكامل</string>
+    <string name="creating_account">جاري إنشاء الحساب...</string>
+    <string name="account_created_welcome">تم إنشاء الحساب بنجاح - مرحباً %1$s</string>
+    <string name="error_creating_account">خطأ في إنشاء الحساب: %1$s</string>
+    <string name="database_connection_error_with_msg">خطأ في الاتصال بقاعدة البيانات: %1$s</string>
+    <string name="welcome_user">مرحباً %1$s</string>
+    <string name="user_processing_error_title">خطأ في معالجة المستخدم</string>
+    <string name="user_processing_error_message">تم العثور على %1$d مستخدم بالبريد الإلكتروني %2$s ولكن فشل في معالجة بياناتهم.
+
+ماذا تريد أن تفعل؟</string>
+    <string name="auto_fix">إصلاح تلقائي</string>
+    <string name="create_new">إنشاء جديد</string>
+    <string name="database_error_title">خطأ في قاعدة البيانات</string>
+    <string name="database_error_message_detailed">فشل في الاتصال بقاعدة البيانات:
+%1$s
+
+تحقق من اتصال الإنترنت وإعدادات Firebase.</string>
+    <string name="performing_forced_fix">جاري الإصلاح القسري...</string>
+    <string name="failed_to_fix_with_msg">فشل في الإصلاح: %1$s</string>
+    <string name="welcome_user_fixed">مرحباً %1$s (تم إصلاح الحساب)</string>
+    <string name="search_user_error_with_msg">خطأ في البحث عن المستخدم: %1$s</string>
+    <string name="user_data_fixed_welcome">تم إصلاح بيانات المستخدم - مرحباً %1$s</string>
+    <string name="user_data_error_contact_admin">خطأ في بيانات المستخدم. يرجى التواصل مع مدير النظام.</string>
+    <string name="convert_to_system_admin_title">تحويل إلى مدير نظام</string>
+    <string name="convert_to_admin_message">هل تريد تحويل هذا الحساب إلى مدير نظام؟
+
+البريد: %1$s
+
+⚠️ هذا الإجراء يمنح صلاحيات كاملة على النظام!</string>
+    <string name="yes_create_admin">نعم، أنشئ مدير</string>
+    <string name="diagnosing">جاري التشخيص...</string>
+    <string name="diagnostic_error_with_msg">خطأ في التشخيص: %1$s</string>
+    <string name="diagnostic_result_title">نتيجة التشخيص</string>
+    <string name="diagnostic_result_message">%1$s
+📋 التوصية:
+%2$s</string>
+    <string name="firebase_info">معلومات Firebase</string>
+    <string name="fixing">جاري الإصلاح...</string>
+    <string name="fix_result_title">نتيجة الإصلاح</string>
+    <string name="fix_failed_with_msg">فشل الإصلاح: %1$s</string>
+    <string name="file_name_invoice_prefix">فاتورة</string>
+    <string name="file_name_compact_suffix">مضغوطة</string>
+    <string name="failed_to_save_image">فشل في حفظ الصورة</string>
+    <string name="invoice_bmp_title_compact">فاتورة مبيعات - مضغوطة</string>
+    <string name="invoice_bmp_title_normal">فاتورة مبيعات</string>
+    <string name="invoice_label_number">رقم الفاتورة: </string>
+    <string name="invoice_label_date">التاريخ: </string>
+    <string name="invoice_label_customer_name">اسم العميل: </string>
+    <string name="invoice_label_customer_phone">هاتف العميل: </string>
+    <string name="invoice_label_payment_method">طريقة الدفع: </string>
+    <string name="invoice_items_title_compact">العناصر (أهم 8)</string>
+    <string name="invoice_items_title">عناصر الفاتورة</string>
+    <string name="product_not_specified">منتج غير محدد</string>
+    <string name="invoice_item_details_format">الكمية: %1$d × %2$s = %3$s</string>
+    <string name="invoice_more_items">... و %1$d عناصر أخرى</string>
+    <string name="invoice_no_items">لا توجد عناصر في هذه الفاتورة</string>
+    <string name="invoice_total_label">المجموع الكلي: </string>
+    <string name="invoice_thanks_compact">شكراً لكم</string>
+    <string name="invoice_thanks_normal">شكراً لتعاملكم معنا</string>
+    <string name="share_invoice">مشاركة الفاتورة</string>
+    <string name="failed_share_file">فشل في مشاركة الملف: %1$s</string>
+
+    <!-- OperationLogsActivity -->
+    <string name="operation_logs_title">أرشيف العمليات</string>
+    <string name="failed_load_operation_logs">فشل في تحميل أرشيف العمليات</string>
+    <string name="no_permission_view_operation_logs">ليس لديك صلاحية لعرض أرشيف العمليات</string>
+    <string name="check_internet_try_again">تحقق من اتصال الإنترنت وحاول مرة أخرى</string>
+    <string name="database_being_prepared_try_later">جارٍ إعداد قاعدة البيانات - يرجى المحاولة بعد قليل</string>
+    <string name="failed_load_operation_logs_with_error">فشل في تحميل أرشيف العمليات: %1$s</string>
+    <string name="failed_load_operation_logs_try_again">فشل في تحميل أرشيف العمليات - يرجى المحاولة مرة أخرى</string>
+    <string name="operation_logs_summary_format">إجمالي: %1$d • حساسة: %2$d • اليوم: %3$d • المعروضة: %4$d</string>
+    <string name="export_feature_in_development">🚧 ميزة التصدير قيد التطوير</string>
+    <string name="clean_old_logs_title">تنظيف السجلات القديمة</string>
+    <string name="clean_old_logs_message">سيتم حذف السجلات الأقدم من 90 يوم.
+\nهل أنت متأكد؟</string>
+    <string name="clean_label">تنظيف</string>
+    <string name="cleaning_old_logs">جاري تنظيف السجلات القديمة...</string>
+    <string name="deleted_old_logs_success">✅ تم حذف %1$d سجل قديم</string>
+    <string name="failed_clean_old_logs">❌ فشل في تنظيف السجلات: %1$s</string>
+    <string name="operation_details_header">🔍 تفاصيل العملية</string>
+    <string name="operation_type_label">📋 النوع: </string>
+    <string name="entity_label">📦 الكائن: </string>
+    <string name="id_label">🆔 المعرف: </string>
+    <string name="user_label">👤 المستخدم: </string>
+    <string name="timestamp_label">🕐 التوقيت: </string>
+    <string name="description_label">📝 الوصف: </string>
+    <string name="device_label">📱 الجهاز: </string>
+    <string name="app_version_label">📦 الإصدار: </string>
+    <string name="operation_details_title">تفاصيل العملية</string>
+
+    <!-- QuickInvoiceDialog -->
+    <string name="failed_load_products">فشل في تحميل المنتجات: %1$s</string>
+    <string name="added_product_success">✅ تم إضافة %1$s</string>
+    <string name="selected_products_count">المنتجات المختارة: %1$d</string>
+    <string name="select_at_least_one_product">الرجاء اختيار منتج واحد على الأقل</string>
+    <string name="error_generating_invoice_number">خطأ في إنشاء رقم الفاتورة: %1$s</string>
+    <string name="failed_save_invoice">فشل في حفظ الفاتورة: %1$s</string>
+
+    <!-- NetworkErrorHandler -->
+    <string name="unexpected_error">حدث خطأ غير متوقع</string>
+    <string name="no_permission_access_data">ليس لديك صلاحية للوصول لهذه البيانات</string>
+    <string name="service_unavailable_try_later">الخدمة غير متاحة حالياً. يرجى المحاولة لاحقاً</string>
+    <string name="deadline_exceeded_check_internet">انتهت مهلة الاتصال. تحقق من سرعة الإنترنت</string>
+    <string name="session_expired_login_again">انتهت صلاحية تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى</string>
+    <string name="data_not_found">البيانات المطلوبة غير موجودة</string>
+    <string name="data_already_exists">البيانات موجودة مسبقاً</string>
+    <string name="resource_exhausted_try_later">تم تجاوز الحد المسموح. يرجى المحاولة لاحقاً</string>
+    <string name="no_internet_check_connection">لا يوجد اتصال بالإنترنت. تحقق من شبكة WiFi أو بيانات الهاتف</string>
+    <string name="service_error_with_operation">خطأ في الخدمة: %1$s</string>
+    <string name="network_error_check_connection">خطأ في الشبكة. تحقق من اتصال الإنترنت</string>
+    <string name="error_in_operation">خطأ في %1$s</string>
+    <string name="retry_question_with_message">%1$s\n\nهل تريد إعادة المحاولة؟</string>
+    <string name="please_retry_operation">يرجى إعادة تنفيذ العملية</string>
+    <string name="data_error_missing_or_corrupt">خطأ في البيانات: %1$s غير موجود أو تالف</string>
+    <string name="data_error_title">خطأ في البيانات</string>
+    <string name="data_error_message_with_support">%1$s\n\nيرجى الاتصال بالدعم الفني إذا استمرت المشكلة.</string>
+    <string name="sync_failed_for_operation">فشل في مزامنة %1$s</string>
+    <string name="no_internet_suffix">لا يوجد اتصال بالإنترنت</string>
+    <string name="server_error_suffix">خطأ في الخادم</string>
+
+    <!-- ReportsFragment additions -->
+    <string name="report_for_day">تقرير ليوم: %1$s</string>
+    <string name="most_sold_category_title">الفئة الأكثر مبيعاً</string>
+    <string name="total_receipts_title">إجمالي عدد الفواتير</string>
+    <string name="tax_title">الضرائب</string>
+    <string name="discounts_title">الخصومات</string>
+    <string name="avg_sales_title">متوسط قيمة المبيعات</string>
+    <string name="best_customer_title">أفضل عميل</string>
+    <string name="payment_methods_title">طرق الدفع</string>
+    <string name="seller_title">البائع</string>
+    <string name="loading_dots">جاري التحميل...</string>
+    <string name="calculating_dots">جاري الحساب...</string>
+    <string name="searching_dots">جاري البحث...</string>
+    <string name="calculating_cash_prefix">💵 جاري الحساب...</string>
+    <string name="calculating_credit_prefix">📝 جاري الحساب...</string>
+    <string name="total_sales_calculating">إجمالي المبيعات: جاري الحساب...</string>
+    <string name="total_profit_calculating">إجمالي الربح: جاري الحساب...</string>
+    <string name="top_product_with_count">%1$s : %2$d</string>
+    <string name="other_products_with_hint">%1$d منتجات أخرى • اضغط للتفاصيل 📊</string>
+    <string name="zero_products_with_hint">0 منتجات • اضغط للتفاصيل 📊</string>
+    <string name="load_error">خطأ في التحميل</string>
+    <string name="zero_customers">0 زبون</string>
+    <string name="only_one_seller">بائع واحد فقط!</string>
+    <string name="active_sellers_count">%1$d بائعين نشطين</string>
+    <string name="total_profit_label">إجمالي الربح: </string>
+    <string name="performance_excellent">أداء ممتاز! 🎉</string>
+    <string name="performance_very_good">أداء جيد جداً ✅</string>
+    <string name="performance_good">أداء جيد 👍</string>
+    <string name="performance_starting">بداية النشاط 📈</string>
+    <string name="performance_no_sales">لا توجد مبيعات 😴</string>
+    <string name="report_refreshed">🔄 تم تحديث التقرير</string>
+
+    <!-- =============================== -->
+    <!-- APP BASIC INFO -->
+    <!-- =============================== -->
+    <string name="app_name">نقطة بيع</string>
+    <string name="action_settings">الإعدادات</string>
+    <string name="currency_symbol">دج</string>
+    <string name="default_web_client_id">584734497865-8mccocqtgufkebr3v1pbftnjbjtjsh4p.apps.googleusercontent.com</string>
+    
+    <!-- =============================== -->
+    <!-- NAVIGATION & MENU -->
+    <!-- =============================== -->
+    <string name="navigation_drawer_open">فتح القائمة</string>
+    <string name="navigation_drawer_close">إغلاق القائمة</string>
+    
+    <!-- Bottom Navigation -->
+    <string name="counter">الكاونتر</string>
+    <string name="counterMenu">الكاونتر</string>
+    <string name="reports">التقارير</string>
+    <string name="reportsMenu">التقارير</string>
+    <string name="today">اليوم</string>
+    <string name="todayMenu">اليوم</string>
+    <string name="items">العناصر</string>
+    <string name="itemsMenu">العناصر</string>
+    <string name="more">المزيد</string>
+    <string name="moreMenu">المزيد</string>
+    
+    <!-- Other Menu Items -->
+    <string name="inventoryManagement">إدارة المنتجات</string>
+    <string name="settings">الإعدادات</string>
+    
+    <!-- =============================== -->
+    <!-- ACTIVITY TITLES -->
+    <!-- =============================== -->
+    <string name="title_activity_profit_details">عرض الأرباح</string>
+    <string name="title_Selected_Customer_Location">تحديد موقع العميل</string>
+    <string name="title_activity_all_invoices">جميع الفواتير</string>
+    <string name="title_activity_qr_code">طباعة QR Code</string>
+    <string name="bmp_gallery_title">معرض صور الفواتير</string>
+    
+    <!-- =============================== -->
+    <!-- LOCATION SERVICES -->
+    <!-- =============================== -->
+    <string name="saveLocation">حفظ الموقع</string>
+    <string name="my_location">موقعي الحالي</string>
+    <string name="getting_location">جاري تحديد موقعك...</string>
+    <string name="location_permission_required">يجب منح صلاحية الموقع لاستخدام هذه الميزة</string>
+    <string name="location_service_disabled">يرجى تفعيل خدمة تحديد الموقع</string>
+    <string name="current_location_set">تم تحديد موقعك الحالي</string>
+    <string name="location_error">خطأ في الوصول للموقع</string>
+    
+    <!-- =============================== -->
+    <!-- INVOICE EDITING -->
+    <!-- =============================== -->
+    <string name="edit_invoice">تعديل الفاتورة</string>
+    <string name="finish_editing">إنهاء التعديل</string>
+    <string name="edit_mode_enabled">وضع التعديل مفعل - اضغط على أي بند لتعديله</string>
+    <string name="edit_mode_disabled">تم إنهاء وضع التعديل</string>
+    <string name="click_to_edit">اضغط للتعديل</string>
+    <string name="save_changes">حفظ التغييرات</string>
+    <string name="save_changes_question">هل تريد حفظ التغييرات في الفاتورة؟</string>
+    <string name="saving_changes">جاري حفظ التغييرات...</string>
+    <string name="changes_saved">تم حفظ التغييرات بنجاح</string>
+    <string name="save_failed">فشل في حفظ التغييرات</string>
+    <string name="no_items_to_edit">لا توجد بنود في الفاتورة للتعديل</string>
+    
+    <!-- =============================== -->
+    <!-- USER MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="fix_users">إصلاح المستخدمين</string>
+    <string name="fix_users_message">هذه الوظيفة ستقوم بإصلاح جميع المستخدمين في النظام</string>
+    <string name="users_fixed_successfully">تم إصلاح المستخدمين بنجاح</string>
+    <string name="fix_users_report_title">تقرير الإصلاح</string>
+    
+    <!-- Login System -->
+    <string name="user_search_failed">فشل البحث عن المستخدم</string>
+    <string name="account_fixed_login">تم إصلاح الحساب</string>
+    <string name="fallback_search_activated">تم تفعيل البحث الاحتياطي</string>
+    
+    <!-- =============================== -->
+    <!-- DATA IMPORT/EXPORT -->
+    <!-- =============================== -->
+    <string name="excel_export">تصدير إلى ملف بيانات</string>
+    <string name="excel_import">استيراد من ملف بيانات</string>
+    <string name="export_success">تم التصدير بنجاح</string>
+    <string name="export_failed">فشل في التصدير</string>
+    <string name="import_success">تم الاستيراد بنجاح</string>
+    <string name="import_failed">فشل في الاستيراد</string>
+    <string name="export_in_progress">جاري التصدير...</string>
+    <string name="import_in_progress">جاري الاستيراد...</string>
+    <string name="select_file">اختر ملف</string>
+    <string name="excel_file_extension">*.csv</string>
+    
+    <!-- Export Types -->
+    <string name="export_customers">تصدير العملاء</string>
+    <string name="export_products">تصدير المنتجات</string>
+    <string name="export_invoices">تصدير الفواتير</string>
+    <string name="export_all">تصدير الكل</string>
+    <string name="import_customers">استيراد العملاء</string>
+    <string name="import_products">استيراد المنتجات</string>
+    
+    <!-- CSV Help -->
+    <string name="csv_encoding_info">نصائح هامة لملفات CSV:\n• الملفات محفوظة بترميز UTF-8\n• يستخدم الفاصلة المنقوطة (;) كفاصل للحقول\n• لفتحها في Excel: افتح مباشرة أو استخدم استيراد البيانات\n• أو استخدم Google Sheets مباشرة</string>
+    <string name="csv_template_info">القالب جاهز للاستخدام:\n• املأ البيانات في الصفوف\n• لا تغير العناوين\n• لا تغير الفاصل (;)\n• احفظ كـ CSV عند الانتهاء</string>
+    
+    <!-- =============================== -->
+    <!-- PRINTING -->
+    <!-- =============================== -->
+    <string name="print_text_description">طباعة نصية سريعة - تحويل النصوص العربية لأحرف لاتينية</string>
+    <string name="print_image_description">طباعة صورة - الحفاظ على النصوص العربية الأصلية</string>
+    <string name="bmp_gallery_description">عرض وطباعة الفواتير المحفوظة كصور BMP</string>
+    <string name="printing_image_progress">جاري طباعة الصورة...</string>
+    <string name="print_image_success">تم طباعة الصورة بالنصوص العربية الكاملة!</string>
+    <string name="print_image_error">فشل في طباعة الصورة</string>
+    
+    <!-- =============================== -->
+    <!-- FINANCIAL REPORTS -->
+    <!-- =============================== -->
+    <string name="cash_collected">النقود المحصلة</string>
+    <string name="total_cash_collected">إجمالي النقود المحصلة</string>
+    <string name="cash_sales">المبيعات النقدية</string>
+    <string name="debt_payments">المدفوعات من الديون</string>
+    <string name="cash_collection_summary">ملخص النقود المحصلة</string>
+    <string name="cash_sales_format">💵 مبيعات نقدية: %1$s</string>
+    <string name="debt_payments_format">💰 مدفوعات الديون: %1$s</string>
+    <string name="total_cash_collected_format">💳 إجمالي النقود المحصلة: %1$s</string>
+    <string name="calculating_debt_payments">جاري حساب المدفوعات...</string>
+    <string name="calculating_cash_collected">جاري حساب النقود المحصلة...</string>
+    
+    <!-- =============================== -->
+    <!-- COUNTER & BADGE -->
+    <!-- =============================== -->
+    <string name="counter_items_count">%1$d منتج</string>
+    <string name="counter_items_count_singular">منتج واحد</string>
+    
+    <!-- =============================== -->
+    <!-- NETWORK & OFFLINE -->
+    <!-- =============================== -->
+    <string name="network_online">متصل بالإنترنت</string>
+    <string name="network_offline">غير متصل - يعمل محلياً</string>
+    <string name="network_reconnected">عاد الاتصال - جاري المزامنة</string>
+    <string name="network_lost">انقطع الاتصال - يعمل في الوضع المحلي</string>
+    <string name="offline_mode_active">الوضع المحلي مفعل</string>
+    <string name="syncing_data">جاري مزامنة البيانات...</string>
+    <string name="sync_completed">تمت المزامنة بنجاح</string>
+    <string name="working_offline">يعمل بدون إنترنت</string>
+    <string name="data_will_sync">البيانات ستتم مزامنتها عند عودة الاتصال</string>
+    <string name="offline_changes_saved">تم حفظ التغييرات محلياً</string>
+    
+    <!-- =============================== -->
+    <!-- GENERAL MESSAGES -->
+    <!-- =============================== -->
+    <string name="hello_blank_fragment">مرحباً</string>
+    
+    <!-- Common Actions -->
+    <string name="ok">موافق</string>
+    <string name="cancel">إلغاء</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+    <string name="save">حفظ</string>
+    <string name="delete">حذف</string>
+
+    <string name="add">إضافة</string>
+    <string name="search">بحث</string>
+    <string name="loading">جاري التحميل...</string>
+    <string name="error">خطأ</string>
+    <string name="success">نجح</string>
+    <string name="failed">فشل</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="close">إغلاق</string>
+    <string name="open">فتح</string>
+    <string name="back">رجوع</string>
+    <string name="next">التالي</string>
+    <string name="previous">السابق</string>
+    <string name="finish">إنهاء</string>
+    <string name="continue_text">متابعة</string>
+    
+    <!-- =============================== -->
+    <!-- LANGUAGE SELECTION -->
+    <!-- =============================== -->
+    <string name="select_language">اختر اللغة</string>
+    <string name="language_changed_restart_required">تم تغيير اللغة - أعد تشغيل التطبيق لتطبيق التغيير</string>
+    <string name="current_language">اللغة الحالية</string>
+    <string name="language_settings">إعدادات اللغة</string>
+    <string name="change_language">تغيير اللغة</string>
+    <string name="change_language_title">🌐 تغيير اللغة</string>
+    <string name="restart_app">إعادة تشغيل التطبيق</string>
+    <string name="language_applied">تم تطبيق اللغة الجديدة</string>
+    
+    <!-- Language Names -->
+    <string name="language_arabic">العربية</string>
+    <string name="language_english">الإنجليزية</string>
+    <string name="language_auto">تلقائي</string>
+    
+    <!-- =============================== -->
+    <!-- CUSTOMER MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="customer_name_label">الاسم: </string>
+    <string name="customer_phone_label">الهاتف: </string>
+    <string name="customer_debt_label">دين: </string>
+    <string name="customer_location_not_set">غير محدد</string>
+    <string name="update_location">تحديد الموقع</string>
+    <string name="set_location">تحديد موقع</string>
+    <string name="update_location_button">تحديث</string>
+    <string name="set_location_button">تحديد</string>
+    <string name="deleting_customer">جاري الحذف...</string>
+    <string name="delete_customer">حذف العميل</string>
+    
+    <!-- =============================== -->
+    <!-- INVOICE MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="invoice_number_label">رقم الفاتورة: </string>
+    <string name="invoice_date_label">التاريخ: </string>
+    <string name="customer_label">العميل: </string>
+    <string name="phone_label">الهاتف: </string>
+    <string name="total_amount_label">المجموع: </string>
+    <string name="payment_method_label">طريقة الدفع: </string>
+    <string name="invoice_hash">فاتورة #</string>
+    <string name="invoice_status_paid">مدفوعة</string>
+    <string name="invoice_status_unpaid">غير مدفوعة</string>
+    <string name="invoice_status_debt">دين</string>
+    <string name="invoice_count_label">عدد الفواتير: </string>
+    <string name="invoice_count_zero">عدد الفواتير: 0</string>
+    <string name="total_sales_label">إجمالي المبيعات: </string>
+    <string name="total_sales_zero">إجمالي المبيعات: 0.00 دج</string>
+    <string name="invoices_today">فواتير %1$s</string>
+    
+    <!-- =============================== -->
+    <!-- PRODUCT MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="product_price_label">السعر: </string>
+    <string name="product_quantity_label">الكمية: </string>
+    <string name="product_min_quantity_label">الحد الأدنى: </string>
+    <string name="product_cost_price_label">سعر التكلفة: </string>
+    <string name="stock_value_label">قيمة المخزون: </string>
+    <string name="current_quantity_label">الكمية الحالية: </string>
+    <string name="total_products_label">إجمالي المنتجات: </string>
+    <string name="low_stock_alert">تحذير: %1$d منتج بكمية منخفضة</string>
+    <string name="no_search_results">لا توجد نتائج للبحث</string>
+    <string name="no_products">لا توجد منتجات</string>
+    <string name="no_customers">لا يوجد زبائن</string>
+    
+    <!-- =============================== -->
+    <!-- USER MANAGEMENT -->
+    <!-- =============================== -->
+    <string name="user_status_active">نشط</string>
+    <string name="user_status_disabled">معطل</string>
+    <string name="last_login_label">آخر دخول: </string>
+    <string name="never_logged_in">لم يسجل دخول من قبل</string>
+    <string name="not_registered">غير مسجل</string>
+    <string name="please_login">يرجى تسجيل الدخول</string>
+    
+    <!-- =============================== -->
+    <!-- REPORTS & ANALYTICS -->
+    <!-- =============================== -->
+    <string name="report_for_date">تقرير ليوم: %1$s</string>
+    <string name="most_sold_category">الفئة الأكثر مبيعاً</string>
+    <string name="total_invoices_count">إجمالي عدد الفواتير</string>
+    <string name="taxes_label">الضرائب</string>
+    <string name="discounts_label">الخصومات</string>
+    <string name="avg_sales_label">متوسط قيمة المبيعات</string>
+    <string name="best_customer_label">أفضل عميل</string>
+    <string name="payment_methods_label">طرق الدفع</string>
+    <string name="seller_label">البائع</string>
+    <string name="loading_data">جاري التحميل...</string>
+    <string name="calculating_data">جاري الحساب...</string>
+    <string name="searching_data">جاري البحث...</string>
+    <string name="evaluating_performance">جاري تقييم الأداء...</string>
+    <string name="no_sales">لا توجد مبيعات</string>
+    <string name="loading_error">خطأ في التحميل</string>
+    <string name="not_specified">غير محدد</string>
+    <string name="no_customers_found">لا يوجد زبائن</string>
+    <string name="best_customer_today">أفضل عميل اليوم</string>
+    <string name="quantity_sold_label">الكمية: </string>
+    <string name="revenue_label">الإيرادات: </string>
+    
+    <!-- =============================== -->
+    <!-- STOCK MOVEMENTS -->
+    <!-- =============================== -->
+    <string name="movement_type_incoming">دخول</string>
+    <string name="movement_type_outgoing">خروج</string>
+    <string name="movement_type_adjustment">تعديل</string>
+    <string name="date_from_label">من: </string>
+    <string name="date_to_label">إلى: </string>
+    <string name="select_start_date">اختر تاريخ البداية</string>
+    <string name="select_end_date">اختر تاريخ النهاية</string>
+    <string name="total_movements_label">إجمالي الحركات: </string>
+    <string name="total_movements_zero">إجمالي الحركات: 0</string>
+    <string name="incoming_movements_label">حركات الدخول: </string>
+    <string name="incoming_movements_zero">حركات الدخول: 0</string>
+    <string name="outgoing_movements_label">حركات الخروج: </string>
+    <string name="outgoing_movements_zero">حركات الخروج: 0</string>
+    <string name="total_products_zero">إجمالي المنتجات: 0</string>
+    <string name="low_stock_zero">تحذير: 0 منتج بكمية منخفضة</string>
+    
+    <!-- =============================== -->
+    <!-- LOCATION SERVICES -->
+    <!-- =============================== -->
+    <string name="getting_location_text">جاري التحديد...</string>
+    <string name="my_current_location">موقعي الحالي</string>
+    
+    <!-- =============================== -->
+    <!-- QUICK INVOICE -->
+    <!-- =============================== -->
+    <string name="selected_products_label">المنتجات المختارة: </string>
+    <string name="total_label">المجموع: </string>
+    <string name="creating_invoice">جاري الإنشاء...</string>
+    <string name="create_invoice">إنشاء الفاتورة</string>
+    
+    <!-- =============================== -->
+    <!-- SAVING STATES -->
+    <!-- =============================== -->
+    <string name="saving_data">جاري الحفظ...</string>
+    <string name="current_method_label">الطريقة الحالية: </string>
+    <string name="edit_payment_method">💳 تعديل طريقة الدفع</string>
+    <string name="select_new_method">اختر الطريقة الجديدة:</string>
+    <string name="edit_payment_note">💡 ملاحظة: تغيير طريقة الدفع سيؤثر على تقارير المبيعات</string>
+    
+    <!-- =============================== -->
+    <!-- NOTIFICATIONS -->
+    <!-- =============================== -->
+    <string name="no_new_notifications">لا توجد إشعارات جديدة</string>
+    <string name="error_loading_notifications">خطأ في تحميل الإشعارات</string>
+    
+    <!-- =============================== -->
+    <!-- UI LABELS & PLACEHOLDERS -->
+    <!-- =============================== -->
+    <string name="username">اسم المستخدم</string>
+    <string name="product_name">اسم المنتج</string>
+    <string name="customer_name">اسم الزبون</string>
+    <string name="customer_email">البريد الإلكتروني</string>
+    <string name="customer_address">العنوان</string>
+    <string name="invoice_number">رقم الفاتورة</string>
+    <string name="file_name">اسم الملف</string>
+    <string name="file_date">التاريخ</string>
+    <string name="file_size">الحجم</string>
+    <string name="transaction_description">وصف المعاملة</string>
+    <string name="reason">السبب</string>
+    <string name="notes">ملاحظات</string>
+    <string name="category">الفئة</string>
+    <string name="role_label">الدور: </string>
+    <string name="manager">مدير</string>
+    <string name="active">نشط</string>
+    
+    <!-- =============================== -->
+    <!-- FRAGMENT TITLES -->
+    <!-- =============================== -->
+    <string name="todays_invoices">فواتير اليوم</string>
+    <string name="products_management">إدارة المنتجات</string>
+    <string name="customers_management">إدارة الزبائن</string>
+    <string name="inventory_management">إدارة المخزون</string>
+    <string name="stock_movements">حركات المخزون</string>
+    <string name="pos_reports">تقارير نقطة البيع</string>
+    <string name="more_options">المزيد من الخيارات</string>
+    
+    <!-- =============================== -->
+    <!-- BUTTONS & ACTIONS -->
+    <!-- =============================== -->
+    <string name="new_invoice">فاتورة جديدة</string>
+    <string name="add_product">إضافة منتج</string>
+    <string name="add_customer">إضافة زبون</string>
+    <string name="add_new_product">إضافة منتوج جديد</string>
+    <string name="edit">تعديل</string>
+    <string name="add_to_invoice">إضافة للفاتورة</string>
+    <string name="filter">تصفية</string>
+    <string name="clear">مسح</string>
+    <string name="export_report">تصدير التقرير</string>
+    <string name="text">نص</string>
+    <string name="share">مشاركة</string>
+    <string name="yesterday">أمس</string>
+
+    <string name="choose_date">اختر تاريخ</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="select_customer">اختيار عميل</string>
+    <string name="home">الرئيسية</string>
+    <string name="customer_locations">مواقع العملاء</string>
+    <string name="user_tools">أدوات المستخدمين</string>
+    <string name="search_movements_hint">بحث في الحركات...</string>
+    <string name="search_product_hint">بحث عن منتج...</string>
+    <string name="search_customer_hint">بحث عن زبون...</string>
+    <string name="search_inventory_hint">بحث في المخزون...</string>
+    <string name="scan_barcode">مسح الباركود</string>
+    <string name="current_invoice">الفاتورة الحالية</string>
+    <string name="checkout">الدفع</string>
+    <string name="select_customer_for_invoice">اختيار عميل للفاتورة</string>
+    <string name="search_customer_by_name_or_phone">البحث بالاسم أو رقم الهاتف</string>
+    <string name="add_new_customer">إضافة عميل جديد</string>
+    <string name="create_quick_invoice">إنشاء فاتورة سريعة</string>
+    <string name="search_in_products">البحث في المنتجات...</string>
+    <string name="select_products">اختر المنتجات:</string>
+    <string name="customer_info_optional">معلومات العميل (اختيارية):</string>
+
+    
+    <!-- =============================== -->
+    <!-- MENU ITEMS -->
+    <!-- =============================== -->
+    <string name="all_invoices">جميع الفواتير</string>
+    <string name="scan_qr_customer">مسح QR Code للعميل</string>
+    <string name="user_management">إدارة المستخدمين</string>
+    <string name="notifications">الإشعارات</string>
+    <string name="invoice_gallery">معرض الفواتير</string>
+    <string name="operation_logs">📋 أرشيف العمليات</string>
+    
+    <!-- =============================== -->
+    <!-- EMPTY STATES -->
+    <!-- =============================== -->
+    <string name="no_invoices_today">لا توجد فواتير لهذا اليوم</string>
+    <string name="no_notifications">لا توجد إشعارات</string>
+    
+    <!-- =============================== -->
+    <!-- PERFORMANCE INDICATOR -->
+    <!-- =============================== -->
+    <string name="performance_indicator">مؤشر الأداء</string>
+    <string name="good_performance">أداء جيد ✅</string>
+    <string name="load_other_date_invoices">📅 تحميل فواتير تاريخ آخر</string>
+    
+    <!-- =============================== -->
+    <!-- INVOICE CREATION -->
+    <!-- =============================== -->
+    <string name="create_invoice_operation">إنشاء فاتورة</string>
+    <string name="create_invoice_description">إنشاء فاتورة جديدة بقيمة 150.00 دج تحتوي على 3 منتجات</string>
+    
+    <!-- =============================== -->
+    <!-- EXAMPLE DATA (for previews) -->
+    <!-- =============================== -->
+    <string name="example_invoice_number">فاتورة #12345</string>
+    <string name="example_customer_name">العميل: أحمد محمد</string>
+    <string name="example_invoice_date">التاريخ: 01/01/2024 14:30</string>
+    <string name="example_invoice_amount">المبلغ: 1250.00 دج</string>
+    <string name="example_product_price">السعر: $10.00</string>
+    <string name="example_quantity">الكمية: 25</string>
+    <string name="example_revenue">الإيرادات: 1500.00دج</string>
+    <string name="example_last_login">آخر دخول: 01/01/2024</string>
+    <string name="example_report_date">تقرير ليوم: 2025/01/17</string>
+    <string name="example_total_sales">إجمالي المبيعات: 0.00دج</string>
+    <string name="example_total_profit">إجمالي الربح: 0.00دج</string>
+    <string name="phone">الهاتف</string>
+  <string name="system_admin">مدير النظام</string>
+  <string name="not_logged_in">غير مسجل دخول</string>
+  <string name="guest_account_limited">حساب ضيف مؤقت (صلاحيات محدودة)</string>
+  <!-- User management strings -->
+  <string name="not_allowed_admin_privileges">❌ غير مسموح: هذا المستخدم غير مصرح له بصلاحيات المدير</string>
+  <string name="not_allowed_change_primary_admin_role">❌ غير مسموح: لا يمكن تغيير دور المدير الأساسي</string>
+  <string name="error_loading_users">خطأ في تحميل المستخدمين: %1$s</string>
+  <string name="add_new_user">إضافة مستخدم جديد</string>
+  <string name="please_enter_username">يرجى إدخال اسم المستخدم</string>
+  <string name="please_enter_valid_email">يرجى إدخال بريد إلكتروني صحيح</string>
+  <string name="please_enter_full_name">يرجى إدخال الاسم الكامل</string>
+  <string name="please_select_user_role">يرجى اختيار دور المستخدم</string>
+  <string name="user_created_successfully">تم إنشاء المستخدم بنجاح</string>
+  <string name="error_creating_user">خطأ في إنشاء المستخدم: %1$s</string>
+  <string name="no_permission_manage_user">ليس لديك صلاحية لإدارة هذا المستخدم</string>
+  <string name="edit_data">تعديل البيانات</string>
+  <string name="change_role">تغيير الدور</string>
+  <string name="toggle_activate">تفعيل/تعطيل</string>
+  <string name="delete_user">حذف المستخدم</string>
+  <string name="edit_user_title">تعديل %1$s</string>
+  <string name="change_role_for_user">تغيير دور %1$s</string>
+  <string name="no_permission_assign_role">ليس لديك صلاحية لتعيين هذا الدور</string>
+  <string name="activated">تم تفعيل</string>
+  <string name="deactivated">تم تعطيل</string>
+  <string name="user">المستخدم</string>
+  <string name="not_allowed_delete_primary_admin">❌ غير مسموح: لا يمكن حذف المدير الأساسي</string>
+  <string name="confirm_delete">تأكيد الحذف</string>
+  <string name="confirm_delete_user">هل أنت متأكد من حذف المستخدم: %1$s؟</string>
+  <string name="user_deleted">تم حذف المستخدم</string>
+  <string name="error_deleting_user">خطأ في حذف المستخدم: %1$s</string>
+  <string name="fix_all_users">إصلاح جميع المستخدمين</string>
+  <string name="quick_diagnosis">تشخيص سريع</string>
+  <string name="login_test">اختبار تسجيل الدخول</string>
+  <string name="fix_now">إصلاح الآن</string>
+  <string name="quick_diagnosis_in_progress">جاري التشخيص السريع...</string>
+  <string name="quick_diagnosis_report_header">📊 تقرير التشخيص السريع:\n\n</string>
+  <string name="total_users_label">👥 إجمالي المستخدمين: </string>
+  <string name="active_users_label">✅ نشطين: </string>
+  <string name="inactive_users_label">❌ غير نشطين: </string>
+  <string name="users_without_role_label">⚠️ بدون دور: </string>
+  <string name="corrupted_users_label">🚫 تالفين: </string>
+  <string name="recommend_run_fix">💡 يُنصح بتشغيل إصلاح المستخدمين.</string>
+  <string name="all_users_good">✨ جميع المستخدمين في حالة جيدة!</string>
+  <string name="diagnosis_result">نتيجة التشخيص</string>
+  <string name="diagnosis_failed">فشل التشخيص: %1$s</string>
+  <string name="enter_email_for_test">أدخل البريد الإلكتروني للاختبار</string>
+  <string name="enter_email_to_test_login">أدخل البريد الإلكتروني لاختبار إمكانية تسجيل الدخول:</string>
+  <string name="test_action">اختبار</string>
+  <string name="testing_email">جاري اختبار: %1$s</string>
+  <string name="failed_mark">❌ فشل</string>
+  <string name="user_not_found_db">لم يتم العثور على المستخدم في قاعدة البيانات</string>
+  <string name="user_exists">✅ المستخدم موجود</string>
+  <string name="email_label">📧 البريد: </string>
+  <string name="name_label">👤 الاسم: </string>
+  <string name="account_active">✅ الحساب نشط</string>
+  <string name="account_inactive">❌ الحساب غير نشط</string>
+  <string name="role_ok_label">✅ الدور: </string>
+  <string name="role_unspecified_label">⚠️ الدور: غير محدد</string>
+  <string name="success_mark">✅ نجح</string>
+  <string name="needs_fix_mark">⚠️ يحتاج إصلاح</string>
+  <string name="error_reading_user_data">خطأ في قراءة بيانات المستخدم: %1$s</string>
+  <string name="search_error">خطأ في البحث: %1$s</string>
+  <string name="test_result_for_email">نتيجة اختبار %1$s</string>
+  <string name="result_with_details">النتيجة: %1$s\n\n%2$s</string>
+  <string name="fix_this_user">إصلاح هذا المستخدم</string>
+  <string name="downgraded_unauthorized_admin">تم تقليل صلاحيات مستخدم غير مصرح له: %1$s</string>
+  <string name="user_fixed">تم إصلاح المستخدم: %1$s</string>
+  <string name="role_changed_from_to"> (تم تغيير الدور من %1$s إلى %2$s)</string>
+  <string name="fix_users_progress">جاري إصلاح المستخدمين...</string>
+  <string name="fixed_users_of_total">تم إصلاح %1$d من أصل %2$d مستخدم</string>
+  <string name="no_users_to_fix">لا يوجد مستخدمين للإصلاح</string>
+  <string name="fix_users_report">تقرير إصلاح المستخدمين:\n\n• إجمالي المستخدمين: %1$d\n• تم إصلاحهم: %2$d\n• سليمين: %3$d\n\nيمكن للمستخدمين الآن تسجيل الدخول بنجاح.</string>
+  <string name="fixed_done">تم الإصلاح!</string>
+    <string name="customer_data_unavailable">بيانات العميل غير متوفرة</string>
+    <string name="customer_location_not_set_system">موقع العميل غير محدد في النظام</string>
+    <string name="location_label">الموقع</string>
+    <string name="opening_maps">جاري فتح الخرائط...</string>
+    <string name="open_location">فتح %1$s</string>
+    <string name="open_location_in_browser">فتح %1$s في المتصفح</string>
+    <string name="cannot_open_maps">لا يمكن فتح الخرائط</string>
+    <string name="open_route_to_name">فتح المسار إلى %1$s</string>
+    <string name="open_location_in_maps_app">فتح موقع %1$s في تطبيق الخرائط</string>
+    <string name="could_not_open_maps_check_internet">لم نتمكن من فتح الخرائط. تحقق من اتصالك بالإنترنت</string>
+    <string name="choose_maps_app">اختر تطبيق الخرائط</string>
+    <string name="choose_app_to_open_location">اختر التطبيق المناسب لفتح %1$s</string>
+    <string name="error_with_message">خطأ: %1$s</string>
+    <string name="test_customer_name">عميل تجريبي</string>
+    <string name="test_opening_maps">اختبار فتح الخرائط...</string>
+    <string name="bluetooth_permissions_required">اذونات البلوتوث مطلوبة</string>
+    <string name="add_quick_product">اضافة منتج بسرعة</string>
+    <string name="fixed_successfully">اصلحت بنجاح</string>
+    <string name="loading_notifications">تحميل التحذيرات</string>
+
+
+</resources>

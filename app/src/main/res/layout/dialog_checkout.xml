@@ -66,26 +66,24 @@
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />
 
-    <RadioGroup
-        android:id="@+id/paymentMethodRadioGroup"
+    <!-- ScrollView لطرق الدفع المتعددة -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:maxHeight="150dp"
         android:layout_marginBottom="16dp">
 
-        <RadioButton
-            android:id="@+id/cashRadioButton"
+        <RadioGroup
+            android:id="@+id/paymentMethodRadioGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="نقداً"
-            android:checked="true" />
+            android:orientation="vertical">
 
-        <RadioButton
-            android:id="@+id/creditRadioButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ديناً" />
-    </RadioGroup>
+            <!-- سيتم إضافة RadioButtons برمجياً -->
+
+        </RadioGroup>
+
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -98,8 +96,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="left"
-            android:text="0.00 ريال"
+            android:gravity="start"
+            android:text="0.00 دج"
             android:textSize="18sp"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold" />

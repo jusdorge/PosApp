@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="إدارة الزبائن"
+            android:text="@string/customers_management"
             android:textColor="@color/colorWhite"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -35,7 +35,7 @@
             android:background="@drawable/search_background"
             android:drawableStart="@android:drawable/ic_menu_search"
             android:drawablePadding="8dp"
-            android:hint="بحث عن زبون..."
+            android:hint="@string/search_customer_hint"
             android:padding="8dp"
             android:textSize="16sp" />
 
@@ -45,25 +45,39 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:backgroundTint="@color/colorAccent"
-            android:text="إضافة زبون"
+            android:text="@string/add_customer"
+            android:textColor="@color/colorWhite" />
+
+        <Button
+            android:id="@+id/shareAllQRCodesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="@color/chartBlue"
+            android:text="@string/share_all_customers_qr"
             android:textColor="@color/colorWhite" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/customersRecyclerView"
+    <!-- Container للقوائم لتجنب التداخل -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="4dp" />
+        android:layout_weight="1">
 
-    <TextView
-        android:id="@+id/emptyCustomersTextView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="لا يوجد زبائن"
-        android:textSize="18sp"
-        android:visibility="gone" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/customersRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="4dp" />
+
+        <TextView
+            android:id="@+id/emptyCustomersTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_customers"
+            android:textSize="18sp"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </LinearLayout> 

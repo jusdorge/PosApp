@@ -4,15 +4,16 @@ plugins {
 }
 
 android {
-    namespace 'com.example.posapp'
+    namespace 'com.example.islamicquiz'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.example.posapp"
-        minSdk 24
+        applicationId "com.example.islamicquiz"
+        minSdk 26
         targetSdk 35
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -30,6 +31,25 @@ android {
     buildFeatures {
         viewBinding true
     }
+    
+    // حل مشكلة MediaTek والأجهزة المختلفة
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        // استبعاد ملفات MediaTek المشكوك فيها
+        exclude '**/mediatek/**'
+        exclude '**/mtk/**'
+    }
+    
+    // تعامل مع أخطاء النظام
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'MissingTranslation'
+    }
 }
 
 dependencies {
@@ -38,6 +58,7 @@ dependencies {
     implementation libs.firebase.firestore
     implementation libs.firebase.analytics
     implementation libs.google.firebase.auth
+    implementation 'com.google.firebase:firebase-storage'
 
     // Google Play Services
     implementation libs.play.services.auth
@@ -46,6 +67,19 @@ dependencies {
     // OpenStreetMap
     implementation 'org.osmdroid:osmdroid-android:6.1.17'
 
+    // QR Code Generation
+    implementation 'com.google.zxing:core:3.5.2'
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
+    // CSV Files Support - Better Android compatibility
+    implementation 'com.opencsv:opencsv:5.7.1'
+
+    // JSON parsing for UserSession
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    // Charts Library for Analytics
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
     // Android Core Dependencies
     implementation libs.appcompat
     implementation libs.material
@@ -53,6 +87,12 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.fragment
     implementation libs.firebase.auth
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
+    // Image loading
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
 
     // Testing
     testImplementation libs.junit
