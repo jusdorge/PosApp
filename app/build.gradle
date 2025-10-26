@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.posapp'
+    namespace 'com.example.islamicquiz'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.example.posapp"
+        applicationId "com.example.islamicquiz"
         minSdk 26
         targetSdk 35
         versionCode 1

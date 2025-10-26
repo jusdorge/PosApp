@@ -41,9 +41,9 @@
 -dontwarn com.google.android.gms.**
 
 # حماية فئات التطبيق الأساسية
--keep class com.example.posapp.model.** { *; }
--keep class com.example.posapp.UserSession { *; }
--keep class com.example.posapp.MyPOSApplication { *; }
+-keep class com.example.islamicquiz.model.** { *; }
+-keep class com.example.islamicquiz.UserSession { *; }
+-keep class com.example.islamicquiz.MyPOSApplication { *; }
 
 # حماية فئات Firestore
 -keepclassmembers class * {

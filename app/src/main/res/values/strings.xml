@@ -812,6 +812,11 @@
     <string name="new_invoice">فاتورة جديدة</string>
     <string name="add_product">إضافة منتج</string>
     <string name="add_customer">إضافة زبون</string>
+    <string name="product_image">صورة المنتج</string>
+    <string name="change_image">تغيير الصورة</string>
+    <string name="image_chosen">تم اختيار الصورة</string>
+    <string name="uploading_image">جارٍ رفع الصورة...</string>
+    <string name="failed_upload_image">فشل رفع الصورة: </string>
     <string name="add_new_product">إضافة منتوج جديد</string>
 
     <string name="add_to_invoice">إضافة للفاتورة</string>

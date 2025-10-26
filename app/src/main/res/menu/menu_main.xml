@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.posapp.MainActivity">
+    tools:context="com.example.islamicquiz.MainActivity">
     
     <!-- عنصر إضافة/اختيار عميل - يظهر كأيقونة في الـ toolbar -->
     <item

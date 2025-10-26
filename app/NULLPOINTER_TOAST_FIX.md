@@ -163,24 +163,26 @@ E/DialogUtils: Error showing toast: رسالة خطأ
 ## 🔄 تطبيق المستقبلي
 
 ### لإضافة DialogFragment جديد:
+
 ```java
 // استخدم DialogUtils بدلاً من Toast مباشرة
-import com.example.posapp.utils.DialogUtils;
+
+import com.example.islamicquiz.utils.DialogUtils;
 
 public class MyDialog extends DialogFragment {
     private void someAsyncOperation() {
         firestore.collection("data")
-            .add(data)
-            .addOnSuccessListener(result -> {
-                // آمن - لن يحدث NullPointerException
-                DialogUtils.showToastSafely(this, "نجح العمل");
-                DialogUtils.dismissSafely(this);
-            })
-            .addOnFailureListener(e -> {
-                // مع logging للتشخيص
-                android.util.Log.e("MyDialog", "فشل العملية", e);
-                DialogUtils.showToastSafely(this, "فشل: " + e.getMessage());
-            });
+                .add(data)
+                .addOnSuccessListener(result -> {
+                    // آمن - لن يحدث NullPointerException
+                    DialogUtils.showToastSafely(this, "نجح العمل");
+                    DialogUtils.dismissSafely(this);
+                })
+                .addOnFailureListener(e -> {
+                    // مع logging للتشخيص
+                    android.util.Log.e("MyDialog", "فشل العملية", e);
+                    DialogUtils.showToastSafely(this, "فشل: " + e.getMessage());
+                });
     }
 }
 ```

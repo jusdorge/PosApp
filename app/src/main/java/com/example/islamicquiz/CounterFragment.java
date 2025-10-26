@@ -1,0 +1,388 @@
+package com.example.islamicquiz;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.islamicquiz.model.Customer;
+import com.example.islamicquiz.model.InvoiceItem;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.islamicquiz.service.CustomerVisitService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CounterFragment extends Fragment implements InvoiceAdapter.OnInvoiceItemDeleteListener, EditInvoiceItemDialog.OnItemUpdatedListener {
+    private static final int QR_SCANNER_REQUEST_CODE = 1001;
+    
+    private static TextView invoiceCustomerValueTextView;
+    private RecyclerView invoiceItemsRecyclerView;
+    private TextView totalPriceTextView;
+    private Button checkoutButton;
+    private Button scanQRButton;
+    private static Button clearCustomerButton;
+    private InvoiceAdapter invoiceAdapter;
+    private static List<InvoiceItem> invoiceItems = new ArrayList<>();
+    private double totalPrice = 0.0;
+    
+    private FirebaseFirestore db;
+    private static Customer currentCustomer;
+    
+    // متغيرات لتتبع الفاتورة المحملة لتجنب التكرار
+    private static String loadedInvoiceId = null;
+    private static boolean isEditingExistingInvoice = false;
+
+    public static CounterFragment activeInstance;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_counter, container, false);
+
+        activeInstance = this;
+        db = FirebaseFirestore.getInstance();
+        
+        // ربط العناصر من واجهة المستخدم
+        invoiceItemsRecyclerView = view.findViewById(R.id.invoiceItemsRecyclerView);
+        totalPriceTextView = view.findViewById(R.id.totalPriceTextView);
+        checkoutButton = view.findViewById(R.id.checkoutButton);
+        scanQRButton = view.findViewById(R.id.scanQRButton);
+        clearCustomerButton = view.findViewById(R.id.clearCustomerButton);
+        invoiceCustomerValueTextView = view.findViewById(R.id.invoiceCustomerValueTextView);
+        if (currentCustomer != null) {
+            invoiceCustomerValueTextView.setText(currentCustomer.getName());
+            clearCustomerButton.setVisibility(View.VISIBLE);
+        } else {
+            clearCustomerButton.setVisibility(View.GONE);
+        }
+
+        // إعداد محول الفاتورة
+        invoiceAdapter = new InvoiceAdapter(invoiceItems, this);
+        
+        // تعيين مستمع للنقر على عناصر الفاتورة لتعديلها
+        invoiceAdapter.setOnInvoiceItemClickListener((item, position) -> {
+            EditInvoiceItemDialog dialog = EditInvoiceItemDialog.newInstance(item, position);
+            dialog.setOnItemUpdatedListener(this);
+            dialog.show(getChildFragmentManager(), "EditInvoiceItemDialog");
+        });
+        
+        invoiceItemsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        invoiceItemsRecyclerView.setAdapter(invoiceAdapter);
+
+        // تحديث البادج في البداية
+        updateTotalPrice();
+
+        // إعداد مستمع زر الدفع
+        checkoutButton.setOnClickListener(v -> {
+            if (invoiceItems.isEmpty()) {
+                Toast.makeText(getContext(), "الفاتورة فارغة", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            // إظهار نافذة الدفع
+            CheckoutDialog dialog;
+    
+            if (currentCustomer != null) {
+                dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice, currentCustomer);
+            } else {
+                dialog = CheckoutDialog.newInstance(new ArrayList<>(invoiceItems), totalPrice);
+            }
+            dialog.setOnInvoiceCompletedListener(() -> {
+                // مسح الفاتورة بعد الدفع
+                invoiceItems.clear();
+                invoiceAdapter.notifyDataSetChanged();
+                updateTotalPrice();
+            });
+            dialog.show(getChildFragmentManager(), "CheckoutDialog");
+        });
+
+        // إعداد مستمع زر مسح QR Code
+        scanQRButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), QRScannerActivity.class);
+            startActivityForResult(intent, QR_SCANNER_REQUEST_CODE);
+        });
+
+        // إعداد مستمع زر حذف العميل
+        clearCustomerButton.setOnClickListener(v -> {
+            showClearCustomerConfirmDialog();
+        });
+
+        // تحديث إجمالي السعر
+        updateTotalPrice();
+
+        return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        
+        if (activeInstance == this) {
+            activeInstance = null;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        // تحديث قائمة الفاتورة وإجمالي السعر عند العودة إلى الشاشة
+        if (invoiceAdapter != null) {
+            invoiceAdapter.notifyDataSetChanged();
+            updateTotalPrice();
+        }
+        
+        // تحديث البادج عند العودة للـ fragment
+        updateCounterBadge();
+        
+        // تحديث عرض العميل وزر الحذف
+        if (invoiceCustomerValueTextView != null) {
+            if (currentCustomer != null) {
+                invoiceCustomerValueTextView.setText(currentCustomer.getName());
+                if (clearCustomerButton != null) {
+                    clearCustomerButton.setVisibility(View.VISIBLE);
+                }
+            } else {
+                invoiceCustomerValueTextView.setText("مجهول");
+                if (clearCustomerButton != null) {
+                    clearCustomerButton.setVisibility(View.GONE);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onInvoiceItemDelete(int position) {
+        if (position >= 0 && position < invoiceItems.size()) {
+            invoiceItems.remove(position);
+            invoiceAdapter.notifyDataSetChanged();
+            updateTotalPrice();
+        }
+    }
+
+    @Override
+    public void onItemUpdated(InvoiceItem item, int position) {
+        if (position >= 0 && position < invoiceItems.size()) {
+            // تحديث عنصر الفاتورة بالقيم الجديدة
+            InvoiceItem currentItem = invoiceItems.get(position);
+            currentItem.setPrice(item.getPrice());
+            currentItem.setQuantity(item.getQuantity());
+            
+            invoiceAdapter.notifyItemChanged(position);
+            updateTotalPrice();
+            
+            Toast.makeText(getContext(), "تم تحديث المنتج بنجاح", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == QR_SCANNER_REQUEST_CODE && resultCode == getActivity().RESULT_OK) {
+            if (data != null) {
+                String customerId = data.getStringExtra("customer_id");
+                String qrData = data.getStringExtra("qr_data");
+                
+                if (customerId != null && !customerId.trim().isEmpty()) {
+                    loadCustomerById(customerId);
+                } else {
+                    Toast.makeText(getContext(), "خطأ في قراءة معرف العميل", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    // طريقة عامة لإضافة عنصر إلى الفاتورة
+    public static void addToInvoice(InvoiceItem item) {
+        // التحقق مما إذا كان المنتج موجودًا بالفعل في الفاتورة
+        boolean found = false;
+        for (InvoiceItem invoiceItem : invoiceItems) {
+            if (invoiceItem.getProductId().equals(item.getProductId())) {
+                // زيادة الكمية إذا كان المنتج موجوداً بالفعل
+                invoiceItem.setQuantity(invoiceItem.getQuantity() + item.getQuantity());
+                found = true;
+                break;
+            }
+        }
+        
+        // إذا لم يكن المنتج موجودًا، أضفه
+        if (!found) {
+            invoiceItems.add(item);
+        }
+        // تحديث واجهة المستخدم إذا كان الـ Fragment نشطًا
+        if (activeInstance != null) {
+            activeInstance.invoiceAdapter.notifyDataSetChanged();
+            activeInstance.updateTotalPrice();
+        }
+    }
+    public static void setCustomer(Customer customer) {
+        currentCustomer = customer;
+        
+        // تحديث TextView وزر الحذف إذا كان Fragment نشطًا
+        if (activeInstance != null && invoiceCustomerValueTextView != null) {
+            if (customer != null) {
+                invoiceCustomerValueTextView.setText(customer.getName());
+                if (clearCustomerButton != null) {
+                    clearCustomerButton.setVisibility(View.VISIBLE);
+                }
+            } else {
+                invoiceCustomerValueTextView.setText("مجهول");
+                if (clearCustomerButton != null) {
+                    clearCustomerButton.setVisibility(View.GONE);
+                }
+            }
+        }
+    }
+
+    public static Customer getCurrentCustomer() {
+        return currentCustomer;
+    }
+
+    public static void clearInvoice() {
+        invoiceItems.clear();
+        
+        // مسح معلومات الفاتورة المحملة
+        loadedInvoiceId = null;
+        isEditingExistingInvoice = false;
+        
+        if (activeInstance != null && activeInstance.invoiceAdapter != null) {
+            activeInstance.invoiceAdapter.notifyDataSetChanged();
+            activeInstance.updateTotalPrice();
+        }
+    }
+    
+    /**
+     * تحميل فاتورة موجودة للتعديل
+     */
+    public static void loadExistingInvoice(String invoiceId, List<InvoiceItem> items, Customer customer) {
+        // مسح الفاتورة الحالية
+        clearInvoice();
+        
+        // تعيين معلومات الفاتورة المحملة
+        loadedInvoiceId = invoiceId;
+        isEditingExistingInvoice = true;
+        
+        // إضافة منتجات الفاتورة
+        if (items != null) {
+            invoiceItems.addAll(items);
+        }
+        
+        // تعيين العميل
+        setCustomer(customer);
+        
+        // تحديث الواجهة
+        if (activeInstance != null && activeInstance.invoiceAdapter != null) {
+            activeInstance.invoiceAdapter.notifyDataSetChanged();
+            activeInstance.updateTotalPrice();
+        }
+    }
+    
+    /**
+     * الحصول على معرف الفاتورة المحملة
+     */
+    public static String getLoadedInvoiceId() {
+        return loadedInvoiceId;
+    }
+    
+    /**
+     * فحص ما إذا كان يتم تعديل فاتورة موجودة
+     */
+    public static boolean isEditingExistingInvoice() {
+        return isEditingExistingInvoice;
+    }
+
+    public static void clearCustomer() {
+        currentCustomer = null;
+        if (activeInstance != null && invoiceCustomerValueTextView != null) {
+            invoiceCustomerValueTextView.setText("مجهول");
+            if (clearCustomerButton != null) {
+                clearCustomerButton.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void loadCustomerById(String customerId) {
+        // إظهار مؤشر التحميل
+        Toast.makeText(getContext(), "جاري تحميل بيانات العميل...", Toast.LENGTH_SHORT).show();
+        
+        db.collection("customers").document(customerId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Customer customer = documentSnapshot.toObject(Customer.class);
+                        if (customer != null) {
+                            customer.setId(documentSnapshot.getId());
+                            setCustomer(customer);
+                            // تسجيل زيارة العميل عند نجاح التحميل عبر المسح
+                            try {
+                                CustomerVisitService.getInstance(getContext()).logVisit(customer, "scan");
+                            } catch (Exception ignore) {}
+                            Toast.makeText(getContext(), "تم اختيار العميل: " + customer.getName(), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "خطأ في تحليل بيانات العميل", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "العميل غير موجود في قاعدة البيانات", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "فشل في تحميل بيانات العميل: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void updateTotalPrice() {
+        totalPrice = 0.0;
+        for (InvoiceItem item : invoiceItems) {
+            totalPrice += item.getQuantity()*item.getPrice();
+        }
+        totalPriceTextView.setText(CurrencyUtils.formatCurrency(totalPrice));
+        
+        // Update badge in MainActivity
+        updateCounterBadge();
+    }
+    
+    /**
+     * Update counter badge in MainActivity
+     */
+    private void updateCounterBadge() {
+        MainActivity mainActivity = MainActivity.getInstance();
+        if (mainActivity != null) {
+            mainActivity.updateCounterBadge(invoiceItems.size());
+        }
+    }
+    
+    /**
+     * عرض حوار تأكيد حذف العميل
+     */
+    private void showClearCustomerConfirmDialog() {
+        if (currentCustomer == null) {
+            return;
+        }
+        
+        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setTitle("حذف العميل")
+                .setMessage("هل أنت متأكد من حذف العميل \"" + currentCustomer.getName() + "\" من الفاتورة الحالية؟\n\nسيعود إلى الوضع الافتراضي: مجهول")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("حذف", (dialog, which) -> {
+                    String customerName = currentCustomer.getName();
+                    clearCustomer();
+                    Toast.makeText(getContext(), "✅ تم حذف العميل: " + customerName, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("إلغاء", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
+} 
