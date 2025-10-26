@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "420286289734",
+    "firebase_url": "https://posappai-default-rtdb.firebaseio.com",
+    "project_id": "posappai",
+    "storage_bucket": "posappai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420286289734:android:809b9faf905d8131a1b747",
+        "android_client_info": {
+          "package_name": "com.example.islamicquiz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNMe7Sqiaj2Ae5P1Hmm0zA1ZVXgIkeG0k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
